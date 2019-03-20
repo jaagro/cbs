@@ -5,9 +5,7 @@ import com.jaagro.cbs.api.dto.progress.BreedingBatchParamTrackingDto;
 import com.jaagro.cbs.api.dto.progress.BreedingProgressDto;
 import com.jaagro.cbs.api.dto.progress.BreedingRecordDto;
 import com.jaagro.cbs.api.dto.progress.DeviceValueDto;
-import com.jaagro.cbs.api.enums.BreedingRecordTypeEnum;
-import com.jaagro.cbs.api.enums.BreedingStandardParamEnum;
-import com.jaagro.cbs.api.enums.DeviceStatusEnum;
+import com.jaagro.cbs.api.enums.*;
 import com.jaagro.cbs.api.model.*;
 import com.jaagro.cbs.api.service.BreedingBrainService;
 import com.jaagro.cbs.api.service.BreedingPlanService;
@@ -234,17 +232,39 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                             }
                             returnDto.setActualResult(actualResult);
                             //如果养殖参数的值类型是"区间值"
-                            if (breedingBatchParameterDo.getValueType().equals(1)) {
+                            if (breedingBatchParameterDo.getValueType().equals(BreedingStandardValueTypeEnum.INTERVAL_VALUE.getCode())) {
                                 if (!CollectionUtils.isEmpty(actualResult)) {
                                     for (DeviceValueDto deviceValue : actualResult) {
-                                        //如果检测值不在标准区间里面，那个报警
+                                        //如果检测值不在标准区间里面则报警
                                         if (breedingBatchParameterDo.getLowerLimit().compareTo(deviceValue.getCurrentValue()) > 0 || deviceValue.getCurrentValue().compareTo(breedingBatchParameterDo.getUpperLimit()) > 0) {
-                                            returnDto.setAlarmMessage("检测值异常，其及时处理！");
+                                            returnDto.setAlarmMessage("检测值超范围异常，其及时处理！");
                                             break;
                                         }
                                     }
                                 }
+                            }else if (breedingBatchParameterDo.getValueType().equals(BreedingStandardValueTypeEnum.CRITICAL_VALUE.getCode())) {
+                                //如果养殖参数的值类型是"临界值"
+                                if (!CollectionUtils.isEmpty(actualResult)) {
+                                    for (DeviceValueDto deviceValue : actualResult) {
+                                        if(breedingBatchParameterDo.getThresholdDirection().equals(ThresholdDirectionEnum.LESS_THAN.getCode())){
+                                            //如果检测值大于参数临界则报警
+                                            BigDecimal paramValue = new BigDecimal(breedingBatchParameterDo.getParamValue());
+                                            if (deviceValue.getCurrentValue().compareTo(paramValue)==1) {
+                                                returnDto.setAlarmMessage("检测值大于临界值异常，其及时处理！");
+                                                break;
+                                            }
+                                        }
 
+                                        if(breedingBatchParameterDo.getThresholdDirection().equals(ThresholdDirectionEnum.MORE_THAN.getCode())){
+                                            //如果检测值小于参数临界则报警
+                                            BigDecimal paramValue = new BigDecimal(breedingBatchParameterDo.getParamValue());
+                                            if (deviceValue.getCurrentValue().compareTo(paramValue)==-1) {
+                                                returnDto.setAlarmMessage("检测值小于临界值异常，其及时处理！");
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
