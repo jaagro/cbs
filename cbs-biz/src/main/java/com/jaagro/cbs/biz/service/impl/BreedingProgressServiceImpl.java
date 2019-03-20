@@ -237,7 +237,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                                     for (DeviceValueDto deviceValue : actualResult) {
                                         //如果检测值不在标准区间里面则报警
                                         if (breedingBatchParameterDo.getLowerLimit().compareTo(deviceValue.getCurrentValue()) > 0 || deviceValue.getCurrentValue().compareTo(breedingBatchParameterDo.getUpperLimit()) > 0) {
-                                            returnDto.setAlarmMessage("检测值异常，其及时处理！");
+                                            returnDto.setAlarmMessage("检测值超范围异常，其及时处理！");
                                             break;
                                         }
                                     }
@@ -250,7 +250,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                                             //如果检测值大于参数临界则报警
                                             BigDecimal paramValue = new BigDecimal(breedingBatchParameterDo.getParamValue());
                                             if (deviceValue.getCurrentValue().compareTo(paramValue)==1) {
-                                                returnDto.setAlarmMessage("检测值异常，其及时处理！");
+                                                returnDto.setAlarmMessage("检测值大于临界值异常，其及时处理！");
                                                 break;
                                             }
                                         }
@@ -259,7 +259,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                                             //如果检测值小于参数临界则报警
                                             BigDecimal paramValue = new BigDecimal(breedingBatchParameterDo.getParamValue());
                                             if (deviceValue.getCurrentValue().compareTo(paramValue)==-1) {
-                                                returnDto.setAlarmMessage("检测值异常，其及时处理！");
+                                                returnDto.setAlarmMessage("检测值小于临界值异常，其及时处理！");
                                                 break;
                                             }
                                         }
