@@ -68,7 +68,7 @@ public class BreedingStandardController {
     public BaseResponse breedingStandard(@PathVariable("standardId") Integer standardId){
         log.info("O delete breedingStandard standardId={}",standardId);
         breedingStandardService.delBreedingStandard(standardId);
-        return BaseResponse.successInstance("删除养殖标准模板");
+        return BaseResponse.successInstance("删除养殖标准模板成功");
     }
     @ApiOperation("查看养殖模板基本信息")
     @GetMapping("/breedingStandard/{id}")

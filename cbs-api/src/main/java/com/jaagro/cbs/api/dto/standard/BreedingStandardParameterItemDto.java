@@ -37,4 +37,9 @@ public class BreedingStandardParameterItemDto implements Serializable{
      * 参数值(标准值,临界值)
      */
     private String paramValue;
+
+    /**
+     * 临界值方向(1->=,2<=)
+     */
+    private Integer thresholdDirection;
 }

@@ -669,10 +669,10 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         if (!CollectionUtils.isEmpty(contractPriceSectionDtoList)) {
             List<ContractPriceSection> contractPriceSectionList = new ArrayList<>();
             for (ContractPriceSectionDto dto : contractPriceSectionDtoList) {
-                if (dto.getWeightLower().compareTo(new BigDecimal("99.99")) == 1 || dto.getWeightUpper().compareTo(new BigDecimal("99.99")) == 1){
+                if (dto.getWeightLower().compareTo(new BigDecimal("99.99")) == 1 || dto.getWeightUpper().compareTo(new BigDecimal("99.99")) == 1) {
                     throw new RuntimeException("鸡重起止要小于100");
                 }
-                if (dto.getRecyclingPrice().compareTo(new BigDecimal("9999.99")) == 1){
+                if (dto.getRecyclingPrice().compareTo(new BigDecimal("9999.99")) == 1) {
                     throw new RuntimeException("回收价格要小于10000");
                 }
                 ContractPriceSection contractPriceSection = new ContractPriceSection();
@@ -755,11 +755,11 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         List<Plant> plants = breedingPlantService.listPlantInfoByPlanId(breedingPlan.getId());
         returnBreedingPlanDto.setPlants(plants);
         //养殖户信息
-        CustomerContactsReturnDto contactsReturnDto = customerClientService.getCustomerContactByCustomerId(breedingPlan.getCustomerId());
-        if (contactsReturnDto != null) {
+        CustomerInfoParamDto customerInfo = getCustomerInfo(breedingPlan.getCustomerId());
+        if (customerInfo != null) {
             returnBreedingPlanDto
-                    .setCustomerName(contactsReturnDto.getContact())
-                    .setCustomerPhone(contactsReturnDto.getPhone());
+                    .setCustomerName(customerInfo.getCustomerName())
+                    .setCustomerPhone(customerInfo.getCustomerPhone());
         }
         //技术员信息
         BaseResponse<List<ListEmployeeDto>> empByDeptId = userClientService.listTechnician();

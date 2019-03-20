@@ -297,8 +297,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
                     .setStatus(parameter.getStatus())
                     .setUnit(parameter.getUnit())
                     .setValueType(parameter.getValueType())
-                    .setDisplayOrder(parameter.getDisplayOrder())
-                    .setThresholdDirection(parameter.getThresholdDirection());
+                    .setDisplayOrder(parameter.getDisplayOrder());
             List<BreedingStandardParameterItemDto> breedingStandardParameterList = new ArrayList<>();
             for (BreedingStandardParameter parameterIn : parameterList){
                 BreedingStandardParameterItemDto itemDto = new BreedingStandardParameterItemDto();
@@ -306,7 +305,8 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
                         .setId(parameterIn.getId())
                         .setLowerLimit(parameterIn.getLowerLimit())
                         .setUpperLimit(parameterIn.getUpperLimit())
-                        .setParamValue(parameterIn.getParamValue());
+                        .setParamValue(parameterIn.getParamValue())
+                        .setThresholdDirection(parameterIn.getThresholdDirection());
                 breedingStandardParameterList.add(itemDto);
             }
             dto.setBreedingStandardParameterList(breedingStandardParameterList);

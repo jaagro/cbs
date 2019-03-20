@@ -82,4 +82,8 @@ public class TestController {
         batchPlantCoopMapper.insertBatch(list);
     }
 
+    public void test(){
+
+    }
+
 }
