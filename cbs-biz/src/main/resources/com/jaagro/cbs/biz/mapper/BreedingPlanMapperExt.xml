@@ -84,12 +84,16 @@
             <if test="createUserName!=null">
                 and bp.create_user_name like concat('%', #{createUserName},'%')
             </if>
+            <if test="batchNo!=null">
+                and bp.batch_no=#{batchNo}
+            </if>
         </where>
     </select>
     <select id="listBreedingParamTemplate" resultType="com.jaagro.cbs.api.dto.standard.ReturnBreedingParamTemplateDto"
             parameterType="com.jaagro.cbs.api.dto.standard.BreedingParamTemplateCriteria">
         select distinct bp.id, bp.batch_no ,bp.customer_id,
-        bp.plan_chicken_quantity,bp.plan_time ,bp.plan_status,bp.create_user_name,bs.standard_name,bs.id breedingStandardId
+        bp.plan_chicken_quantity,bp.plan_time ,bp.plan_status,bp.create_user_name,bs.standard_name,bs.id
+        breedingStandardId
         from breeding_plan bp inner join breeding_batch_parameter bbp on (bp.id=bbp.param_id)
         inner join breeding_standard_parameter bsp on (bbp.param_id=bsp.id)
         inner join breeding_standard bs on (bsp.standard_id=bs.id )
@@ -111,7 +115,8 @@
         </where>
     </select>
     <select id="listToSlaughterConfirm" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List"/>
+        SELECT
+        <include refid="Base_Column_List"/>
         FROM breeding_plan
         WHERE
         enable = 1
