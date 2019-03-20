@@ -85,7 +85,7 @@
                 and bp.create_user_name like concat('%', #{createUserName},'%')
             </if>
             <if test="batchNo!=null">
-                and bp.batch_no=#{batchNo}
+                and bp.batch_no like concat('%', #{batchNo},'%')
             </if>
         </where>
     </select>
