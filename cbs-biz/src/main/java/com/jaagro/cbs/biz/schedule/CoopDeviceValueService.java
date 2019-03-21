@@ -71,8 +71,7 @@ public class CoopDeviceValueService {
                 deviceValueMapper.insertBatch(historyList);
             }
 
-
-            redis.del("Scheduled:redisLock:coopDeviceValue");
+            redisLock.unLock("Scheduled:redisLock:coopDeviceValue");
         }
         log.info("coopDeviceValue:定时钟执行结束");
     }

@@ -1,6 +1,5 @@
 package com.jaagro.cbs.biz.mapper;
 
-import com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto;
 import com.jaagro.cbs.api.dto.farmer.BreedingRecordDto;
 import com.jaagro.cbs.api.model.*;
 import com.jaagro.cbs.biz.mapper.base.BaseMapper;
@@ -25,7 +24,7 @@ public interface BreedingRecordMapperExt extends BaseMapper<BreedingRecord, Bree
      * @param todayDate
      * @return
      */
-    List<BreedingRecord> listSumByParams(@Param("todayDate") String todayDate);
+    List<BreedingRecordDaily> listBreedingDailyByParams(@Param("todayDate") String todayDate);
 
     /**
      * 鸡舍养殖每日汇总
@@ -42,14 +41,6 @@ public interface BreedingRecordMapperExt extends BaseMapper<BreedingRecord, Bree
      * @return
      */
     List<BatchInfo> listBatchInfoByParams(@Param("todayDate") String todayDate);
-
-    /**
-     * 死淘数量 -- 根据批次
-     *
-     * @param criteriaDto
-     * @return
-     */
-    int sumDeadAmountByPlanId(BatchInfoCriteriaDto criteriaDto);
 
     /**
      * 根据条件查询养殖记录列表

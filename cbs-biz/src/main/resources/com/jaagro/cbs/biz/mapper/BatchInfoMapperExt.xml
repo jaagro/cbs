@@ -6,7 +6,7 @@
 
     <delete id="deleteByDate" parameterType="java.lang.String">
         delete from batch_info
-        where DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{todayDate}
+        where DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{todayDate}, '%Y-%m-%d' )
     </delete>
     <insert id="insertBatch" parameterType="com.jaagro.cbs.api.model.BatchInfo">
         <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
@@ -27,7 +27,8 @@
             #{item.fodderAmount,jdbcType=DECIMAL},
             #{item.fodderValue,jdbcType=DECIMAL}, #{item.babychickValue,jdbcType=DECIMAL},
             #{item.drugValue,jdbcType=DECIMAL},
-            #{item.saleValue,jdbcType=DECIMAL}, #{item.balance,jdbcType=DECIMAL}, #{item.enable,jdbcType=BIT}, #{item.createUserId,jdbcType=INTEGER})
+            #{item.saleValue,jdbcType=DECIMAL}, #{item.balance,jdbcType=DECIMAL}, #{item.enable,jdbcType=BIT},
+            #{item.createUserId,jdbcType=INTEGER})
         </foreach>
     </insert>
     <select id="getStartAmountByPlanId" parameterType="com.jaagro.cbs.api.model.BatchInfo"
@@ -38,8 +39,12 @@
             batch_info
         WHERE
             ENABLE = 1
-            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{createTime}
+            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{createTime}, '%Y-%m-%d' )
             AND plan_id = #{planId}
+            AND day_age = #{dayAge}
+        ORDER BY
+            create_time
+            LIMIT 1
     </select>
 
     <select id="getTheLatestBatchInfo" resultMap="BaseResultMap" parameterType="java.lang.Integer">

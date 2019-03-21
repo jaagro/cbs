@@ -90,7 +90,7 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
             batchCoopDailyMapper.batchInsert(dailyList);
 
             //去锁
-            redis.del("Scheduled:BatchCoopDailyService:batchCoopDaily");
+            redisLock.unLock("Scheduled:BatchCoopDailyService:batchCoopDaily");
         }
     }
 }
