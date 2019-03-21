@@ -6,6 +6,7 @@ import com.jaagro.cbs.api.dto.ValidList;
 import com.jaagro.cbs.api.dto.plan.CustomerInfoParamDto;
 import com.jaagro.cbs.api.dto.standard.*;
 import com.jaagro.cbs.api.enums.BreedingStandardParamEnum;
+import com.jaagro.cbs.api.enums.BreedingStandardValueTypeEnum;
 import com.jaagro.cbs.api.enums.PlanStatusEnum;
 import com.jaagro.cbs.api.enums.SortTypeEnum;
 import com.jaagro.cbs.api.model.BreedingStandard;
@@ -20,11 +21,14 @@ import com.jaagro.cbs.biz.mapper.BreedingStandardMapperExt;
 import com.jaagro.cbs.biz.mapper.BreedingStandardParameterMapperExt;
 import com.jaagro.constant.UserInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Case;
+import org.hibernate.validator.internal.xml.ParameterType;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import sun.font.TrueTypeFont;
 
 import java.util.*;
 
@@ -50,7 +54,6 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
     private BreedingPlanMapperExt breedingPlanMapper;
     @Autowired
     private BreedingPlanService breedingPlanService;
-
     /**
      * 创建养殖模版与参数
      *
@@ -286,8 +289,8 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
                 .andStandardIdEqualTo(standardId).andParamTypeEqualTo(paramType).andParamNameEqualTo(paramName);
         parameterExample.setOrderByClause("day_age asc");
         List<BreedingStandardParameter> parameterList = standardParameterMapper.selectByExample(parameterExample);
+        BreedingParameterListDto dto = new BreedingParameterListDto();
         if (!CollectionUtils.isEmpty(parameterList)){
-            BreedingParameterListDto dto = new BreedingParameterListDto();
             BreedingStandardParameter parameter = parameterList.get(0);
             dto.setAlarm(parameter.getAlarm())
                     .setNecessary(parameter.getNecessary())
@@ -311,10 +314,62 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
             }
             dto.setBreedingStandardParameterList(breedingStandardParameterList);
             return dto;
+        }else {
+            generateInitParamList(dto,paramName,paramType,standardId);
         }
-        return null;
+        return dto;
     }
 
+   private void generateInitParamList(BreedingParameterListDto dto,String paramName,Integer paramType,Integer standardId){
+       boolean isInitParam = ("体重标准".equals(paramName) && BreedingStandardParamEnum.WEIGHT.getCode() == paramType)
+               || ("饲喂重量".equals(paramName) && BreedingStandardParamEnum.FEEDING_WEIGHT.getCode() == paramType)
+               || ("饲喂次数".equals(paramName) && BreedingStandardParamEnum.FEEDING_FODDER_NUM.getCode() == paramType)
+               || ("死淘".equals(paramName) && BreedingStandardParamEnum.DIE.getCode() == paramType);
+       if (isInitParam){
+           BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(standardId);
+           if (breedingStandard == null){
+               throw new RuntimeException("模板id="+standardId+"不存在");
+           }
+           Integer breedingDays = breedingStandard.getBreedingDays();
+           if (breedingDays == null){
+               throw new RuntimeException("喂养天数为空");
+           }
+           switch (paramName){
+               case "体重标准" :
+                   dto.setDisplayOrder(1);
+                   dto.setUnit("克/只/日");
+                   break;
+               case "饲喂重量" :
+                   dto.setDisplayOrder(2);
+                   dto.setUnit("克/只/日");
+                   break;
+               case "饲喂次数" :
+                   dto.setDisplayOrder(3);
+                   dto.setUnit("次");
+                   break;
+               case "死淘" :
+                   dto.setDisplayOrder(4);
+                   dto.setUnit("%");
+                   break;
+               default:
+                   break;
+           }
+           dto.setValueType(BreedingStandardValueTypeEnum.STANDARD_VALUE.getCode())
+                   .setStatus(1)
+                   .setStandardId(standardId)
+                   .setParamName(paramName)
+                   .setParamType(paramType)
+                   .setNecessary(Boolean.TRUE)
+                   .setAlarm(Boolean.TRUE);
+           List<BreedingStandardParameterItemDto> breedingStandardParameterList = new ArrayList<>();
+           for (int i = 0; i < breedingDays; i++){
+               BreedingStandardParameterItemDto itemDto = new BreedingStandardParameterItemDto();
+               itemDto.setDayAge(i+1);
+               breedingStandardParameterList.add(itemDto);
+           }
+           dto.setBreedingStandardParameterList(breedingStandardParameterList);
+       }
+    }
     /**
      * 根据模板id查询药品配置信息
      *
@@ -342,18 +397,39 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         if (CollectionUtils.isEmpty(parameterTypeDtoList)){
             throw new RuntimeException("养殖模板参数为空");
         }
+        List<BreedingStandardParameter> needUpdateDisplayOrderList = new ArrayList<>();
         for (ParameterTypeDto parameterTypeDto : parameterTypeDtoList){
             if (dto.getParamName().equals(parameterTypeDto.getParamName()) && dto.getParamType().equals(parameterTypeDto.getParamType())){
                 if (SortTypeEnum.UP.equals(sortType)){
-
+                    if (dto.getDisplayOrder() <= 1){
+                        break;
+                    }
+                    if (dto.getParamType().equals(parameterTypeDto.getParamType()) && dto.getParamName().equals(parameterTypeDto.getParamName())){
+                        parameterTypeDto.setDisplayOrder(parameterTypeDto.getDisplayOrder()-1);
+                    }
+                    if (dto.getDisplayOrder() < parameterTypeDto.getDisplayOrder() || (dto.getDisplayOrder() == parameterTypeDto.getDisplayOrder() - 1)){
+                        parameterTypeDto.setDisplayOrder(parameterTypeDto.getDisplayOrder()+1);
+                    }
                 }else {
-
+                    if (dto.getDisplayOrder() >= parameterTypeDtoList.size()){
+                        break;
+                    }
+                    if (dto.getParamType().equals(parameterTypeDto.getParamType()) && dto.getParamName().equals(parameterTypeDto.getParamName())){
+                        parameterTypeDto.setDisplayOrder(parameterTypeDto.getDisplayOrder()+1);
+                    }
+                    if (dto.getDisplayOrder() > parameterTypeDto.getDisplayOrder() || (dto.getDisplayOrder() == parameterTypeDto.getDisplayOrder() + 1)){
+                        parameterTypeDto.setDisplayOrder(parameterTypeDto.getDisplayOrder()-1);
+                    }
                 }
+                BreedingStandardParameterExample parameterExample = new BreedingStandardParameterExample();
+                List<BreedingStandardParameter> parameterList = standardParameterMapper.selectByExample(parameterExample);
+                needUpdateDisplayOrderList.addAll(parameterList);
             }
         }
-
+        standardParameterMapper.batchUpdateByPrimaryKeySelective(needUpdateDisplayOrderList);
         return result;
     }
+
 
     /**
      * 获取养殖模板基本信息
