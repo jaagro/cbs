@@ -455,12 +455,21 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         }
         //更新采购单状态
         PurchaseOrder purchaseOrder = new PurchaseOrder();
-        purchaseOrder
-                .setId(dto.getPurchaseOrderId());
-        if (dto.getPurchaseOrderStatus() != null) {
+        if (dto.getPurchaseOrderId() != null) {
             purchaseOrder
-                    .setPurchaseOrderStatus(dto.getPurchaseOrderStatus());
-            purchaseOrderMapper.updateByPrimaryKeySelective(purchaseOrder);
+                    .setId(dto.getPurchaseOrderId());
+            if (dto.getPurchaseOrderStatus() != null) {
+                if (PurchaseOrderStatusEnum.PENDING_ARRIVED.getCode() == dto.getPurchaseOrderStatus()) {
+                    purchaseOrder
+                            .setDeliveryTime(new Date());
+                }
+                if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
+                    purchaseOrder.setSignerTime(new Date());
+                }
+                purchaseOrder
+                        .setPurchaseOrderStatus(dto.getPurchaseOrderStatus());
+                purchaseOrderMapper.updateByPrimaryKeySelective(purchaseOrder);
+            }
         }
     }
 
