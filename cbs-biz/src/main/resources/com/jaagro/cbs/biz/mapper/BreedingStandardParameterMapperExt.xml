@@ -168,4 +168,10 @@
         AND param_name = #{paramName}
         AND param_type = #{paramType}
     </delete>
+    <delete id="deleteByExample" parameterType="com.jaagro.cbs.api.model.BreedingStandardParameterExample" >
+        delete from breeding_standard_parameter
+        <if test="_parameter != null" >
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
 </mapper>
