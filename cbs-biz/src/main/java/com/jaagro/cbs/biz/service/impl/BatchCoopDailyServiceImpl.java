@@ -2,8 +2,6 @@ package com.jaagro.cbs.biz.service.impl;
 
 import com.jaagro.cbs.api.model.BatchCoopDaily;
 import com.jaagro.cbs.api.model.BreedingPlan;
-import com.jaagro.cbs.api.model.BreedingRecord;
-import com.jaagro.cbs.api.model.BreedingRecordExample;
 import com.jaagro.cbs.api.service.BatchCoopDailyService;
 import com.jaagro.cbs.biz.mapper.BatchCoopDailyMapperExt;
 import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
@@ -40,71 +38,51 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
     private RedisUtil redis;
 
     /**
-     * 获取昨天的日期
-     *
-     * @return
-     */
-    private String getDay() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        return sdf.format(new Date());
-    }
-
-    /**
      * 鸡舍养殖每日汇总
      */
     @Override
     public void batchCoopDaily() {
         //加锁
         long time = System.currentTimeMillis() + 10 * 1000;
-        boolean success = redisLock.lock("Scheduled:BatchCoopDailyService:batchCoopDaily", String.valueOf(time), null, null);
+        boolean success = redisLock.lock("Scheduled:redisLock:batchCoopDaily", String.valueOf(time), null, null);
         if (!success) {
             throw new RuntimeException("请求正在处理中");
         }
-        String todayDate = getDay();
-        //鸡舍日汇总列表
+        //格式化今日
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String todayDate = sdf.format(new Date());
+        //鸡舍养殖每日汇总列表
         List<BatchCoopDaily> dailyList = new ArrayList<>();
         //从BreedingRecord统计
-        BreedingRecordExample breedingRecordExample = new BreedingRecordExample();
-        breedingRecordExample.createCriteria()
-                .andEnableEqualTo(true);
-        List<BreedingRecord> breedingRecordList = breedingRecordMapper.listCoopDailySumByParams(todayDate);
+        List<BatchCoopDaily> breedingRecordList = breedingRecordMapper.listCoopDailyByParams(todayDate);
         if (!CollectionUtils.isEmpty(breedingRecordList)) {
-            for (BreedingRecord record : breedingRecordList) {
-                BatchCoopDaily daily = new BatchCoopDaily();
-                BeanUtils.copyProperties(record, daily);
-                //死淘数量
-                Integer deadAmount = breedingRecordMapper.sumDeadAmountByCoopId(record);
-                daily.setDeadAmount(deadAmount);
-                //起始喂养数量 && 剩余喂养数量
-                Date createDate = new Date();
-                DateUtils.ceiling(createDate, 2);
+            for (BatchCoopDaily batchCoopDaily : breedingRecordList) {
+                // 查询昨日剩余喂养数量 来当做今天的起始喂养数量
                 BatchCoopDaily coopDaily = new BatchCoopDaily();
-                coopDaily.setCreateTime(createDate).setCoopId(daily.getCoopId());
+                BeanUtils.copyProperties(batchCoopDaily, coopDaily);
+                coopDaily.setCreateTime(DateUtils.addDays(batchCoopDaily.getCreateTime(), -1));
+                // 昨日剩余喂养数量
                 Integer startAmount = batchCoopDailyMapper.getStartAmountByCoopId(coopDaily);
                 if (startAmount != null && startAmount > 0) {
-                    daily.setStartAmount(startAmount);
-                    if (deadAmount > 0) {
+                    batchCoopDaily.setStartAmount(startAmount);
+                    if (batchCoopDaily.getDeadAmount() != null) {
                         // 剩余喂养数量=起始-死淘
-                        daily.setCurrentAmount(daily.getStartAmount() - daily.getDeadAmount());
+                        batchCoopDaily.setCurrentAmount(batchCoopDaily.getStartAmount() - batchCoopDaily.getDeadAmount());
                     }
                 } else {
                     //查询不到记录，就用breeding_plan的计划上鸡数量
-                    BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(record.getPlanId());
+                    BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(batchCoopDaily.getPlanId());
                     if (breedingPlan != null) {
-                        daily.setStartAmount(breedingPlan.getPlanChickenQuantity());
+                        batchCoopDaily.setStartAmount(breedingPlan.getPlanChickenQuantity());
                         // 剩余喂养数量=计划上鸡数量
-                        daily.setCurrentAmount(breedingPlan.getPlanChickenQuantity());
+                        batchCoopDaily.setCurrentAmount(breedingPlan.getPlanChickenQuantity());
                     }
                 }
-                //出栏数量
-                //当日累积喂料次数
-                Integer countFeed = breedingRecordMapper.countFodderTimesByCoopId(record);
-                daily.setFodderTimes(countFeed);
-                //当日累积喂料量
-                daily.setFodderAmount(record.getBreedingValue());
-                daily.setCreateUserId(1);
+                //出栏数量 待定
+                //创建人
+                batchCoopDaily.setCreateUserId(1);
                 //
-                dailyList.add(daily);
+                dailyList.add(batchCoopDaily);
             }
             //插入前先删除
             batchCoopDailyMapper.deleteByDate(todayDate);
@@ -112,7 +90,7 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
             batchCoopDailyMapper.batchInsert(dailyList);
 
             //去锁
-            redis.del("Scheduled:BatchCoopDailyService:batchCoopDaily");
+            redisLock.unLock("Scheduled:redisLock:batchCoopDaily");
         }
     }
 }

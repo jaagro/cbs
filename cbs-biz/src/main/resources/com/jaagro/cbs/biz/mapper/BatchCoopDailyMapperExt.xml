@@ -12,8 +12,12 @@
             batch_coop_daily
         WHERE
             enable = 1
-            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{createTime}
+            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{createTime}, '%Y-%m-%d' )
             AND coop_id = #{coopId}
+            AND plan_id = #{planId}
+            AND day_age = #{dayAge}
+        OEDER BY create_time desc
+        LIMIT 1
     </select>
     <insert id="batchInsert" parameterType="com.jaagro.cbs.api.model.BatchCoopDaily">
         <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
@@ -39,6 +43,6 @@
     </insert>
     <delete id="deleteByDate" parameterType="java.lang.String">
     delete from batch_coop_daily
-    where DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{todayDate}
+    where DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{todayDate}, '%Y-%m-%d' )
   </delete>
 </mapper>

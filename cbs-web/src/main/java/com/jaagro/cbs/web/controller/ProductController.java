@@ -4,7 +4,6 @@ package com.jaagro.cbs.web.controller;
 import com.jaagro.cbs.api.dto.product.ListProductCriteria;
 
 import com.jaagro.cbs.api.service.ProductService;
-import com.jaagro.cbs.biz.service.OssSignUrlClientService;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
