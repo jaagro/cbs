@@ -118,4 +118,10 @@ public interface BreedingStandardService {
      * @param standardId
      */
     void delBreedingStandard(Integer standardId);
+
+    /**
+     * 养殖计划参数配置可选择养殖模板列表
+     * @return
+     */
+    List<BreedingStandard> listBreedingStandardForParamConfiguration();
 }

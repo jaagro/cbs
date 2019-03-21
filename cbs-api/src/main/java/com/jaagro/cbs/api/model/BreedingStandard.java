@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * @author :gaoxin
- * @date :2019/03/19
+ * @author :asus
+ * @date :2019/03/21
  */
 @Data
 @NoArgsConstructor
@@ -35,6 +35,11 @@ public class BreedingStandard implements Serializable {
      * 养殖天数
      */
     private Integer breedingDays;
+
+    /**
+     * 模板状态(0-待参数配置,1-可用)
+     */
+    private Integer standardStatus;
 
     /**
      * 是否有效(0-无效,1-有效)
