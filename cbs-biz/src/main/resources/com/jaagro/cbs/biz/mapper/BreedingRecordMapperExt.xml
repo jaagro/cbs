@@ -47,7 +47,7 @@
             batch_no,
             coop_id,
             day_age,
-            SUM(breeding_value) as breeding_value,
+            SUM( CASE WHEN record_type = 1 THEN breeding_value  END ) AS breeding_value,
             create_time
         FROM
             breeding_record
@@ -64,7 +64,7 @@
             breeding_record
         WHERE
             enable = 1
-            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{createTime}
+            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{createTime}, '%Y-%m-%d' )
             AND coop_id = #{coopId}
             AND plan_id = #{planId}
             AND record_type = 1
