@@ -14,6 +14,7 @@
             enable = 1
             AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{createTime}, '%Y-%m-%d' )
             AND coop_id = #{coopId}
+            AND plan_id = #{planId}
     </select>
     <insert id="batchInsert" parameterType="com.jaagro.cbs.api.model.BatchCoopDaily">
         <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">

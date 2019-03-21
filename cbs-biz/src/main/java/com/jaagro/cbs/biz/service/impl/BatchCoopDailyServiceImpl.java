@@ -10,6 +10,7 @@ import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
 import com.jaagro.cbs.biz.mapper.BreedingRecordMapperExt;
 import com.jaagro.cbs.biz.utils.RedisLock;
 import com.jaagro.cbs.biz.utils.RedisUtil;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,11 +77,11 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
                 daily.setDeadAmount(deadAmount);
                 //起始喂养数量 && 剩余喂养数量
                 BatchCoopDaily coopDaily = new BatchCoopDaily();
-                coopDaily.setCreateTime(record.getCreateTime()).setCoopId(daily.getCoopId());
+                coopDaily.setCreateTime(DateUtils.addDays(record.getCreateTime(), -1)).setCoopId(daily.getCoopId()).setPlanId(daily.getPlanId());
                 Integer startAmount = batchCoopDailyMapper.getStartAmountByCoopId(coopDaily);
                 if (startAmount != null && startAmount > 0) {
                     daily.setStartAmount(startAmount);
-                    if (deadAmount > 0) {
+                    if (deadAmount != null) {
                         // 剩余喂养数量=起始-死淘
                         daily.setCurrentAmount(daily.getStartAmount() - daily.getDeadAmount());
                     }
