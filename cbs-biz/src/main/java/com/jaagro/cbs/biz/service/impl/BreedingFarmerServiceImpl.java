@@ -182,6 +182,8 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                             Integer planChickenQuantity = returnBreedingBatchDetailsDto.getPlanChickenQuantity();
                             if (saleAmount != null) {
                                 breedingStock = new BigDecimal(planChickenQuantity).subtract(saleAmount);
+                            } else {
+                                breedingStock = new BigDecimal(planChickenQuantity);
                             }
                             if (breedingStock != null && deadAmount != null) {
                                 totalBreedingStock = breedingStock.subtract(deadAmount);
