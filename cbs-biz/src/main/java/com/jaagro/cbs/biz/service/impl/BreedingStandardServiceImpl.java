@@ -80,7 +80,19 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
     public Integer updateBreedingTemplate(CreateBreedingStandardDto dto) {
         log.info("O BreedingStandardServiceImpl.updateBreedingTemplate input BreedingStandardDto:{}", dto);
         Integer currentUserId = getCurrentUserId();
-        BreedingStandard breedingStandard = new BreedingStandard();
+        BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(dto.getId());
+        // 如果养殖天数减少则删除大于修改后养殖天数日龄的养殖参数
+        if (breedingStandard.getBreedingDays() != null && dto.getBreedingDays() != null ) {
+            if (breedingStandard.getBreedingDays() < dto.getBreedingDays()){
+                throw new RuntimeException("亲,不允许增加养殖天数");
+            }
+            if (breedingStandard.getBreedingDays() > dto.getBreedingDays()){
+                BreedingStandardParameterExample example = new BreedingStandardParameterExample();
+                example.createCriteria().andEnableEqualTo(Boolean.TRUE).andStandardIdEqualTo(dto.getId())
+                        .andDayAgeGreaterThan(dto.getBreedingDays());
+                standardParameterMapper.deleteByExample(example);
+            }
+        }
         BeanUtils.copyProperties(dto, breedingStandard);
         breedingStandard.setModifyTime(new Date())
                 .setModifyUserId(currentUserId);

@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -37,7 +38,8 @@ public class CreateBreedingStandardDto implements Serializable {
     /**
      * 养殖天数
      */
-    @Min(value = 1, message = "{breedingDays.Min}")
+    @Min(value = 30, message = "{breedingDays.Min}")
+    @Max(value = 60, message = "{breedingDays.Max}")
     @NotNull(message = "{breedingDays.NotNull}")
     private Integer breedingDays;
 }
