@@ -12,7 +12,7 @@
             batch_coop_daily
         WHERE
             enable = 1
-            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{createTime}
+            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{createTime}, '%Y-%m-%d' )
             AND coop_id = #{coopId}
     </select>
     <insert id="batchInsert" parameterType="com.jaagro.cbs.api.model.BatchCoopDaily">
