@@ -41,13 +41,16 @@
             plan_id,
             record_type
     </select>
-    <select id="listCoopDailySumByParams" parameterType="java.lang.String" resultMap="BaseResultMap">
+    <select id="listCoopDailyByParams" parameterType="java.lang.String"
+            resultType="com.jaagro.cbs.api.model.BatchCoopDaily">
         SELECT
             plan_id ,
             batch_no,
             coop_id,
             day_age,
-            SUM( CASE WHEN record_type = 1 THEN breeding_value  END ) AS breeding_value,
+            SUM( CASE WHEN record_type = 1 THEN breeding_value  END ) AS fodder_amount,
+            SUM( CASE WHEN record_type = 4 THEN breeding_value  END ) AS dead_amount,
+            COUNT(CASE WHEN record_type = 1 THEN breeding_value  END) as fodder_times,
             create_time
         FROM
             breeding_record
@@ -55,32 +58,6 @@
             enable = 1
             AND DATE_FORMAT(create_time, '%Y-%m-%d') = #{todayDate}
             GROUP BY plan_id,coop_id
-    </select>
-    <select id="countFodderTimesByCoopId" parameterType="com.jaagro.cbs.api.model.BreedingRecord"
-            resultType="java.lang.Integer">
-        SELECT
-            count(breeding_value) as breeding_value
-        FROM
-            breeding_record
-        WHERE
-            enable = 1
-            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{createTime}, '%Y-%m-%d' )
-            AND coop_id = #{coopId}
-            AND plan_id = #{planId}
-            AND record_type = 1
-    </select>
-    <select id="sumDeadAmountByCoopId" parameterType="com.jaagro.cbs.api.model.BreedingRecord"
-            resultType="java.lang.Integer">
-        SELECT
-            SUM( breeding_value )
-        FROM
-            breeding_record
-        WHERE
-            enable = 1
-            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{createTime}, '%Y-%m-%d' )
-            AND coop_id = #{coopId}
-            AND plan_id = #{planId}
-            AND record_type = 4
     </select>
     <select id="listBatchInfoByParams" resultType="com.jaagro.cbs.api.model.BatchInfo" parameterType="java.lang.String">
         SELECT
