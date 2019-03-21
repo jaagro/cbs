@@ -44,7 +44,8 @@ public class CoopDeviceValueService {
     /**
      * 批次养殖情况汇总
      */
-    @Scheduled(cron = "0 0/10 * * * ?")
+//    @Scheduled(cron = "0 0/10 * * * ?")
+    @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void coopDeviceValue() {
         log.info("coopDeviceValue:定时钟执行开始");
