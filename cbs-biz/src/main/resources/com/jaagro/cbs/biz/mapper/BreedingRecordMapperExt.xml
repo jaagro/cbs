@@ -80,18 +80,6 @@
         GROUP BY
             r.plan_id
     </select>
-    <select id="sumDeadAmountByPlanId" parameterType="com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto"
-            resultType="int">
-        SELECT
-            sum(breeding_value) as breeding_value
-        FROM
-            breeding_record
-        WHERE
-            enable = 1
-            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{todayDate}
-            AND plan_id = #{planId}
-            AND record_type = 4
-    </select>
     <select id="listByParams" resultMap="DetailResultMap" parameterType="com.jaagro.cbs.api.model.BreedingRecord">
         SELECT
         <include refid="Base_Column_List"/>

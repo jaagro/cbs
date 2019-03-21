@@ -8,6 +8,7 @@ import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
 import com.jaagro.cbs.biz.mapper.BreedingRecordMapperExt;
 import com.jaagro.cbs.biz.utils.RedisLock;
 import com.jaagro.cbs.biz.utils.RedisUtil;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -59,6 +60,7 @@ public class BatchInfoServiceImpl implements BatchInfoService {
                     throw new RuntimeException("计划有误");
                 }
                 // 昨日的剩余喂养数量
+                info.setCreateTime(DateUtils.addDays(new Date(), -1)).setDayAge(info.getDayAge() - 1);
                 Integer currentAmount = batchInfoMapper.getStartAmountByPlanId(info);
                 if (currentAmount != null && currentAmount > 0) {
                     info.setStartAmount(currentAmount);
@@ -76,6 +78,7 @@ public class BatchInfoServiceImpl implements BatchInfoService {
                 info
                         .setEnable(true)
                         .setCreateUserId(1)
+                        .setDayAge(info.getDayAge() + 1)
                         .setStartDay(breedingPlan.getPlanTime())
                         .setTechnician(breedingPlan.getTechnician())
                         .setTechnicianId(breedingPlan.getTechnicianId());

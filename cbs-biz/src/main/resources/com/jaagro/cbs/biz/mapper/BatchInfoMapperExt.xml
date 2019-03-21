@@ -42,9 +42,8 @@
             AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{createTime}, '%Y-%m-%d' )
             AND plan_id = #{planId}
             AND day_age = #{dayAge}
-        ORDER BY
-            create_time
-            LIMIT 1
+        ORDER BY create_time DESC
+        LIMIT 1
     </select>
 
     <select id="getTheLatestBatchInfo" resultMap="BaseResultMap" parameterType="java.lang.Integer">
