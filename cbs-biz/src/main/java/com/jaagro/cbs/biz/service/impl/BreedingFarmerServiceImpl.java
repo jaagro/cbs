@@ -436,18 +436,20 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                 .andEnableEqualTo(true)
                 .andIdEqualTo(dto.getPurchaseOrderId());
         List<PurchaseOrder> purchaseOrderList = purchaseOrderMapper.selectByExample(purchaseOrderExample);
-        if (!CollectionUtils.isEmpty(purchaseOrderList)) {
-            PurchaseOrder purchaseOrder = purchaseOrderList.get(0);
-            //种苗已签收 更改养殖计划状态为养殖中
-            if (purchaseOrder.getProductType() != null) {
-                if (ProductTypeEnum.SPROUT.getCode() == purchaseOrder.getProductType()) {
-                    if (purchaseOrder.getPlanId() != null) {
-                        BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(purchaseOrder.getPlanId());
-                        if (breedingPlan != null && PlanStatusEnum.SIGN_CHICKEN.getCode() == breedingPlan.getPlanStatus()) {
-                            breedingPlan
-                                    .setPlanStatus(PlanStatusEnum.BREEDING.getCode())
-                                    .setId(purchaseOrder.getPlanId());
-                            breedingPlanMapper.updateByPrimaryKeySelective(breedingPlan);
+        if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
+            if (!CollectionUtils.isEmpty(purchaseOrderList)) {
+                PurchaseOrder purchaseOrder = purchaseOrderList.get(0);
+                //种苗已签收 更改养殖计划状态为养殖中
+                if (purchaseOrder.getProductType() != null) {
+                    if (ProductTypeEnum.SPROUT.getCode() == purchaseOrder.getProductType()) {
+                        if (purchaseOrder.getPlanId() != null) {
+                            BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(purchaseOrder.getPlanId());
+                            if (breedingPlan != null && PlanStatusEnum.SIGN_CHICKEN.getCode() == breedingPlan.getPlanStatus()) {
+                                breedingPlan
+                                        .setPlanStatus(PlanStatusEnum.BREEDING.getCode())
+                                        .setId(purchaseOrder.getPlanId());
+                                breedingPlanMapper.updateByPrimaryKeySelective(breedingPlan);
+                            }
                         }
                     }
                 }
