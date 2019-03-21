@@ -397,18 +397,39 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         if (CollectionUtils.isEmpty(parameterTypeDtoList)){
             throw new RuntimeException("养殖模板参数为空");
         }
+        List<BreedingStandardParameter> needUpdateDisplayOrderList = new ArrayList<>();
         for (ParameterTypeDto parameterTypeDto : parameterTypeDtoList){
             if (dto.getParamName().equals(parameterTypeDto.getParamName()) && dto.getParamType().equals(parameterTypeDto.getParamType())){
                 if (SortTypeEnum.UP.equals(sortType)){
-
+                    if (dto.getDisplayOrder() <= 1){
+                        break;
+                    }
+                    if (dto.getParamType().equals(parameterTypeDto.getParamType()) && dto.getParamName().equals(parameterTypeDto.getParamName())){
+                        parameterTypeDto.setDisplayOrder(parameterTypeDto.getDisplayOrder()-1);
+                    }
+                    if (dto.getDisplayOrder() < parameterTypeDto.getDisplayOrder() || (dto.getDisplayOrder() == parameterTypeDto.getDisplayOrder() - 1)){
+                        parameterTypeDto.setDisplayOrder(parameterTypeDto.getDisplayOrder()+1);
+                    }
                 }else {
-
+                    if (dto.getDisplayOrder() >= parameterTypeDtoList.size()){
+                        break;
+                    }
+                    if (dto.getParamType().equals(parameterTypeDto.getParamType()) && dto.getParamName().equals(parameterTypeDto.getParamName())){
+                        parameterTypeDto.setDisplayOrder(parameterTypeDto.getDisplayOrder()+1);
+                    }
+                    if (dto.getDisplayOrder() > parameterTypeDto.getDisplayOrder() || (dto.getDisplayOrder() == parameterTypeDto.getDisplayOrder() + 1)){
+                        parameterTypeDto.setDisplayOrder(parameterTypeDto.getDisplayOrder()-1);
+                    }
                 }
+                BreedingStandardParameterExample parameterExample = new BreedingStandardParameterExample();
+                List<BreedingStandardParameter> parameterList = standardParameterMapper.selectByExample(parameterExample);
+                needUpdateDisplayOrderList.addAll(parameterList);
             }
         }
-
+        standardParameterMapper.batchUpdateByPrimaryKeySelective(needUpdateDisplayOrderList);
         return result;
     }
+
 
     /**
      * 获取养殖模板基本信息
