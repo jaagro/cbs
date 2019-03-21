@@ -22,7 +22,8 @@
         <collection property="breedingRecordItemsList" column="id"
                     select="com.jaagro.cbs.biz.mapper.BreedingRecordItemsMapperExt.listByBreedingRecordId"/>
     </resultMap>
-    <select id="listSumByParams" parameterType="java.lang.String" resultMap="BaseResultMap">
+    <select id="listBreedingDailyByParams" parameterType="java.lang.String"
+            resultType="com.jaagro.cbs.api.model.BreedingRecordDaily">
         SELECT
             id,
             plan_id,
@@ -36,7 +37,7 @@
             breeding_record
         WHERE
             ENABLE = 1
-            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{todayDate}
+            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{todayDate}, '%Y-%m-%d' )
         GROUP BY
             plan_id,
             record_type
@@ -64,20 +65,18 @@
             r.plan_id,
             r.batch_no,
             r.day_age,
-            CASE WHEN r.record_type = 1 THEN SUM( r.breeding_value ) END AS fodder_amount,
-            CASE WHEN r.record_type = 4 THEN SUM( r.breeding_value ) END AS dead_amount,
-            r.unit,
-            r.ENABLE,
+            SUM( CASE WHEN r.record_type = 4 THEN r.breeding_value END ) AS dead_amount,
+            SUM( CASE WHEN r.record_type = 1 THEN r.breeding_value END ) AS fodder_amount,
             p.technician_id AS technician_id,
-            p.technician AS technician ,
-            p.plan_chicken_quantity as plan_chicken_quantity
-            FROM
+            p.technician AS technician,
+	        r.create_time as create_time
+        FROM
             breeding_record r
             INNER JOIN breeding_plan p ON r.plan_id = p.id
         WHERE
-            r.enable = 1
-            AND p.enable = 1
-            AND DATE_FORMAT( r.create_time, '%Y-%m-%d' ) = #{todayDate}
+            r.ENABLE = 1
+            AND p.ENABLE = 1
+             AND DATE_FORMAT( r.create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{todayDate}, '%Y-%m-%d' )
         GROUP BY
             r.plan_id
     </select>

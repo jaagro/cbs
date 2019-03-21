@@ -84,6 +84,7 @@ public class ProductServiceImpl implements ProductService {
         }
         List<Integer> drugType = Arrays.asList(ProductTypeEnum.DRUG.getCode());
         condition.andProductTypeIn(drugType);
+        productExample.setOrderByClause("create_time desc");
         List<Product> products = productMapper.selectByExample(productExample);
         return new PageInfo(products);
     }

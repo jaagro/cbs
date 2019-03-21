@@ -95,16 +95,24 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         //3.累计所有喂养饲料
                         BigDecimal accumulativeTotalFeed = batchInfoMapper.accumulativeTotalFeed(planIds);
                         //当前存栏量
-                        BigDecimal totalBreedingStock = totalPlanStock.subtract(accumulativeTotalDeadAmount).subtract(accumulativeTotalSaleAmount);
+                        BigDecimal totalBreedingStock;
+                        if (accumulativeTotalDeadAmount != null) {
+                            totalBreedingStock = totalPlanStock.subtract(accumulativeTotalDeadAmount);
+                        } else {
+                            totalBreedingStock = totalPlanStock;
+                        }
+                        if (totalBreedingStock != null && accumulativeTotalSaleAmount != null) {
+                            totalBreedingStock.subtract(accumulativeTotalSaleAmount);
+                        }
                         //环控异常指数
                         BigDecimal accumulativeTotalAbnormalWarn = deviceAlarmLogMapper.accumulativeTotalAbnormalWarn(planIds);
                         //饲料库存
-                        PurchaseOrderParamDto purchaseOrderParamDto = new PurchaseOrderParamDto();
-                        purchaseOrderParamDto
+                        PurchaseOrderItemsParamDto purchaseOrderItemsParamDto = new PurchaseOrderItemsParamDto();
+                        purchaseOrderItemsParamDto
                                 .setPlanIds(planIds)
                                 .setProductType(ProductTypeEnum.FEED.getCode());
-                        BigDecimal planFeedWeight = purchaseOrderMapper.calculateTotalPlanFeedWeight(purchaseOrderParamDto);
-                        if (planFeedWeight != null) {
+                        BigDecimal planFeedWeight = purchaseOrderItemsMapper.calculateTotalPlanFeedWeight(purchaseOrderItemsParamDto);
+                        if (planFeedWeight != null && accumulativeTotalFeed != null) {
                             BigDecimal totalFeedStock = planFeedWeight.subtract(accumulativeTotalFeed);
                             returnBreedingFarmerIndexDto
                                     .setTotalFeedStock(totalFeedStock);
@@ -169,17 +177,18 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         BigDecimal deadAmount = batchInfoMapper.accumulativeDeadAmount(planId);
                         //计算存栏量
                         if (returnBreedingBatchDetailsDto.getPlanChickenQuantity() != null) {
-                            BigDecimal breedingStock = null;
-                            BigDecimal totalBreedingStock = null;
+                            BigDecimal breedingStock;
                             Integer planChickenQuantity = returnBreedingBatchDetailsDto.getPlanChickenQuantity();
                             if (saleAmount != null) {
                                 breedingStock = new BigDecimal(planChickenQuantity).subtract(saleAmount);
+                            } else {
+                                breedingStock = new BigDecimal(planChickenQuantity);
                             }
                             if (breedingStock != null && deadAmount != null) {
-                                totalBreedingStock = breedingStock.subtract(deadAmount);
+                                breedingStock = breedingStock.subtract(deadAmount);
                             }
                             returnBreedingBatchDetailsDto
-                                    .setBreedingStock(totalBreedingStock);
+                                    .setBreedingStock(breedingStock);
                             if (returnBreedingBatchDetailsDto.getPlanStatus() != null) {
                                 returnBreedingBatchDetailsDto
                                         .setStrPlanStatus(PlanStatusEnum.getDescByCode(returnBreedingBatchDetailsDto.getPlanStatus()));
@@ -436,18 +445,20 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                 .andEnableEqualTo(true)
                 .andIdEqualTo(dto.getPurchaseOrderId());
         List<PurchaseOrder> purchaseOrderList = purchaseOrderMapper.selectByExample(purchaseOrderExample);
-        if (!CollectionUtils.isEmpty(purchaseOrderList)) {
-            PurchaseOrder purchaseOrder = purchaseOrderList.get(0);
-            //种苗已签收 更改养殖计划状态为养殖中
-            if (purchaseOrder.getProductType() != null) {
-                if (ProductTypeEnum.SPROUT.getCode() == purchaseOrder.getProductType()) {
-                    if (purchaseOrder.getPlanId() != null) {
-                        BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(purchaseOrder.getPlanId());
-                        if (breedingPlan != null && PlanStatusEnum.SIGN_CHICKEN.getCode() == breedingPlan.getPlanStatus()) {
-                            breedingPlan
-                                    .setPlanStatus(PlanStatusEnum.BREEDING.getCode())
-                                    .setId(purchaseOrder.getPlanId());
-                            breedingPlanMapper.updateByPrimaryKeySelective(breedingPlan);
+        if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
+            if (!CollectionUtils.isEmpty(purchaseOrderList)) {
+                PurchaseOrder purchaseOrder = purchaseOrderList.get(0);
+                //种苗已签收 更改养殖计划状态为养殖中
+                if (purchaseOrder.getProductType() != null) {
+                    if (ProductTypeEnum.SPROUT.getCode() == purchaseOrder.getProductType()) {
+                        if (purchaseOrder.getPlanId() != null) {
+                            BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(purchaseOrder.getPlanId());
+                            if (breedingPlan != null && PlanStatusEnum.SIGN_CHICKEN.getCode() == breedingPlan.getPlanStatus()) {
+                                breedingPlan
+                                        .setPlanStatus(PlanStatusEnum.BREEDING.getCode())
+                                        .setId(purchaseOrder.getPlanId());
+                                breedingPlanMapper.updateByPrimaryKeySelective(breedingPlan);
+                            }
                         }
                     }
                 }
