@@ -85,7 +85,7 @@ public class BatchInfoServiceImpl implements BatchInfoService {
             //批量插入
             batchInfoMapper.insertBatch(batchInfoList);
 
-            redis.del("Scheduled:redisLock:batchInfo");
+            redisLock.unLock("Scheduled:redisLock:batchInfo");
         }
 
     }

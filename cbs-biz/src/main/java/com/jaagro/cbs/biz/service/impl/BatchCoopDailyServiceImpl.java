@@ -44,7 +44,7 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
     public void batchCoopDaily() {
         //加锁
         long time = System.currentTimeMillis() + 10 * 1000;
-        boolean success = redisLock.lock("Scheduled:BatchCoopDailyService:batchCoopDaily", String.valueOf(time), null, null);
+        boolean success = redisLock.lock("Scheduled:redisLock:batchCoopDaily", String.valueOf(time), null, null);
         if (!success) {
             throw new RuntimeException("请求正在处理中");
         }
@@ -90,7 +90,7 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
             batchCoopDailyMapper.batchInsert(dailyList);
 
             //去锁
-            redisLock.unLock("Scheduled:BatchCoopDailyService:batchCoopDaily");
+            redisLock.unLock("Scheduled:redisLock:batchCoopDaily");
         }
     }
 }
