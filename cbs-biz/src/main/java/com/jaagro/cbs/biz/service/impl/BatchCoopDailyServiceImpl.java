@@ -76,14 +76,12 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
                 Integer deadAmount = breedingRecordMapper.sumDeadAmountByCoopId(record);
                 daily.setDeadAmount(deadAmount);
                 //起始喂养数量 && 剩余喂养数量
-                Date createDate = new Date();
-                DateUtils.ceiling(createDate, 2);
                 BatchCoopDaily coopDaily = new BatchCoopDaily();
-                coopDaily.setCreateTime(createDate).setCoopId(daily.getCoopId());
+                coopDaily.setCreateTime(DateUtils.addDays(record.getCreateTime(), -1)).setCoopId(daily.getCoopId()).setPlanId(daily.getPlanId());
                 Integer startAmount = batchCoopDailyMapper.getStartAmountByCoopId(coopDaily);
                 if (startAmount != null && startAmount > 0) {
                     daily.setStartAmount(startAmount);
-                    if (deadAmount > 0) {
+                    if (deadAmount != null) {
                         // 剩余喂养数量=起始-死淘
                         daily.setCurrentAmount(daily.getStartAmount() - daily.getDeadAmount());
                     }
