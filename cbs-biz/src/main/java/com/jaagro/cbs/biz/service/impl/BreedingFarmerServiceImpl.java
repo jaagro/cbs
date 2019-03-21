@@ -95,7 +95,15 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         //3.累计所有喂养饲料
                         BigDecimal accumulativeTotalFeed = batchInfoMapper.accumulativeTotalFeed(planIds);
                         //当前存栏量
-                        BigDecimal totalBreedingStock = totalPlanStock.subtract(accumulativeTotalDeadAmount).subtract(accumulativeTotalSaleAmount);
+                        BigDecimal totalBreedingStock;
+                        if (accumulativeTotalDeadAmount != null) {
+                            totalBreedingStock = totalPlanStock.subtract(accumulativeTotalDeadAmount);
+                        } else {
+                            totalBreedingStock = totalPlanStock;
+                        }
+                        if (totalBreedingStock != null && accumulativeTotalSaleAmount != null) {
+                            totalBreedingStock.subtract(accumulativeTotalSaleAmount);
+                        }
                         //环控异常指数
                         BigDecimal accumulativeTotalAbnormalWarn = deviceAlarmLogMapper.accumulativeTotalAbnormalWarn(planIds);
                         //饲料库存
@@ -104,7 +112,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                                 .setPlanIds(planIds)
                                 .setProductType(ProductTypeEnum.FEED.getCode());
                         BigDecimal planFeedWeight = purchaseOrderMapper.calculateTotalPlanFeedWeight(purchaseOrderParamDto);
-                        if (planFeedWeight != null) {
+                        if (planFeedWeight != null && accumulativeTotalFeed != null) {
                             BigDecimal totalFeedStock = planFeedWeight.subtract(accumulativeTotalFeed);
                             returnBreedingFarmerIndexDto
                                     .setTotalFeedStock(totalFeedStock);
@@ -436,18 +444,20 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                 .andEnableEqualTo(true)
                 .andIdEqualTo(dto.getPurchaseOrderId());
         List<PurchaseOrder> purchaseOrderList = purchaseOrderMapper.selectByExample(purchaseOrderExample);
-        if (!CollectionUtils.isEmpty(purchaseOrderList)) {
-            PurchaseOrder purchaseOrder = purchaseOrderList.get(0);
-            //种苗已签收 更改养殖计划状态为养殖中
-            if (purchaseOrder.getProductType() != null) {
-                if (ProductTypeEnum.SPROUT.getCode() == purchaseOrder.getProductType()) {
-                    if (purchaseOrder.getPlanId() != null) {
-                        BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(purchaseOrder.getPlanId());
-                        if (breedingPlan != null && PlanStatusEnum.SIGN_CHICKEN.getCode() == breedingPlan.getPlanStatus()) {
-                            breedingPlan
-                                    .setPlanStatus(PlanStatusEnum.BREEDING.getCode())
-                                    .setId(purchaseOrder.getPlanId());
-                            breedingPlanMapper.updateByPrimaryKeySelective(breedingPlan);
+        if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
+            if (!CollectionUtils.isEmpty(purchaseOrderList)) {
+                PurchaseOrder purchaseOrder = purchaseOrderList.get(0);
+                //种苗已签收 更改养殖计划状态为养殖中
+                if (purchaseOrder.getProductType() != null) {
+                    if (ProductTypeEnum.SPROUT.getCode() == purchaseOrder.getProductType()) {
+                        if (purchaseOrder.getPlanId() != null) {
+                            BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(purchaseOrder.getPlanId());
+                            if (breedingPlan != null && PlanStatusEnum.SIGN_CHICKEN.getCode() == breedingPlan.getPlanStatus()) {
+                                breedingPlan
+                                        .setPlanStatus(PlanStatusEnum.BREEDING.getCode())
+                                        .setId(purchaseOrder.getPlanId());
+                                breedingPlanMapper.updateByPrimaryKeySelective(breedingPlan);
+                            }
                         }
                     }
                 }
@@ -455,12 +465,21 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         }
         //更新采购单状态
         PurchaseOrder purchaseOrder = new PurchaseOrder();
-        purchaseOrder
-                .setId(dto.getPurchaseOrderId());
-        if (dto.getPurchaseOrderStatus() != null) {
+        if (dto.getPurchaseOrderId() != null) {
             purchaseOrder
-                    .setPurchaseOrderStatus(dto.getPurchaseOrderStatus());
-            purchaseOrderMapper.updateByPrimaryKeySelective(purchaseOrder);
+                    .setId(dto.getPurchaseOrderId());
+            if (dto.getPurchaseOrderStatus() != null) {
+                if (PurchaseOrderStatusEnum.PENDING_ARRIVED.getCode() == dto.getPurchaseOrderStatus()) {
+                    purchaseOrder
+                            .setDeliveryTime(new Date());
+                }
+                if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
+                    purchaseOrder.setSignerTime(new Date());
+                }
+                purchaseOrder
+                        .setPurchaseOrderStatus(dto.getPurchaseOrderStatus());
+                purchaseOrderMapper.updateByPrimaryKeySelective(purchaseOrder);
+            }
         }
     }
 
