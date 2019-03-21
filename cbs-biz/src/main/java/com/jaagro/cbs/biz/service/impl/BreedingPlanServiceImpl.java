@@ -210,7 +210,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         if (!CollectionUtils.isEmpty(listBaseResponse.getData())) {
             customerIds = listBaseResponse.getData();
         } else {
-            customerIds = Arrays.asList(99999999);
+            customerIds = Collections.singletonList(999999999);
         }
         return customerIds;
     }
