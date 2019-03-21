@@ -177,8 +177,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         BigDecimal deadAmount = batchInfoMapper.accumulativeDeadAmount(planId);
                         //计算存栏量
                         if (returnBreedingBatchDetailsDto.getPlanChickenQuantity() != null) {
-                            BigDecimal breedingStock = null;
-                            BigDecimal totalBreedingStock = null;
+                            BigDecimal breedingStock;
                             Integer planChickenQuantity = returnBreedingBatchDetailsDto.getPlanChickenQuantity();
                             if (saleAmount != null) {
                                 breedingStock = new BigDecimal(planChickenQuantity).subtract(saleAmount);
@@ -186,10 +185,10 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                                 breedingStock = new BigDecimal(planChickenQuantity);
                             }
                             if (breedingStock != null && deadAmount != null) {
-                                totalBreedingStock = breedingStock.subtract(deadAmount);
+                                breedingStock = breedingStock.subtract(deadAmount);
                             }
                             returnBreedingBatchDetailsDto
-                                    .setBreedingStock(totalBreedingStock);
+                                    .setBreedingStock(breedingStock);
                             if (returnBreedingBatchDetailsDto.getPlanStatus() != null) {
                                 returnBreedingBatchDetailsDto
                                         .setStrPlanStatus(PlanStatusEnum.getDescByCode(returnBreedingBatchDetailsDto.getPlanStatus()));
