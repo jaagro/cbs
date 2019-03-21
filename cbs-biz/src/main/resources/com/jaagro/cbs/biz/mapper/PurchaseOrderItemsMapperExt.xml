@@ -16,4 +16,20 @@
                       AND product_type = #{productType}
                   )
     </delete>
+    <select id="calculateTotalPlanFeedWeight" resultType="java.math.BigDecimal" parameterType="java.lang.Integer">
+        select sum(poi.quantity)
+        from purchase_order po inner join purchase_order_items poi on (po.id=poi.purchase_order_id)
+        <where>
+            po.enable=1
+            <if test="productType!=null">
+                and product_type=#{productType}
+            </if>
+            <if test="planIds!=null">
+                and plan_id in
+                <foreach collection="planIds" open="(" separator="," close=")" item="planId">
+                    ${planId}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>

@@ -107,11 +107,11 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         //环控异常指数
                         BigDecimal accumulativeTotalAbnormalWarn = deviceAlarmLogMapper.accumulativeTotalAbnormalWarn(planIds);
                         //饲料库存
-                        PurchaseOrderParamDto purchaseOrderParamDto = new PurchaseOrderParamDto();
-                        purchaseOrderParamDto
+                        PurchaseOrderItemsParamDto purchaseOrderItemsParamDto = new PurchaseOrderItemsParamDto();
+                        purchaseOrderItemsParamDto
                                 .setPlanIds(planIds)
                                 .setProductType(ProductTypeEnum.FEED.getCode());
-                        BigDecimal planFeedWeight = purchaseOrderMapper.calculateTotalPlanFeedWeight(purchaseOrderParamDto);
+                        BigDecimal planFeedWeight = purchaseOrderItemsMapper.calculateTotalPlanFeedWeight(purchaseOrderItemsParamDto);
                         if (planFeedWeight != null && accumulativeTotalFeed != null) {
                             BigDecimal totalFeedStock = planFeedWeight.subtract(accumulativeTotalFeed);
                             returnBreedingFarmerIndexDto
