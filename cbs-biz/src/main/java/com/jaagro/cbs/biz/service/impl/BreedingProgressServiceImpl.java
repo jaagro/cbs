@@ -163,6 +163,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
             //养殖计划所用的参数
             BreedingBatchParameterExample batchParameterExample = new BreedingBatchParameterExample();
             batchParameterExample.createCriteria().andPlanIdEqualTo(planId).andDayAgeEqualTo(dayAge).andEnableEqualTo(true);
+            batchParameterExample.setOrderByClause("display_order asc");
             List<BreedingBatchParameter> breedingBatchParameterDos = breedingBatchParameterMapper.selectByExample(batchParameterExample);
 
             if (!CollectionUtils.isEmpty(breedingBatchParameterDos)) {
@@ -274,6 +275,8 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
         } catch (Exception ex) {
             log.error("R BreedingProgressServiceImpl.getBreedingBatchParamById  error:" + ex);
         }
+        Collections.sort(returnDtos, Comparator.comparingInt(BreedingBatchParamTrackingDto::getDisplayOrder));
+
         return returnDtos;
     }
 
