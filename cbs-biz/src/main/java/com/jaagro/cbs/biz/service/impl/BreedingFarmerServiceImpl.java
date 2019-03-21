@@ -95,7 +95,14 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         //3.累计所有喂养饲料
                         BigDecimal accumulativeTotalFeed = batchInfoMapper.accumulativeTotalFeed(planIds);
                         //当前存栏量
-                        BigDecimal totalBreedingStock = totalPlanStock.subtract(accumulativeTotalDeadAmount).subtract(accumulativeTotalSaleAmount);
+                        BigDecimal totalBreedingStock = null;
+                        if (accumulativeTotalDeadAmount != null) {
+                            totalBreedingStock = totalPlanStock.subtract(accumulativeTotalDeadAmount);
+
+                        }
+                        if (totalBreedingStock != null && accumulativeTotalSaleAmount != null) {
+                            totalBreedingStock.subtract(accumulativeTotalSaleAmount);
+                        }
                         //环控异常指数
                         BigDecimal accumulativeTotalAbnormalWarn = deviceAlarmLogMapper.accumulativeTotalAbnormalWarn(planIds);
                         //饲料库存
@@ -104,7 +111,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                                 .setPlanIds(planIds)
                                 .setProductType(ProductTypeEnum.FEED.getCode());
                         BigDecimal planFeedWeight = purchaseOrderMapper.calculateTotalPlanFeedWeight(purchaseOrderParamDto);
-                        if (planFeedWeight != null) {
+                        if (planFeedWeight != null && accumulativeTotalFeed != null) {
                             BigDecimal totalFeedStock = planFeedWeight.subtract(accumulativeTotalFeed);
                             returnBreedingFarmerIndexDto
                                     .setTotalFeedStock(totalFeedStock);
