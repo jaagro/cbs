@@ -205,10 +205,12 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
      */
     @Override
     public List<Integer> listCustomerIdsByKeyword(String keyword) {
-        List<Integer> customerIds = null;
+        List<Integer> customerIds;
         BaseResponse<List<Integer>> listBaseResponse = customerClientService.listCustomerIdByKeyWord(keyword);
         if (!CollectionUtils.isEmpty(listBaseResponse.getData())) {
             customerIds = listBaseResponse.getData();
+        } else {
+            customerIds = Collections.singletonList(999999999);
         }
         return customerIds;
     }

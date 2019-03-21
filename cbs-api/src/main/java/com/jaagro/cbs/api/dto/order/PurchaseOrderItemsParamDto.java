@@ -19,7 +19,7 @@ import java.util.Set;
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class PurchaseOrderParamDto implements Serializable {
+public class PurchaseOrderItemsParamDto implements Serializable {
     /**
      * 商品类型
      */

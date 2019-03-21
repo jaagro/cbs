@@ -3,23 +3,6 @@
 <mapper namespace="com.jaagro.cbs.biz.mapper.PurchaseOrderMapperExt">
 
     <!--          自动生成扩展XML author: generator on 2019/2/21                 -->
-    <select id="calculateTotalPlanFeedWeight" resultType="java.math.BigDecimal" parameterType="java.lang.Integer">
-        select
-        sum(weight) totalPlanFeedWeight
-        from purchase_order
-        <where>
-            enable=1
-            <if test="productType!=null">
-                and product_type=#{productType}
-            </if>
-            <if test="planIds!=null">
-                and plan_id in
-                <foreach collection="planIds" open="(" separator="," close=")" item="planId">
-                    ${planId}
-                </foreach>
-            </if>
-        </where>
-    </select>
     <select id="queryPurchaseOrderByCondition" resultType="java.lang.Integer"
             parameterType="com.jaagro.cbs.biz.bo.PurchaseOrderBo">
         select distinct o.id from purchase_order o, purchase_order_items i
@@ -28,10 +11,10 @@
               and o.product_type = #{productType}
               and o.plan_id=#{planId} and o.order_phase=#{orderPhase}
     </select>
-    <delete id="deleteByExample" parameterType="com.jaagro.cbs.api.model.PurchaseOrderExample" >
+    <delete id="deleteByExample" parameterType="com.jaagro.cbs.api.model.PurchaseOrderExample">
         delete from purchase_order
-        <if test="_parameter != null" >
-            <include refid="Example_Where_Clause" />
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
         </if>
     </delete>
     <delete id="deleteByCriteria" parameterType="com.jaagro.cbs.biz.bo.PurchaseOrderBo">
