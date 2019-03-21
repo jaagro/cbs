@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -64,12 +63,9 @@ public class CoopDeviceValueService {
                 deviceValueMapper.deleteByValue(history);
                 //检测是否需要警报
                 deviceAlarm(history);
-                history.setCreateTime(new Date());
             }
-            if (!CollectionUtils.isEmpty(historyList)) {
-                //批量插入
-                deviceValueMapper.insertBatch(historyList);
-            }
+            //批量插入
+            deviceValueMapper.insertBatch(historyList);
 
             redisLock.unLock("Scheduled:redisLock:coopDeviceValue");
         }

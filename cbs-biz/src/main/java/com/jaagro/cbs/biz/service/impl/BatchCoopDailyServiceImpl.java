@@ -57,11 +57,11 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
         List<BatchCoopDaily> breedingRecordList = breedingRecordMapper.listCoopDailyByParams(todayDate);
         if (!CollectionUtils.isEmpty(breedingRecordList)) {
             for (BatchCoopDaily batchCoopDaily : breedingRecordList) {
-                //查询昨日剩余喂养数量 来当做今天的起始喂养数量
+                // 查询昨日剩余喂养数量 来当做今天的起始喂养数量
                 BatchCoopDaily coopDaily = new BatchCoopDaily();
                 BeanUtils.copyProperties(batchCoopDaily, coopDaily);
                 coopDaily.setCreateTime(DateUtils.addDays(batchCoopDaily.getCreateTime(), -1));
-                //得到 昨日剩余喂养数量
+                // 昨日剩余喂养数量
                 Integer startAmount = batchCoopDailyMapper.getStartAmountByCoopId(coopDaily);
                 if (startAmount != null && startAmount > 0) {
                     batchCoopDaily.setStartAmount(startAmount);
