@@ -95,10 +95,11 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         //3.累计所有喂养饲料
                         BigDecimal accumulativeTotalFeed = batchInfoMapper.accumulativeTotalFeed(planIds);
                         //当前存栏量
-                        BigDecimal totalBreedingStock = null;
+                        BigDecimal totalBreedingStock;
                         if (accumulativeTotalDeadAmount != null) {
                             totalBreedingStock = totalPlanStock.subtract(accumulativeTotalDeadAmount);
-
+                        } else {
+                            totalBreedingStock = totalPlanStock;
                         }
                         if (totalBreedingStock != null && accumulativeTotalSaleAmount != null) {
                             totalBreedingStock.subtract(accumulativeTotalSaleAmount);
