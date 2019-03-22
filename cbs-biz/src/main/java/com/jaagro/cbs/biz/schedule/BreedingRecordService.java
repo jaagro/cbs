@@ -49,21 +49,23 @@ public class BreedingRecordService {
      * 批次养殖记录表日汇总
      */
     @Scheduled(cron = "0 0 2 * * ?")
+//    @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void breedingRecordDaily() {
-        log.info("batchCoopDaily:定时钟执行开始");
+        log.info("breedingRecordDaily:定时钟执行开始");
         try {
             breedingRecordDailyService.breedingRecordDaily();
         } catch (Exception ex) {
             log.error("批次养殖记录表日汇总执行错误:" + ex);
         }
-        log.info("batchCoopDaily:定时钟执行结束");
+        log.info("breedingRecordDaily:定时钟执行结束");
     }
 
     /**
      * 批次养殖情况汇总
      */
-    @Scheduled(cron = "0 0 2 * * ?")
+//    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void batchInfo() {
         log.info("batchInfo:定时钟执行开始");

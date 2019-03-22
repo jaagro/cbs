@@ -26,6 +26,5 @@
         value_type
         ORDER BY
         create_time DESC
-        LIMIT 1
     </select>
 </mapper>

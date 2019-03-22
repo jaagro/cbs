@@ -135,7 +135,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
             //当天需要的饲料总和 = 当天存栏量乘以当天每只鸡需要的饲料  单位：克
             BigDecimal oneDayNeedFood = livingQuantity.multiply(dayAgeFeedWeight);
             if (oneDayNeedFood.compareTo(BigDecimal.ZERO) == 1) {
-                totalLeftFood =totalLeftFood.multiply(new BigDecimal("1000"));
+                totalLeftFood = totalLeftFood.multiply(new BigDecimal("1000"));
                 int usageDays = totalLeftFood.divide(oneDayNeedFood, 0, BigDecimal.ROUND_DOWN).intValue();
                 breedingProgressDto.setUsageDays(usageDays);
             }
@@ -163,6 +163,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
             //养殖计划所用的参数
             BreedingBatchParameterExample batchParameterExample = new BreedingBatchParameterExample();
             batchParameterExample.createCriteria().andPlanIdEqualTo(planId).andDayAgeEqualTo(dayAge).andEnableEqualTo(true);
+            batchParameterExample.setOrderByClause("display_order asc");
             List<BreedingBatchParameter> breedingBatchParameterDos = breedingBatchParameterMapper.selectByExample(batchParameterExample);
 
             if (!CollectionUtils.isEmpty(breedingBatchParameterDos)) {
@@ -242,23 +243,23 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                                         }
                                     }
                                 }
-                            }else if (breedingBatchParameterDo.getValueType().equals(BreedingStandardValueTypeEnum.CRITICAL_VALUE.getCode())) {
+                            } else if (breedingBatchParameterDo.getValueType().equals(BreedingStandardValueTypeEnum.CRITICAL_VALUE.getCode())) {
                                 //如果养殖参数的值类型是"临界值"
                                 if (!CollectionUtils.isEmpty(actualResult)) {
                                     for (DeviceValueDto deviceValue : actualResult) {
-                                        if(breedingBatchParameterDo.getThresholdDirection().equals(ThresholdDirectionEnum.LESS_THAN.getCode())){
+                                        if (breedingBatchParameterDo.getThresholdDirection().equals(ThresholdDirectionEnum.LESS_THAN.getCode())) {
                                             //如果检测值大于参数临界则报警
                                             BigDecimal paramValue = new BigDecimal(breedingBatchParameterDo.getParamValue());
-                                            if (deviceValue.getCurrentValue().compareTo(paramValue)==1) {
+                                            if (deviceValue.getCurrentValue().compareTo(paramValue) == 1) {
                                                 returnDto.setAlarmMessage("检测值大于临界值异常，其及时处理！");
                                                 break;
                                             }
                                         }
 
-                                        if(breedingBatchParameterDo.getThresholdDirection().equals(ThresholdDirectionEnum.MORE_THAN.getCode())){
+                                        if (breedingBatchParameterDo.getThresholdDirection().equals(ThresholdDirectionEnum.MORE_THAN.getCode())) {
                                             //如果检测值小于参数临界则报警
                                             BigDecimal paramValue = new BigDecimal(breedingBatchParameterDo.getParamValue());
-                                            if (deviceValue.getCurrentValue().compareTo(paramValue)==-1) {
+                                            if (deviceValue.getCurrentValue().compareTo(paramValue) == -1) {
                                                 returnDto.setAlarmMessage("检测值小于临界值异常，其及时处理！");
                                                 break;
                                             }
@@ -274,6 +275,8 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
         } catch (Exception ex) {
             log.error("R BreedingProgressServiceImpl.getBreedingBatchParamById  error:" + ex);
         }
+        Collections.sort(returnDtos, Comparator.comparingInt(BreedingBatchParamTrackingDto::getDisplayOrder));
+
         return returnDtos;
     }
 
@@ -371,20 +374,21 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
      * @return
      */
     private BigDecimal getLeftFeedFoodByPlanId(int planId) {
-        BigDecimal leftFeedFood = BigDecimal.ZERO;
         //获取已签收的饲料总和
         BigDecimal totalSignedFood = purchaseOrderMapper.getTotalSignedFoodByPlanId(planId);
         if (null == totalSignedFood) {
             totalSignedFood = BigDecimal.ZERO;
         }
         //已喂养饲料总和
-        BigDecimal totalFeededFood = batchInfoMapper.accumulativeFeed(planId);
-        if (null == totalFeededFood) {
-            totalFeededFood = BigDecimal.ZERO;
+        BigDecimal totalFedFood = batchInfoMapper.accumulativeFeed(planId);
+        if (null == totalFedFood) {
+            totalFedFood = BigDecimal.ZERO;
         }
         //剩余饲料 = 已签收的饲料总和 - 已喂养饲料总和
-        leftFeedFood = totalSignedFood.subtract(totalFeededFood);
-
+        BigDecimal leftFeedFood = totalSignedFood.subtract(totalFedFood);
+        if (null == leftFeedFood) {
+            leftFeedFood = BigDecimal.ZERO;
+        }
         return leftFeedFood;
 
     }
