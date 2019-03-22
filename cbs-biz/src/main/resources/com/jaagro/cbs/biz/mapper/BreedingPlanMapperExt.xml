@@ -87,6 +87,7 @@
             <if test="batchNo!=null">
                 and bp.batch_no like concat('%', #{batchNo},'%')
             </if>
+            order by po.create_time desc
         </where>
     </select>
     <select id="listBreedingParamTemplate" resultType="com.jaagro.cbs.api.dto.standard.ReturnBreedingParamTemplateDto"
