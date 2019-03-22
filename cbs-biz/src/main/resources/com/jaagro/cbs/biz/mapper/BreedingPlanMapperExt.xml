@@ -111,6 +111,7 @@
             <if test="batchNo!=null">
                 and bp.batch_no like concat('%', #{batchNo},'%')
             </if>
+            order by bs.create_time desc
         </where>
     </select>
     <select id="listToSlaughterConfirm" resultMap="BaseResultMap">
