@@ -109,6 +109,12 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createBreedingPlan(CreateBreedingPlanDto dto) {
+        // 雏鸡数量不能大于最大可养数量
+        Integer planChickenQuantity = dto.getPlanChickenQuantity();
+        Integer breedingAble = getBreedingAble(dto.getPlantIds());
+        if (planChickenQuantity > breedingAble){
+            throw new RuntimeException("雏鸡数量不能大于最大可养数量");
+        }
         BreedingPlan breedingPlan = new BreedingPlan();
         UserInfo currentUser = currentUserService.getCurrentUser();
         if (currentUser != null && currentUser.getId() != null && currentUser.getTenantId() != null &&
@@ -147,6 +153,20 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                 batchPlantCoopMapper.insertBatch(batchPlantCoops);
             }
         }
+    }
+
+    private Integer getBreedingAble(List<Integer> plantIds) {
+        CoopExample example = new CoopExample();
+        example.createCriteria().andEnableEqualTo(Boolean.TRUE).andPlantIdIn(plantIds)
+                .andCoopStatusEqualTo(CoopStatusEnum.LEISURE.getCode());
+        List<Coop> coopList = coopMapper.selectByExample(example);
+        Integer breedingAble = 0;
+        if (!CollectionUtils.isEmpty(coopList)){
+            for (Coop coop : coopList){
+                breedingAble += coop.getCapacity();
+            }
+        }
+        return breedingAble;
     }
 
     /**
