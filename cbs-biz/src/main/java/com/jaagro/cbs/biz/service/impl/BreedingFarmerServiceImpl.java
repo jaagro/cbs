@@ -296,6 +296,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                 if (PurchaseOrderStatusEnum.ORDER_PLACED.getCode() == type.getCode()) {
                     continue;
                 }
+                
                 purchaseOrderStatus.add(type.getCode());
             }
         } else {
