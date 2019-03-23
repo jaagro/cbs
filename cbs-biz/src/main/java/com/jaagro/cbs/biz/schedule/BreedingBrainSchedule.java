@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 @Slf4j
-public class BreedingBrainService {
+public class BreedingBrainSchedule {
 
 
     @Autowired
@@ -45,7 +45,7 @@ public class BreedingBrainService {
      * 第二阶段510饲料、511饲料自动生成养殖计划采购订单
      * 每天晚上11点跑一次
      */
-//    @Scheduled(cron = "0 40 23 1/1 * ?")
+//    @Scheduled(cron = "0 50 23 1/1 * ?")
     @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void calculatePhaseTwoFoodWeight() {
@@ -69,7 +69,7 @@ public class BreedingBrainService {
      * 第三阶段29->计划养殖天数的511饲料订单自动生成养殖计划采购订单
      * 每天晚上11点跑一次
      */
-    //@Scheduled(cron = "0 50 23 1/1 * ?")
+    //@Scheduled(cron = "0 55 23 1/1 * ?")
     @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void calculatePhaseFourFoodWeight() {
