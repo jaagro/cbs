@@ -861,8 +861,8 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                         returnPurchaseOrderDto
                                 .setSignerPhone(userInfo.getPhoneNumber());
                     }
-                    returnPurchaseOrderDtos.add(returnPurchaseOrderDto);
                 }
+                returnPurchaseOrderDtos.add(returnPurchaseOrderDto);
             }
         }
         returnChickenSignDetailsDto.setReturnPurchaseOrderDtos(returnPurchaseOrderDtos);
