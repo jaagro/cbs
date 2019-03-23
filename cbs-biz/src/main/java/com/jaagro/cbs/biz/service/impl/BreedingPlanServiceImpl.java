@@ -13,8 +13,10 @@ import com.jaagro.cbs.api.dto.order.AccumulationPurchaseOrderParamDto;
 import com.jaagro.cbs.api.dto.plan.*;
 import com.jaagro.cbs.api.dto.progress.BreedingBatchParamTrackingDto;
 import com.jaagro.cbs.api.dto.standard.BreedingParameterDto;
+import com.jaagro.cbs.api.dto.standard.BreedingStandardDrugDto;
 import com.jaagro.cbs.api.enums.*;
 import com.jaagro.cbs.api.model.*;
+import com.jaagro.cbs.api.service.BreedingBrainService;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.BreedingProgressService;
 import com.jaagro.cbs.biz.bo.BatchPlantCoopBo;
@@ -26,6 +28,7 @@ import com.jaagro.cbs.biz.utils.MathUtil;
 import com.jaagro.cbs.biz.utils.SequenceCodeUtils;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.utils.BaseResponse;
+import com.netflix.discovery.converters.Auto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.BeanUtils;
@@ -99,6 +102,10 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
     private BreedingRecordItemsMapperExt breedingRecordItemsMapper;
     @Autowired
     private PurchaseOrderItemsMapperExt purchaseOrderItemsMapper;
+    @Autowired
+    private BreedingBrainService breedingBrainService;
+    @Autowired
+    private BreedingStandardDrugMapperExt breedingStandardDrugMapper;
 
     /**
      * 创建养殖计划
@@ -909,10 +916,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         UserInfo currentUser = currentUserService.getCurrentUser();
         Integer currentUserId = currentUser == null ? null : currentUser.getId();
         // 插入养殖计划和鸡舍关系更新鸡舍在养数量和状态
-        BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(dto.getPlanId());
-        if (breedingPlan == null) {
-            throw new RuntimeException("养殖计划id=" + dto.getPlanId() + "不存在");
-        }
+        BreedingPlan breedingPlan = judgeBreedingPlan(dto.getPlanId());
         // 插入养殖计划参数
         List<BreedingParameterDto> breedingParameterDtoList = dto.getBreedingParameterDtoList();
         Integer standardId = null;
@@ -976,6 +980,63 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             }
         }
         // 更新养殖计划
+        updateBreedingPlanToSignChicken(breedingPlan,breedingStandard,currentUserId);
+        // 生成第一批鸡苗,饲料,药品采购单
+        breedingBrainService.calculateDrugPurchaseOrderById(breedingPlan);
+        breedingBrainService.calculatePhaseOneFoodWeightById(breedingPlan);
+        // 生成药品配置
+        configPlanDrug(breedingPlan,standardId,currentUserId);
+    }
+
+    private BreedingPlan judgeBreedingPlan(Integer planId) {
+        BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
+        if (breedingPlan == null) {
+            throw new RuntimeException("养殖计划id=" + planId + "不存在");
+        }
+        if (!breedingPlan.getPlanStatus().equals(PlanStatusEnum.PARAM_CORRECT.getCode())){
+            throw new RuntimeException("只有待参数配置状态的计划才可以做参数配置");
+        }
+        return breedingPlan;
+    }
+
+    /**
+     * 养殖计划药品配置
+     * @param breedingPlan
+     * @param standardId
+     */
+    private void configPlanDrug(BreedingPlan breedingPlan, Integer standardId, Integer currentUserId) {
+        List<BreedingStandardDrugDto> standardDrugDtoList= breedingStandardDrugMapper.listBreedingStandardDrugs(standardId);
+        if (!CollectionUtils.isEmpty(standardDrugDtoList)){
+            List<BreedingBatchDrug> breedingBatchDrugList = new ArrayList<>();
+            for (BreedingStandardDrugDto dto : standardDrugDtoList){
+                BreedingBatchDrug drug = new BreedingBatchDrug();
+                drug.setBatchNo(breedingPlan.getBatchNo())
+                        .setCreateTime(new Date())
+                        .setCreateUserId(currentUserId)
+                        .setDayAgeStart(dto.getDayAgeStart())
+                        .setDayAgeEnd(dto.getDayAgeEnd())
+                        .setDays(dto.getDays())
+                        .setEnable(Boolean.TRUE)
+                        .setFeedVolume(dto.getFeedVolume())
+                        .setPlanId(breedingPlan.getId())
+                        .setProductId(dto.getProductId())
+                        .setSkuNo(dto.getSkuNo())
+                        .setStopDrugFlag(dto.getStopDrugFlag());
+                breedingBatchDrugList.add(drug);
+            }
+            breedingBatchDrugMapper.batchInsert(breedingBatchDrugList);
+        }
+
+        
+    }
+
+    /**
+     * 更新养殖计划状态为待上鸡签收
+     * @param breedingPlan
+     * @param breedingStandard
+     * @param currentUserId
+     */
+    private void updateBreedingPlanToSignChicken(BreedingPlan breedingPlan, BreedingStandard breedingStandard, Integer currentUserId) {
         breedingPlan.setPlanStatus(PlanStatusEnum.SIGN_CHICKEN.getCode())
                 .setModifyTime(new Date())
                 .setModifyUserId(currentUserId)

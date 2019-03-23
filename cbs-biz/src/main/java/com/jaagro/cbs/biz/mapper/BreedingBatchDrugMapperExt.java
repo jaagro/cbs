@@ -3,8 +3,10 @@ package com.jaagro.cbs.biz.mapper;
 import com.jaagro.cbs.api.model.BreedingBatchDrug;
 import com.jaagro.cbs.api.model.BreedingBatchDrugExample;
 import com.jaagro.cbs.biz.mapper.base.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 
 /**
@@ -15,5 +17,9 @@ import javax.annotation.Resource;
  */
 @Resource
 public interface BreedingBatchDrugMapperExt extends BaseMapper<BreedingBatchDrug, BreedingBatchDrugExample> {
-
+    /**
+     * 批量插入
+     * @param breedingBatchDrugList
+     */
+    void batchInsert(@Param("breedingBatchDrugList") List<BreedingBatchDrug> breedingBatchDrugList);
 }
