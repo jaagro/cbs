@@ -275,8 +275,6 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
         } catch (Exception ex) {
             log.error("R BreedingProgressServiceImpl.getBreedingBatchParamById  error:" + ex);
         }
-        Collections.sort(returnDtos, Comparator.comparingInt(BreedingBatchParamTrackingDto::getDisplayOrder));
-
         return returnDtos;
     }
 
