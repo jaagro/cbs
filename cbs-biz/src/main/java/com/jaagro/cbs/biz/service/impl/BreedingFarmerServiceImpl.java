@@ -293,6 +293,9 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         List<Integer> purchaseOrderStatus = new ArrayList<>();
         if (dto.getPurchaseOrderStatus() == null) {
             for (PurchaseOrderStatusEnum type : PurchaseOrderStatusEnum.values()) {
+                if (PurchaseOrderStatusEnum.ORDER_PLACED.getCode() == type.getCode()) {
+                    continue;
+                }
                 purchaseOrderStatus.add(type.getCode());
             }
         } else {
