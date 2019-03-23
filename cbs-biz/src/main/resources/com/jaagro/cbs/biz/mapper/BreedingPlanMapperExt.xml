@@ -45,6 +45,17 @@
         from breeding_plan
         where customer_id = #{customerId,jdbcType=INTEGER}
         and enable = 1
+        and plan_status in (2,3,4,5)
+        order by create_time desc
+    </select>
+    <select id="listAllBreedingPlanByCustomerId"
+            resultType="com.jaagro.cbs.api.dto.farmer.ReturnBreedingBatchDetailsDto"
+            parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from breeding_plan
+        where customer_id = #{customerId,jdbcType=INTEGER}
+        and enable = 1
         order by create_time desc
     </select>
 
@@ -95,9 +106,9 @@
         select distinct bp.id, bp.batch_no ,bp.customer_id,
         bp.plan_chicken_quantity,bp.plan_time ,bp.plan_status,bp.create_user_name,bs.standard_name,bs.id
         breedingStandardId
-        from breeding_plan bp right join breeding_batch_parameter bbp on (bp.id=bbp.param_id)
-        right join breeding_standard_parameter bsp on (bbp.param_id=bsp.id)
-        right join breeding_standard bs on (bsp.standard_id=bs.id )
+        from breeding_plan bp inner join breeding_batch_parameter bbp on (bp.id=bbp.param_id)
+        inner join breeding_standard_parameter bsp on (bbp.param_id=bsp.id)
+        inner join breeding_standard bs on (bsp.standard_id=bs.id )
         <where>
             bs.enable=1
             <if test="customerIds!=null">
@@ -112,6 +123,7 @@
             <if test="batchNo!=null">
                 and bp.batch_no like concat('%', #{batchNo},'%')
             </if>
+            and bp.plan_status in (2,3,4,5,6)
             order by bs.create_time desc
         </where>
     </select>
