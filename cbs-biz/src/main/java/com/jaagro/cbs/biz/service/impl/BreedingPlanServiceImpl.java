@@ -180,7 +180,8 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
      * 养殖计划列表 批次列表 养殖列表（复用）
      * (返回数据类型相同但计划状态不同 用flag区分
      * flag=1表示养殖计划列表数据
-     * flag=2 表示批次列表数据）
+     * flag=2 表示批次列表数据
+     * flag=3 表示养殖批次管理）
      *
      * @param dto
      * @return
@@ -189,7 +190,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
     @Override
     public PageInfo listBreedingPlan(BreedingPlanParamDto dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-//        dto.setTenantId();    先注释,等待从userInfo获取租户id
+        dto.setTenantId(currentUserService.getCurrentUser().getTenantId());
         if (dto.getCustomerInfo() != null) {
             List<Integer> customerIds = listCustomerIdsByKeyword(dto.getCustomerInfo());
             dto.setCustomerIds(customerIds);
