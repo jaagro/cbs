@@ -36,12 +36,20 @@ public interface BreedingPlanMapperExt extends BaseMapper<BreedingPlan, Breeding
     List<ReturnBreedingPlanDto> listBreedingPlan(BreedingPlanParamDto dto);
 
     /**
-     * 根据客户id 查询当前客户所有养殖批次详情
+     * 根据客户id 查询当前客户养殖批次详情
      *
      * @param customerId
      * @return
      */
     List<ReturnBreedingBatchDetailsDto> listBreedingPlanByCustomerId(@Param("customerId") Integer customerId);
+
+    /**
+     * 根据客户id 查询当前客户所有养殖批次详情
+     *
+     * @param customerId
+     * @return
+     */
+    List<ReturnBreedingBatchDetailsDto> listAllBreedingPlanByCustomerId(@Param("customerId") Integer customerId);
 
     /**
      * 根据当前客户id 查询所有养殖计划id 集合
@@ -76,6 +84,7 @@ public interface BreedingPlanMapperExt extends BaseMapper<BreedingPlan, Breeding
 
     /**
      * 查看可能需要从养殖中到待出栏确认的养殖计划
+     *
      * @return
      */
     List<BreedingPlan> listToSlaughterConfirm();

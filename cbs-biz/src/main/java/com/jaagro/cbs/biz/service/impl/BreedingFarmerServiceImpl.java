@@ -78,7 +78,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         if (currentUser != null && currentUser.getId() != null) {
             GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
             if (customerUser != null && customerUser.getRelevanceId() != null) {
-                List<ReturnBreedingBatchDetailsDto> returnBreedingBatchDetailsDtos = breedingPlanMapper.listBreedingPlanByCustomerId(customerUser.getRelevanceId());
+                List<ReturnBreedingBatchDetailsDto> returnBreedingBatchDetailsDtos = breedingPlanMapper.listAllBreedingPlanByCustomerId(customerUser.getRelevanceId());
                 if (!CollectionUtils.isEmpty(returnBreedingBatchDetailsDtos)) {
                     for (ReturnBreedingBatchDetailsDto returnBreedingBatchDetailsDto : returnBreedingBatchDetailsDtos) {
                         planIds.add(returnBreedingBatchDetailsDto.getId());
@@ -440,46 +440,55 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
     @Override
     public void updatePurchaseOrder(UpdatePurchaseOrderParamDto dto) {
         PurchaseOrderExample purchaseOrderExample = new PurchaseOrderExample();
-        purchaseOrderExample
-                .createCriteria()
-                .andEnableEqualTo(true)
+        PurchaseOrderExample.Criteria criteria = purchaseOrderExample.createCriteria();
+        criteria.andEnableEqualTo(true)
                 .andIdEqualTo(dto.getPurchaseOrderId());
         List<PurchaseOrder> purchaseOrderList = purchaseOrderMapper.selectByExample(purchaseOrderExample);
-        if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
-            if (!CollectionUtils.isEmpty(purchaseOrderList)) {
-                PurchaseOrder purchaseOrder = purchaseOrderList.get(0);
-                //种苗已签收 更改养殖计划状态为养殖中
-                if (purchaseOrder.getProductType() != null) {
-                    if (ProductTypeEnum.SPROUT.getCode() == purchaseOrder.getProductType()) {
-                        if (purchaseOrder.getPlanId() != null) {
-                            BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(purchaseOrder.getPlanId());
-                            if (breedingPlan != null && PlanStatusEnum.SIGN_CHICKEN.getCode() == breedingPlan.getPlanStatus()) {
-                                breedingPlan
-                                        .setPlanStatus(PlanStatusEnum.BREEDING.getCode())
-                                        .setId(purchaseOrder.getPlanId());
-                                breedingPlanMapper.updateByPrimaryKeySelective(breedingPlan);
-                            }
-                        }
-                    }
-                }
-            }
+        if (CollectionUtils.isEmpty(purchaseOrderList)) {
+            throw new RuntimeException("当前采购订单不存在");
         }
         //更新采购单状态
         PurchaseOrder purchaseOrder = new PurchaseOrder();
-        if (dto.getPurchaseOrderId() != null) {
-            purchaseOrder
-                    .setId(dto.getPurchaseOrderId());
-            if (dto.getPurchaseOrderStatus() != null) {
-                if (PurchaseOrderStatusEnum.PENDING_ARRIVED.getCode() == dto.getPurchaseOrderStatus()) {
-                    purchaseOrder
-                            .setDeliveryTime(new Date());
-                }
-                if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
-                    purchaseOrder.setSignerTime(new Date());
-                }
+        purchaseOrder
+                .setId(dto.getPurchaseOrderId());
+        if (dto.getPurchaseOrderStatus() != null) {
+            if (PurchaseOrderStatusEnum.PENDING_ARRIVED.getCode() == dto.getPurchaseOrderStatus()) {
                 purchaseOrder
-                        .setPurchaseOrderStatus(dto.getPurchaseOrderStatus());
-                purchaseOrderMapper.updateByPrimaryKeySelective(purchaseOrder);
+                        .setDeliveryTime(new Date());
+            }
+            if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
+                purchaseOrder.setSignerTime(new Date());
+            }
+            purchaseOrder
+                    .setPurchaseOrderStatus(dto.getPurchaseOrderStatus());
+            purchaseOrderMapper.updateByPrimaryKeySelective(purchaseOrder);
+        }
+        if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
+            purchaseOrder = purchaseOrderList.get(0);
+            //当前第一批采购订单全部签收 更改养殖计划状态为养殖中
+            if (purchaseOrder.getPlanId() != null) {
+                BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(purchaseOrder.getPlanId());
+                if (breedingPlan != null && PlanStatusEnum.SIGN_CHICKEN.getCode() == breedingPlan.getPlanStatus()) {
+                    PurchaseOrderExample example = new PurchaseOrderExample();
+                    int count = 0;
+                    example
+                            .createCriteria()
+                            .andEnableEqualTo(true)
+                            .andOrderPhaseEqualTo(1)
+                            .andPlanIdEqualTo(purchaseOrder.getPlanId());
+                    purchaseOrderList = purchaseOrderMapper.selectByExample(example);
+                    for (PurchaseOrder order : purchaseOrderList) {
+                        if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == order.getPurchaseOrderStatus()) {
+                            count++;
+                        }
+                    }
+                    if (count == purchaseOrderList.size()) {
+                        breedingPlan
+                                .setPlanStatus(PlanStatusEnum.BREEDING.getCode())
+                                .setId(purchaseOrder.getPlanId());
+                        breedingPlanMapper.updateByPrimaryKeySelective(breedingPlan);
+                    }
+                }
             }
         }
     }
