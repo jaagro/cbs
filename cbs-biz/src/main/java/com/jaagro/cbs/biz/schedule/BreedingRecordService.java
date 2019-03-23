@@ -64,7 +64,7 @@ public class BreedingRecordService {
     /**
      * 批次养殖情况汇总
      */
-    @Scheduled(cron = "0 10 23 1/1 * ?")
+    @Scheduled(cron = "0 0 0/1 * * ? ")
 //    @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void batchInfo() {
