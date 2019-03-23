@@ -36,6 +36,10 @@
                 and plan_status in (1,2)
                 order by create_time desc
             </if>
+            <if test="flag==3">
+                and plan_status in (3,4,5)
+                order by create_time desc
+            </if>
         </where>
     </select>
     <select id="listBreedingPlanByCustomerId" resultType="com.jaagro.cbs.api.dto.farmer.ReturnBreedingBatchDetailsDto"
