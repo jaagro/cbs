@@ -138,8 +138,6 @@
         WHERE
         enable = 1
         AND plan_status = 3
-        AND plan_time &lt;= CURRENT_DATE() - (
-        plan_time - (breeding_days - 7)
-        )
+        AND plan_time &lt;= CURRENT_DATE() - (breeding_days - 7)
     </select>
 </mapper>
