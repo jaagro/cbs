@@ -147,6 +147,12 @@ public class BreedingStandardController {
         return BaseResponse.successInstance(breedingStandardService.listAllBreedingStandard());
     }
 
+    @ApiOperation("养殖计划参数配置可选择养殖模板列表")
+    @GetMapping("/listBreedingStandardForParamConfiguration")
+    public BaseResponse listBreedingStandardForParamConfiguration(){
+        log.info("O listBreedingStandardForParamConfiguration");
+        return BaseResponse.successInstance(breedingStandardService.listBreedingStandardForParamConfiguration());
+    }
     @ApiOperation("查询单个养殖模板详情按日龄分组")
     @GetMapping("/getBreedingStandardDetail/{id}")
     public BaseResponse getBreedingStandardDetail(@PathVariable("id") Integer id) {

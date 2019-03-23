@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * @author :gaoxin
- * @date :2019/03/19
+ * @author :asus
+ * @date :2019/03/21
  */
 @Data
 @NoArgsConstructor
@@ -73,7 +73,7 @@ public class BreedingStandardParameter implements Serializable {
     private String paramValue;
 
     /**
-     * 临界值方向(1->=,2<=)
+     * 临界值方向(1>=,2<=)
      */
     private Integer thresholdDirection;
 

@@ -8,6 +8,7 @@
         SELECT 
           <include refid="Base_Column_List"/>
         FROM breeding_standard
+        ORDER BY create_time desc
     </select>
 
 </mapper>

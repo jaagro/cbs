@@ -33,7 +33,11 @@
                 order by create_time desc
             </if>
             <if test="flag==2">
-                and plan_status in (1,2,3,4,5,6)
+                and plan_status in (1,2)
+                order by create_time desc
+            </if>
+            <if test="flag==3">
+                and plan_status in (3,4,5)
                 order by create_time desc
             </if>
         </where>
@@ -87,6 +91,7 @@
             <if test="batchNo!=null">
                 and bp.batch_no like concat('%', #{batchNo},'%')
             </if>
+            order by po.create_time desc
         </where>
     </select>
     <select id="listBreedingParamTemplate" resultType="com.jaagro.cbs.api.dto.standard.ReturnBreedingParamTemplateDto"
@@ -94,11 +99,11 @@
         select distinct bp.id, bp.batch_no ,bp.customer_id,
         bp.plan_chicken_quantity,bp.plan_time ,bp.plan_status,bp.create_user_name,bs.standard_name,bs.id
         breedingStandardId
-        from breeding_plan bp inner join breeding_batch_parameter bbp on (bp.id=bbp.param_id)
-        inner join breeding_standard_parameter bsp on (bbp.param_id=bsp.id)
-        inner join breeding_standard bs on (bsp.standard_id=bs.id )
+        from breeding_plan bp right join breeding_batch_parameter bbp on (bp.id=bbp.param_id)
+        right join breeding_standard_parameter bsp on (bbp.param_id=bsp.id)
+        right join breeding_standard bs on (bsp.standard_id=bs.id )
         <where>
-            bp.enable=1
+            bs.enable=1
             <if test="customerIds!=null">
                 and bp.customer_id IN
                 <foreach collection="customerIds" open="(" separator="," close=")" item="customerId">
@@ -111,7 +116,7 @@
             <if test="batchNo!=null">
                 and bp.batch_no like concat('%', #{batchNo},'%')
             </if>
-            and plan_status in (2,3,4,5,6)
+            order by bs.create_time desc
         </where>
     </select>
     <select id="listToSlaughterConfirm" resultMap="BaseResultMap">
