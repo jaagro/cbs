@@ -1022,7 +1022,8 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                         .setPlanId(breedingPlan.getId())
                         .setProductId(dto.getProductId())
                         .setSkuNo(dto.getSkuNo())
-                        .setStopDrugFlag(dto.getStopDrugFlag());
+                        .setStopDrugFlag(dto.getStopDrugFlag())
+                        .setStandardDrugId(dto.getId());
                 breedingBatchDrugList.add(drug);
             }
             breedingBatchDrugMapper.batchInsert(breedingBatchDrugList);
