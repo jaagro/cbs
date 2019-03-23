@@ -11,19 +11,19 @@
         insert into breeding_standard_parameter (standard_id, param_name, day_age,
         param_type, value_type, lower_limit,
         upper_limit, unit, alarm,
-        param_value, threshold_direction, status, necessary,
-        create_time, create_user_id, modify_time,
-        modify_user_id, enable)
+        param_value, threshold_direction, status,
+        necessary, display_order, create_time,
+        create_user_id, modify_time, modify_user_id,
+        enable)
         values
         <foreach collection="parameterList" separator="," item="item">
             (#{item.standardId,jdbcType=INTEGER}, #{item.paramName,jdbcType=VARCHAR}, #{item.dayAge,jdbcType=INTEGER},
             #{item.paramType,jdbcType=INTEGER}, #{item.valueType,jdbcType=INTEGER}, #{item.lowerLimit,jdbcType=DECIMAL},
             #{item.upperLimit,jdbcType=DECIMAL}, #{item.unit,jdbcType=VARCHAR}, #{item.alarm,jdbcType=BIT},
-            #{item.paramValue,jdbcType=VARCHAR}, #{item.thresholdDirection,jdbcType=INTEGER},
-            #{item.status,jdbcType=INTEGER}, #{item.necessary,jdbcType=BIT},
-            #{item.createTime,jdbcType=TIMESTAMP}, #{item.createUserId,jdbcType=INTEGER},
-            #{item.modifyTime,jdbcType=TIMESTAMP},
-            #{item.modifyUserId,jdbcType=INTEGER}, #{item.enable,jdbcType=BIT})
+            #{item.paramValue,jdbcType=VARCHAR}, #{item.thresholdDirection,jdbcType=INTEGER}, #{item.status,jdbcType=INTEGER},
+            #{item.necessary,jdbcType=BIT}, #{item.displayOrder,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.createUserId,jdbcType=INTEGER}, #{item.modifyTime,jdbcType=TIMESTAMP}, #{item.modifyUserId,jdbcType=INTEGER},
+            #{item.enable,jdbcType=BIT})
         </foreach>
     </insert>
     <update id="batchUpdateByPrimaryKeySelective" parameterType="list">
@@ -117,6 +117,13 @@
                 <foreach collection="parameterList" item="i" index="index">
                     <if test="i.necessary!=null">
                         when id=#{i.id} then #{i.necessary}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="display_order =case" suffix="end,">
+                <foreach collection="parameterList" item="i" index="index">
+                    <if test="i.displayOrder!=null">
+                        when id=#{i.id} then #{i.displayOrder}
                     </if>
                 </foreach>
             </trim>
