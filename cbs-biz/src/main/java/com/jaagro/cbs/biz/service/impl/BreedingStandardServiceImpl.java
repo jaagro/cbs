@@ -46,7 +46,10 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
     private BreedingPlanMapperExt breedingPlanMapper;
     @Autowired
     private BreedingPlanService breedingPlanService;
-
+    /**
+     * 一个养殖周期需要停药的次数
+     */
+    private static final Integer breedingStopDrugCount = 2;
     /**
      * 创建养殖模版与参数
      *
@@ -485,6 +488,16 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
     @Override
     public void configurationDrugs(ValidList<BreedingStandardDrugListDto> drugList) {
         if (!CollectionUtils.isEmpty(drugList)) {
+            // 一个养殖周期必须有两个以上停药日
+            Integer stopDrugCount = 0;
+            for (BreedingStandardDrugListDto drugListDto : drugList){
+                if (drugListDto.getStopDrugFlag() != null && drugListDto.getStopDrugFlag()){
+                    stopDrugCount++;
+                }
+            }
+            if (stopDrugCount < breedingStopDrugCount){
+                throw new RuntimeException("一个养殖周期必须有两个以上停药日");
+            }
             Integer standardId = drugList.get(0).getStandardId();
             Integer currentUserId = getCurrentUserId();
             breedingStandardDrugMapper.delByStandardId(standardId);
