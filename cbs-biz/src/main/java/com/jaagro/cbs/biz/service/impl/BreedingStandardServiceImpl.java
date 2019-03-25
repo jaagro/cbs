@@ -51,6 +51,10 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
      */
     private static final Integer breedingStopDrugCount = 2;
     /**
+     * 必要参数类型个数
+     */
+    private static final Integer necessaryParamTypeNum = 4;
+    /**
      * 创建养殖模版与参数
      *
      * @param dto
@@ -193,10 +197,12 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
                     .andParamNameIn(necessaryParamList);
             List<BreedingStandardParameter> parameterList = standardParameterMapper.selectByExample(example);
             BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(dto.getStandardId());
-            if (!CollectionUtils.isEmpty(parameterList) && parameterList.size() == breedingStandard.getBreedingDays()*4){
-                breedingStandard.setStandardStatus(StandardStatusEnum.WAIT_DRUG_CONFIGURATION.getCode())
-                        .setModifyUserId(currentUserId);
-                breedingStandardMapper.updateByPrimaryKeySelective(breedingStandard);
+            if (!CollectionUtils.isEmpty(parameterList) && parameterList.size() == breedingStandard.getBreedingDays()*necessaryParamTypeNum){
+                if (breedingStandard.getStandardStatus() != null &&  StandardStatusEnum.NORMAL.getCode() != breedingStandard.getStandardStatus()){
+                    breedingStandard.setStandardStatus(StandardStatusEnum.WAIT_DRUG_CONFIGURATION.getCode())
+                            .setModifyUserId(currentUserId);
+                    breedingStandardMapper.updateByPrimaryKeySelective(breedingStandard);
+                }
             }
         }
 
