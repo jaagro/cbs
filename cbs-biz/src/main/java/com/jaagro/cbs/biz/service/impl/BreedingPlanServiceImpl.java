@@ -1064,6 +1064,136 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
      * @param planId
      * @author @Gao.
      */
+//    @Override
+//    public ReturnBreedingDetailsDto breedingDetails(Integer planId) {
+//        HashMap<Integer, BigDecimal> calculatePlanFeedWeightMap = new HashMap<>(16);
+//        ReturnBreedingDetailsDto returnBreedingDetailsDto = new ReturnBreedingDetailsDto();
+//        //送料情况信息
+//        BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
+//        if (breedingPlan == null) {
+//            throw new RuntimeException("当前养殖计划" + planId + "不存在");
+//        }
+//        BatchInfo batchInfo = batchInfoMapper.getTheLatestBatchInfo(planId);
+//        if (batchInfo != null) {
+//            //累计所有死淘数量
+//            BigDecimal accumulativeDeadAmount = batchInfoMapper.accumulativeDeadAmount(planId);
+//            //累计所有的出栏量
+//            BigDecimal accumulativeSaleAmount = batchInfoMapper.accumulativeSaleAmount(planId);
+//            //累计所有饲料喂养量
+//            BigDecimal accumulativeFeed = batchInfoMapper.accumulativeFeed(planId);
+//            //计算存活数
+//            BigDecimal survivalStock = new BigDecimal(breedingPlan.getPlanChickenQuantity()).subtract(accumulativeDeadAmount).abs();
+//            //计算存栏量
+//            BigDecimal breedingStock = new BigDecimal(breedingPlan.getPlanChickenQuantity()).subtract(accumulativeDeadAmount).subtract(accumulativeSaleAmount).abs();
+//            //计算成活率
+//            String percentage = null;
+//            if (survivalStock != null && breedingPlan.getPlanChickenQuantity() != null && breedingPlan.getPlanChickenQuantity() > 0) {
+//                percentage = mathUtil.percentage(survivalStock.intValue(), breedingPlan.getPlanChickenQuantity());
+//            }
+//            //计算预计出栏时间
+//            String expectSuchTime = null;
+//            if (breedingPlan.getPlanTime() != null && breedingPlan.getBreedingDays() != null) {
+//                expectSuchTime = DateUtil.accumulateDateByDay(breedingPlan.getPlanTime(), breedingPlan.getBreedingDays());
+//            }
+//            //计算异常次数
+//            DeviceAlarmLogExample deviceAlarmLogExample = new DeviceAlarmLogExample();
+//            deviceAlarmLogExample.createCriteria().andPlanIdEqualTo(planId);
+//            int abnormalWarn = deviceAlarmLogMapper.countByExample(deviceAlarmLogExample);
+//            //计算询问总次数
+//            TechConsultRecordExample techConsultRecordExample = new TechConsultRecordExample();
+//            techConsultRecordExample.createCriteria().andPlanIdEqualTo(planId);
+//            int askQues = techConsultRecordMapper.countByExample(techConsultRecordExample);
+//            //计算询问解决次数
+//            techConsultRecordExample.createCriteria().andTechConsultStatusEqualTo(TechConsultStatusEnum.STATUS_SOLVED.getCode());
+//            int solveQuestions = techConsultRecordMapper.countByExample(techConsultRecordExample);
+//            //计算计划采购 数量 重量
+//            List<CalculatePurchaseOrderDto> calculatePurchaseOrderDtos = new ArrayList<>();
+//            for (ProductTypeEnum productTypeEnum : ProductTypeEnum.values()) {
+//                if (ProductTypeEnum.VACCINE.getCode() == productTypeEnum.getCode()) {
+//                    continue;
+//                }
+//                BigDecimal planPurchaseValue = null;
+//                BigDecimal deliverPurchaseValue = null;
+//                int productType = productTypeEnum.getCode();
+//                CalculatePurchaseOrderDto calculatePurchaseOrderDto = new CalculatePurchaseOrderDto();
+//                HashMap<Integer, BigDecimal> calculatePurchaseOrderAllMap = calculatePurchaseOrder(planId, productType, null);
+//                if (calculatePurchaseOrderAllMap != null && calculatePurchaseOrderAllMap.get(productType) != null) {
+//                    planPurchaseValue = calculatePurchaseOrderAllMap.get(productType);
+//                    if (ProductTypeEnum.FEED.getCode() == productType) {
+//                        calculatePlanFeedWeightMap.put(productType, planPurchaseValue);
+//                    }
+//                }
+//                HashMap<Integer, BigDecimal> calculatePurchaseOrderMap = calculatePurchaseOrder(planId, productType, PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode());
+//                if (calculatePurchaseOrderMap.get(productType) != null) {
+//                    deliverPurchaseValue = calculatePurchaseOrderMap.get(productType);
+//                }
+//                calculatePurchaseOrderDto
+//                        .setProductType(productType)
+//                        .setPlanPurchaseValue(planPurchaseValue)
+//                        .setDeliverPurchaseValue(deliverPurchaseValue);
+//                calculatePurchaseOrderDtos.add(calculatePurchaseOrderDto);
+//            }
+//            //计算计划饲料 剩余饲料
+//            if (calculatePlanFeedWeightMap.get(ProductTypeEnum.FEED.getCode()) != null) {
+//                BigDecimal totalPlanFeedWeight = calculatePlanFeedWeightMap.get(ProductTypeEnum.FEED.getCode());
+//                if (totalPlanFeedWeight != null) {
+//                    returnBreedingDetailsDto
+//                            .setPlanFeed(totalPlanFeedWeight)
+//                            .setRemainFeed(totalPlanFeedWeight.subtract(accumulativeFeed));
+//                }
+//            }
+//            //计算理论体重值
+//            BreedingBatchParameterExample breedingBatchParameterExample = new BreedingBatchParameterExample();
+//            breedingBatchParameterExample
+//                    .createCriteria()
+//                    .andPlanIdEqualTo(planId)
+//                    .andEnableEqualTo(true)
+//                    .andDayAgeEqualTo(batchInfo.getDayAge())
+//                    .andStatusEqualTo(BreedingStandardStatusEnum.ENABLE.getCode())
+//                    .andParamTypeEqualTo(BreedingStandardParamEnum.WEIGHT.getCode())
+//                    .andValueTypeEqualTo(BreedingStandardValueTypeEnum.STANDARD_VALUE.getCode());
+//            List<BreedingBatchParameter> breedingBatchParameters = breedingBatchParameterMapper.selectByExample(breedingBatchParameterExample);
+//            if (!CollectionUtils.isEmpty(breedingBatchParameters)) {
+//                BreedingBatchParameter breedingBatchParameter = breedingBatchParameters.get(0);
+//                if (MathUtil.isNum(breedingBatchParameter.getParamValue())) {
+//                    returnBreedingDetailsDto.setTheoryWeight(breedingBatchParameter.getParamValue());
+//                }
+//                //计算理论料肉比
+//                if (breedingBatchParameter.getParamValue() != null && MathUtil.isNum(breedingBatchParameter.getParamValue())) {
+//                    BigDecimal paramValue = new BigDecimal(breedingBatchParameter.getParamValue());
+//                    BigDecimal meat = paramValue.multiply(breedingStock);
+//                    if (meat != null && accumulativeFeed != null) {
+//                        BigDecimal feedMeatRate = meat.divide(accumulativeFeed);
+//                        returnBreedingDetailsDto.setFeedMeatRate(feedMeatRate);
+//                    }
+//                }
+//            }
+//            //养殖场信息
+//            List<Plant> plants = breedingPlantService.listPlantInfoByPlanId(planId);
+//            returnBreedingDetailsDto
+//                    .setPlants(plants)
+//                    .setAskQuestions(askQues)
+//                    .setSurvivalRate(percentage)
+//                    .setAbnormalWarn(abnormalWarn)
+//                    .setDayAge(batchInfo.getDayAge())
+//                    .setExpectSuchTime(expectSuchTime)
+//                    .setSolveQuestions(solveQuestions)
+//                    .setCalculatePurchaseOrderDtos(calculatePurchaseOrderDtos);
+//            if (breedingStock != null) {
+//                returnBreedingDetailsDto
+//                        .setBreedingStock(breedingStock.intValue());
+//            }
+//            if (breedingPlan.getBreedingDays() != null) {
+//                returnBreedingDetailsDto
+//                        .setBreedingDays(breedingPlan.getBreedingDays());
+//            }
+//        }
+//        //养殖计划详情信息
+//        ReturnBreedingPlanDetailsDto returnBreedingPlanDetailsDto = breedingPlanDetails(planId);
+//        returnBreedingDetailsDto
+//                .setReturnBreedingPlanDetails(returnBreedingPlanDetailsDto);
+//        return returnBreedingDetailsDto;
+//    }
     @Override
     public ReturnBreedingDetailsDto breedingDetails(Integer planId) {
         HashMap<Integer, BigDecimal> calculatePlanFeedWeightMap = new HashMap<>(16);
@@ -1074,75 +1204,97 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             throw new RuntimeException("当前养殖计划" + planId + "不存在");
         }
         BatchInfo batchInfo = batchInfoMapper.getTheLatestBatchInfo(planId);
-        if (batchInfo != null) {
-            //累计所有死淘数量
-            BigDecimal accumulativeDeadAmount = batchInfoMapper.accumulativeDeadAmount(planId);
-            //累计所有的出栏量
-            BigDecimal accumulativeSaleAmount = batchInfoMapper.accumulativeSaleAmount(planId);
-            //累计所有饲料喂养量
-            BigDecimal accumulativeFeed = batchInfoMapper.accumulativeFeed(planId);
-            //计算存活数
-            BigDecimal survivalStock = new BigDecimal(breedingPlan.getPlanChickenQuantity()).subtract(accumulativeDeadAmount).abs();
-            //计算存栏量
-            BigDecimal breedingStock = new BigDecimal(breedingPlan.getPlanChickenQuantity()).subtract(accumulativeDeadAmount).subtract(accumulativeSaleAmount).abs();
-            //计算成活率
-            String percentage = null;
-            if (survivalStock != null && breedingPlan.getPlanChickenQuantity() != null && breedingPlan.getPlanChickenQuantity() > 0) {
-                percentage = mathUtil.percentage(survivalStock.intValue(), breedingPlan.getPlanChickenQuantity());
+        //累计所有死淘数量
+        BigDecimal accumulativeDeadAmount = batchInfoMapper.accumulativeDeadAmount(planId);
+        //累计所有的出栏量
+        BigDecimal accumulativeSaleAmount = batchInfoMapper.accumulativeSaleAmount(planId);
+        //累计所有饲料喂养量
+        BigDecimal accumulativeFeed = batchInfoMapper.accumulativeFeed(planId);
+        //计算存活数
+        BigDecimal survivalStock = null;
+        if (breedingPlan.getPlanChickenQuantity() != null) {
+            survivalStock = new BigDecimal(breedingPlan.getPlanChickenQuantity());
+        }
+        if (survivalStock != null && accumulativeDeadAmount != null) {
+            survivalStock = survivalStock.subtract(accumulativeDeadAmount);
+        }
+        //计算存栏量
+        BigDecimal breedingStock = null;
+        if (breedingPlan.getPlanChickenQuantity() != null) {
+            breedingStock = new BigDecimal(breedingPlan.getPlanChickenQuantity());
+        }
+        if (breedingStock != null && accumulativeDeadAmount != null) {
+            breedingStock = breedingStock.subtract(accumulativeDeadAmount);
+        }
+        if (breedingStock != null && accumulativeSaleAmount != null) {
+            breedingStock = breedingStock.subtract(accumulativeSaleAmount);
+        }
+        //计算成活率
+        String percentage = null;
+        if (survivalStock != null && breedingPlan.getPlanChickenQuantity() != null && breedingPlan.getPlanChickenQuantity() > 0) {
+            percentage = mathUtil.percentage(survivalStock.intValue(), breedingPlan.getPlanChickenQuantity());
+        }
+        //计算预计出栏时间
+        String expectSuchTime = null;
+        if (breedingPlan.getPlanTime() != null && breedingPlan.getBreedingDays() != null) {
+            expectSuchTime = DateUtil.accumulateDateByDay(breedingPlan.getPlanTime(), breedingPlan.getBreedingDays());
+        }
+        //计算异常次数
+        DeviceAlarmLogExample deviceAlarmLogExample = new DeviceAlarmLogExample();
+        deviceAlarmLogExample.createCriteria().andPlanIdEqualTo(planId);
+        int abnormalWarn = deviceAlarmLogMapper.countByExample(deviceAlarmLogExample);
+        //计算询问总次数
+        TechConsultRecordExample techConsultRecordExample = new TechConsultRecordExample();
+        techConsultRecordExample.createCriteria().andPlanIdEqualTo(planId);
+        int askQues = techConsultRecordMapper.countByExample(techConsultRecordExample);
+        //计算询问解决次数
+        techConsultRecordExample.createCriteria().andTechConsultStatusEqualTo(TechConsultStatusEnum.STATUS_SOLVED.getCode());
+        int solveQuestions = techConsultRecordMapper.countByExample(techConsultRecordExample);
+        //计算计划采购 数量 重量
+        List<CalculatePurchaseOrderDto> calculatePurchaseOrderDtos = new ArrayList<>();
+        for (ProductTypeEnum productTypeEnum : ProductTypeEnum.values()) {
+            if (ProductTypeEnum.VACCINE.getCode() == productTypeEnum.getCode()) {
+                continue;
             }
-            //计算预计出栏时间
-            String expectSuchTime = null;
-            if (breedingPlan.getPlanTime() != null && breedingPlan.getBreedingDays() != null) {
-                expectSuchTime = DateUtil.accumulateDateByDay(breedingPlan.getPlanTime(), breedingPlan.getBreedingDays());
+            BigDecimal planPurchaseValue = null;
+            BigDecimal deliverPurchaseValue = null;
+            int productType = productTypeEnum.getCode();
+            CalculatePurchaseOrderDto calculatePurchaseOrderDto = new CalculatePurchaseOrderDto();
+            HashMap<Integer, BigDecimal> calculatePurchaseOrderAllMap = calculatePurchaseOrder(planId, productType, null);
+            if (calculatePurchaseOrderAllMap != null && calculatePurchaseOrderAllMap.get(productType) != null) {
+                planPurchaseValue = calculatePurchaseOrderAllMap.get(productType);
+                if (ProductTypeEnum.FEED.getCode() == productType) {
+                    calculatePlanFeedWeightMap.put(productType, planPurchaseValue);
+                }
             }
-            //计算异常次数
-            DeviceAlarmLogExample deviceAlarmLogExample = new DeviceAlarmLogExample();
-            deviceAlarmLogExample.createCriteria().andPlanIdEqualTo(planId);
-            int abnormalWarn = deviceAlarmLogMapper.countByExample(deviceAlarmLogExample);
-            //计算询问总次数
-            TechConsultRecordExample techConsultRecordExample = new TechConsultRecordExample();
-            techConsultRecordExample.createCriteria().andPlanIdEqualTo(planId);
-            int askQues = techConsultRecordMapper.countByExample(techConsultRecordExample);
-            //计算询问解决次数
-            techConsultRecordExample.createCriteria().andTechConsultStatusEqualTo(TechConsultStatusEnum.STATUS_SOLVED.getCode());
-            int solveQuestions = techConsultRecordMapper.countByExample(techConsultRecordExample);
-            //计算计划采购 数量 重量
-            List<CalculatePurchaseOrderDto> calculatePurchaseOrderDtos = new ArrayList<>();
-            for (ProductTypeEnum productTypeEnum : ProductTypeEnum.values()) {
-                if (ProductTypeEnum.VACCINE.getCode() == productTypeEnum.getCode()) {
-                    continue;
-                }
-                BigDecimal planPurchaseValue = null;
-                BigDecimal deliverPurchaseValue = null;
-                int productType = productTypeEnum.getCode();
-                CalculatePurchaseOrderDto calculatePurchaseOrderDto = new CalculatePurchaseOrderDto();
-                HashMap<Integer, BigDecimal> calculatePurchaseOrderAllMap = calculatePurchaseOrder(planId, productType, null);
-                if (calculatePurchaseOrderAllMap != null && calculatePurchaseOrderAllMap.get(productType) != null) {
-                    planPurchaseValue = calculatePurchaseOrderAllMap.get(productType);
-                    if (ProductTypeEnum.FEED.getCode() == productType) {
-                        calculatePlanFeedWeightMap.put(productType, planPurchaseValue);
-                    }
-                }
-                HashMap<Integer, BigDecimal> calculatePurchaseOrderMap = calculatePurchaseOrder(planId, productType, PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode());
-                if (calculatePurchaseOrderMap.get(productType) != null) {
-                    deliverPurchaseValue = calculatePurchaseOrderMap.get(productType);
-                }
-                calculatePurchaseOrderDto
-                        .setProductType(productType)
-                        .setPlanPurchaseValue(planPurchaseValue)
-                        .setDeliverPurchaseValue(deliverPurchaseValue);
-                calculatePurchaseOrderDtos.add(calculatePurchaseOrderDto);
+            HashMap<Integer, BigDecimal> calculatePurchaseOrderMap = calculatePurchaseOrder(planId, productType, PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode());
+            if (calculatePurchaseOrderMap.get(productType) != null) {
+                deliverPurchaseValue = calculatePurchaseOrderMap.get(productType);
             }
-            //计算计划饲料 剩余饲料
-            if (calculatePlanFeedWeightMap.get(ProductTypeEnum.FEED.getCode()) != null) {
-                BigDecimal totalPlanFeedWeight = calculatePlanFeedWeightMap.get(ProductTypeEnum.FEED.getCode());
-                if (totalPlanFeedWeight != null) {
+            calculatePurchaseOrderDto
+                    .setProductType(productType)
+                    .setPlanPurchaseValue(planPurchaseValue)
+                    .setDeliverPurchaseValue(deliverPurchaseValue);
+            calculatePurchaseOrderDtos.add(calculatePurchaseOrderDto);
+        }
+        //计算计划饲料 剩余饲料
+        if (calculatePlanFeedWeightMap.get(ProductTypeEnum.FEED.getCode()) != null) {
+            BigDecimal totalPlanFeedWeight = calculatePlanFeedWeightMap.get(ProductTypeEnum.FEED.getCode());
+            if (totalPlanFeedWeight != null) {
+                returnBreedingDetailsDto
+                        .setPlanFeed(totalPlanFeedWeight);
+                if (totalPlanFeedWeight != null && accumulativeFeed != null) {
                     returnBreedingDetailsDto
-                            .setPlanFeed(totalPlanFeedWeight)
                             .setRemainFeed(totalPlanFeedWeight.subtract(accumulativeFeed));
+                } else {
+                    returnBreedingDetailsDto
+                            .setRemainFeed(totalPlanFeedWeight);
                 }
             }
-            //计算理论体重值
+        }
+        //计算理论体重值
+        List<BreedingBatchParameter> breedingBatchParameters = null;
+        if (batchInfo != null && batchInfo.getDayAge() != null) {
             BreedingBatchParameterExample breedingBatchParameterExample = new BreedingBatchParameterExample();
             breedingBatchParameterExample
                     .createCriteria()
@@ -1152,41 +1304,45 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                     .andStatusEqualTo(BreedingStandardStatusEnum.ENABLE.getCode())
                     .andParamTypeEqualTo(BreedingStandardParamEnum.WEIGHT.getCode())
                     .andValueTypeEqualTo(BreedingStandardValueTypeEnum.STANDARD_VALUE.getCode());
-            List<BreedingBatchParameter> breedingBatchParameters = breedingBatchParameterMapper.selectByExample(breedingBatchParameterExample);
-            if (!CollectionUtils.isEmpty(breedingBatchParameters)) {
-                BreedingBatchParameter breedingBatchParameter = breedingBatchParameters.get(0);
-                if (MathUtil.isNum(breedingBatchParameter.getParamValue())) {
-                    returnBreedingDetailsDto.setTheoryWeight(breedingBatchParameter.getParamValue());
-                }
-                //计算理论料肉比
-                if (breedingBatchParameter.getParamValue() != null && MathUtil.isNum(breedingBatchParameter.getParamValue())) {
-                    BigDecimal paramValue = new BigDecimal(breedingBatchParameter.getParamValue());
-                    BigDecimal meat = paramValue.multiply(breedingStock);
-                    if (meat != null && accumulativeFeed != null) {
-                        BigDecimal feedMeatRate = meat.divide(accumulativeFeed);
-                        returnBreedingDetailsDto.setFeedMeatRate(feedMeatRate);
-                    }
+            breedingBatchParameters = breedingBatchParameterMapper.selectByExample(breedingBatchParameterExample);
+        }
+        if (!CollectionUtils.isEmpty(breedingBatchParameters)) {
+            BreedingBatchParameter breedingBatchParameter = breedingBatchParameters.get(0);
+            if (MathUtil.isNum(breedingBatchParameter.getParamValue())) {
+                returnBreedingDetailsDto.setTheoryWeight(breedingBatchParameter.getParamValue());
+            }
+            //计算理论料肉比
+            if (breedingBatchParameters != null && breedingBatchParameter.getParamValue() != null
+                    && MathUtil.isNum(breedingBatchParameter.getParamValue())) {
+                BigDecimal paramValue = new BigDecimal(breedingBatchParameter.getParamValue());
+                BigDecimal meat = paramValue.multiply(breedingStock);
+                if (meat != null && accumulativeFeed != null) {
+                    BigDecimal feedMeatRate = meat.divide(accumulativeFeed);
+                    returnBreedingDetailsDto.setFeedMeatRate(feedMeatRate);
                 }
             }
-            //养殖场信息
-            List<Plant> plants = breedingPlantService.listPlantInfoByPlanId(planId);
+        }
+        //养殖场信息
+        List<Plant> plants = breedingPlantService.listPlantInfoByPlanId(planId);
+        if (batchInfo != null && batchInfo.getDayAge() != null) {
             returnBreedingDetailsDto
-                    .setPlants(plants)
-                    .setAskQuestions(askQues)
-                    .setSurvivalRate(percentage)
-                    .setAbnormalWarn(abnormalWarn)
-                    .setDayAge(batchInfo.getDayAge())
-                    .setExpectSuchTime(expectSuchTime)
-                    .setSolveQuestions(solveQuestions)
-                    .setCalculatePurchaseOrderDtos(calculatePurchaseOrderDtos);
-            if (breedingStock != null) {
-                returnBreedingDetailsDto
-                        .setBreedingStock(breedingStock.intValue());
-            }
-            if (breedingPlan.getBreedingDays() != null) {
-                returnBreedingDetailsDto
-                        .setBreedingDays(breedingPlan.getBreedingDays());
-            }
+                    .setDayAge(batchInfo.getDayAge());
+        }
+        returnBreedingDetailsDto
+                .setPlants(plants)
+                .setAskQuestions(askQues)
+                .setSurvivalRate(percentage)
+                .setAbnormalWarn(abnormalWarn)
+                .setExpectSuchTime(expectSuchTime)
+                .setSolveQuestions(solveQuestions)
+                .setCalculatePurchaseOrderDtos(calculatePurchaseOrderDtos);
+        if (breedingStock != null) {
+            returnBreedingDetailsDto
+                    .setBreedingStock(breedingStock.intValue());
+        }
+        if (breedingPlan.getBreedingDays() != null) {
+            returnBreedingDetailsDto
+                    .setBreedingDays(breedingPlan.getBreedingDays());
         }
         //养殖计划详情信息
         ReturnBreedingPlanDetailsDto returnBreedingPlanDetailsDto = breedingPlanDetails(planId);
