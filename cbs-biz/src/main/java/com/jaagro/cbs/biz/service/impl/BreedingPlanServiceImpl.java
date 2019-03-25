@@ -119,7 +119,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         // 雏鸡数量不能大于最大可养数量
         Integer planChickenQuantity = dto.getPlanChickenQuantity();
         Integer breedingAble = getBreedingAble(dto.getPlantIds());
-        if (planChickenQuantity > breedingAble){
+        if (planChickenQuantity > breedingAble) {
             throw new RuntimeException("雏鸡数量不能大于最大可养数量");
         }
         BreedingPlan breedingPlan = new BreedingPlan();
@@ -168,8 +168,8 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                 .andCoopStatusEqualTo(CoopStatusEnum.LEISURE.getCode());
         List<Coop> coopList = coopMapper.selectByExample(example);
         Integer breedingAble = 0;
-        if (!CollectionUtils.isEmpty(coopList)){
-            for (Coop coop : coopList){
+        if (!CollectionUtils.isEmpty(coopList)) {
+            for (Coop coop : coopList) {
                 breedingAble += coop.getCapacity();
             }
         }
@@ -579,12 +579,12 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         List<BreedingPlanDetailDto> breedingPlanDetailDtoList = breedingPlanMapper.listByCustomerId(customerId);
         if (!CollectionUtils.isEmpty(breedingPlanDetailDtoList)) {
             Iterator<BreedingPlanDetailDto> iterator = breedingPlanDetailDtoList.iterator();
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 BreedingPlanDetailDto next = iterator.next();
                 boolean flag = next.getPlanStatus().equals(PlanStatusEnum.BREEDING.getCode()) || next.getPlanStatus().equals(PlanStatusEnum.COMPLETED.getCode())
                         || next.getPlanStatus().equals(PlanStatusEnum.SIGN_CHICKEN.getCode()) || next.getPlanStatus().equals(PlanStatusEnum.SLAUGHTER_CONFIRM.getCode())
                         || next.getPlanStatus().equals(PlanStatusEnum.SLAUGHTER_PLAN.getCode());
-                if (!flag){
+                if (!flag) {
                     iterator.remove();
                 }
             }
@@ -991,9 +991,9 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             }
         }
         // 更新养殖计划
-        updateBreedingPlanToSignChicken(breedingPlan,breedingStandard,currentUserId);
+        updateBreedingPlanToSignChicken(breedingPlan, breedingStandard, currentUserId);
         // 生成药品配置
-        configPlanDrug(breedingPlan,standardId,currentUserId);
+        configPlanDrug(breedingPlan, standardId, currentUserId);
         // 生成第一批鸡苗,饲料,药品采购单
         breedingBrainService.calculateDrugPurchaseOrderById(breedingPlan);
         breedingBrainService.calculatePhaseOneFoodWeightById(breedingPlan);
@@ -1004,7 +1004,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         if (breedingPlan == null) {
             throw new RuntimeException("养殖计划id=" + planId + "不存在");
         }
-        if (!breedingPlan.getPlanStatus().equals(PlanStatusEnum.PARAM_CORRECT.getCode())){
+        if (!breedingPlan.getPlanStatus().equals(PlanStatusEnum.PARAM_CORRECT.getCode())) {
             throw new RuntimeException("只有待参数配置状态的计划才可以做参数配置");
         }
         return breedingPlan;
@@ -1012,14 +1012,15 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
 
     /**
      * 养殖计划药品配置
+     *
      * @param breedingPlan
      * @param standardId
      */
     private void configPlanDrug(BreedingPlan breedingPlan, Integer standardId, Integer currentUserId) {
-        List<BreedingStandardDrugDto> standardDrugDtoList= breedingStandardDrugMapper.listBreedingStandardDrugs(standardId);
-        if (!CollectionUtils.isEmpty(standardDrugDtoList)){
+        List<BreedingStandardDrugDto> standardDrugDtoList = breedingStandardDrugMapper.listBreedingStandardDrugs(standardId);
+        if (!CollectionUtils.isEmpty(standardDrugDtoList)) {
             List<BreedingBatchDrug> breedingBatchDrugList = new ArrayList<>();
-            for (BreedingStandardDrugDto dto : standardDrugDtoList){
+            for (BreedingStandardDrugDto dto : standardDrugDtoList) {
                 BreedingBatchDrug drug = new BreedingBatchDrug();
                 drug.setBatchNo(breedingPlan.getBatchNo())
                         .setCreateTime(new Date())
@@ -1039,11 +1040,12 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             breedingBatchDrugMapper.batchInsert(breedingBatchDrugList);
         }
 
-        
+
     }
 
     /**
      * 更新养殖计划状态为待上鸡签收
+     *
      * @param breedingPlan
      * @param breedingStandard
      * @param currentUserId
@@ -1107,6 +1109,9 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             //计算计划采购 数量 重量
             List<CalculatePurchaseOrderDto> calculatePurchaseOrderDtos = new ArrayList<>();
             for (ProductTypeEnum productTypeEnum : ProductTypeEnum.values()) {
+                if (ProductTypeEnum.VACCINE.getCode() == productTypeEnum.getCode()) {
+                    continue;
+                }
                 BigDecimal planPurchaseValue = null;
                 BigDecimal deliverPurchaseValue = null;
                 int productType = productTypeEnum.getCode();
@@ -1200,7 +1205,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
      */
     private HashMap<Integer, BigDecimal> calculatePurchaseOrder(Integer planId, Integer productType, Integer
             purchaseOrderStatus) {
-        BigDecimal totalPlanFeedStatistics = BigDecimal.ZERO;
+        BigDecimal totalPurchaseOrderItemsStatistics = BigDecimal.ZERO;
         HashMap<Integer, BigDecimal> calculatePurchaseOrderMap = new HashMap<>(16);
         //查询计划用料
         PurchaseOrderExample purchaseOrderExample = new PurchaseOrderExample();
@@ -1226,13 +1231,13 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                 if (!CollectionUtils.isEmpty(purchaseOrderItems)) {
                     for (PurchaseOrderItems purchaseOrderItem : purchaseOrderItems) {
                         if (purchaseOrderItem.getQuantity() != null) {
-                            totalPlanFeedStatistics = totalPlanFeedStatistics.add((purchaseOrderItem.getQuantity()));
+                            totalPurchaseOrderItemsStatistics = totalPurchaseOrderItemsStatistics.add((purchaseOrderItem.getQuantity()));
                         }
                     }
                 }
             }
         }
-        calculatePurchaseOrderMap.put(productType, totalPlanFeedStatistics);
+        calculatePurchaseOrderMap.put(productType, totalPurchaseOrderItemsStatistics);
         return calculatePurchaseOrderMap;
     }
 }
