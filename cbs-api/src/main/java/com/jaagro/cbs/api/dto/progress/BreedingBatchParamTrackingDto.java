@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -29,5 +30,8 @@ public class BreedingBatchParamTrackingDto extends BreedingBatchParameter implem
      */
     private String alarmMessage;
 
-
+    /**
+     * 养殖过程中记录的值（）
+     */
+    private String actualValue;
 }
