@@ -442,6 +442,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
      */
     @Override
     public void updatePurchaseOrder(UpdatePurchaseOrderParamDto dto) {
+        final int countVal = 4;
         PurchaseOrderExample purchaseOrderExample = new PurchaseOrderExample();
         PurchaseOrderExample.Criteria criteria = purchaseOrderExample.createCriteria();
         criteria.andEnableEqualTo(true)
@@ -485,7 +486,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                             count++;
                         }
                     }
-                    if (count == purchaseOrderList.size()) {
+                    if (count == purchaseOrderList.size() && count == countVal) {
                         breedingPlan
                                 .setPlanStatus(PlanStatusEnum.BREEDING.getCode())
                                 .setId(purchaseOrder.getPlanId());
