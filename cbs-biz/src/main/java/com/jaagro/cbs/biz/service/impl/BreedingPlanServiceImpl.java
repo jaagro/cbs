@@ -992,11 +992,11 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         }
         // 更新养殖计划
         updateBreedingPlanToSignChicken(breedingPlan,breedingStandard,currentUserId);
+        // 生成药品配置
+        configPlanDrug(breedingPlan,standardId,currentUserId);
         // 生成第一批鸡苗,饲料,药品采购单
         breedingBrainService.calculateDrugPurchaseOrderById(breedingPlan);
         breedingBrainService.calculatePhaseOneFoodWeightById(breedingPlan);
-        // 生成药品配置
-        configPlanDrug(breedingPlan,standardId,currentUserId);
     }
 
     private BreedingPlan judgeBreedingPlan(Integer planId) {
