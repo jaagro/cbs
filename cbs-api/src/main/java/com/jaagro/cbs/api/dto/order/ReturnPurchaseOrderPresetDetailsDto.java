@@ -32,6 +32,11 @@ public class ReturnPurchaseOrderPresetDetailsDto implements Serializable {
     private Integer planChickenQuantity;
 
     /**
+     * 订单货物类型（1: 种苗 2: 饲料 3: 药品）
+     */
+    private Integer productType;
+
+    /**
      * 上鸡时间
      */
     private Date planTime;
