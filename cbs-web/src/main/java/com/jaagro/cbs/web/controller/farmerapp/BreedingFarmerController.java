@@ -191,9 +191,14 @@ public class BreedingFarmerController {
                     BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(techConsultRecord.getHandleUserId());
                     if (globalUser != null && globalUser.getData() != null) {
                         UserInfo userInfo = globalUser.getData();
-                        technicalInquiriesVo
-                                .setHandlePhone(userInfo.getPhoneNumber())
-                                .setHandleUser(userInfo.getName());
+                        if (userInfo.getPhoneNumber() != null) {
+                            technicalInquiriesVo
+                                    .setHandlePhone(userInfo.getPhoneNumber());
+                        }
+                        if (userInfo.getName() != null) {
+                            technicalInquiriesVo
+                                    .setHandleUser(userInfo.getName());
+                        }
                     }
                 }
                 if (techConsultRecord.getPlantId() != null) {
