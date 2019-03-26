@@ -510,7 +510,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                     example
                             .createCriteria()
                             .andEnableEqualTo(true)
-                            .andOrderPhaseEqualTo(1)
+                            .andOrderPhaseEqualTo(PurchaseOrderPhaseEnum.PHASE_ONE.getCode())
                             .andPlanIdEqualTo(purchaseOrder.getPlanId());
                     purchaseOrderList = purchaseOrderMapper.selectByExample(example);
                     for (PurchaseOrder order : purchaseOrderList) {
