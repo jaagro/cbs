@@ -1,5 +1,6 @@
 package com.jaagro.cbs.biz.service.impl;
 
+import com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto;
 import com.jaagro.cbs.api.model.BatchInfo;
 import com.jaagro.cbs.api.model.BreedingPlan;
 import com.jaagro.cbs.api.service.BatchInfoService;
@@ -12,6 +13,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,7 +41,7 @@ public class BatchInfoServiceImpl implements BatchInfoService {
      * 批次养殖情况汇总
      */
     @Override
-    public void batchInfo() {
+    public void batchInfo(BatchInfoCriteriaDto criteriaDto) {
         // 加锁
         long time = System.currentTimeMillis() + 10 * 1000;
         boolean success = redisLock.lock("Scheduled:redisLock:batchInfo", String.valueOf(time), null, null);
@@ -48,10 +50,12 @@ public class BatchInfoServiceImpl implements BatchInfoService {
         }
         // 初始化今日
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String todayDate = sdf.format(new Date());
+        if (StringUtils.isEmpty(criteriaDto.getTodayDate())) {
+            criteriaDto.setTodayDate(sdf.format(new Date()));
+        }
         // 从breedingRecord统计
         // 得到批次养殖情况汇总列表
-        List<BatchInfo> batchInfoList = breedingRecordMapper.listBatchInfoByParams(todayDate);
+        List<BatchInfo> batchInfoList = breedingRecordMapper.listBatchInfoByParams(criteriaDto);
         if (!CollectionUtils.isEmpty(batchInfoList)) {
             for (BatchInfo info : batchInfoList) {
                 // 计划
@@ -84,7 +88,7 @@ public class BatchInfoServiceImpl implements BatchInfoService {
                         .setTechnicianId(breedingPlan.getTechnicianId());
             }
             //删除
-            batchInfoMapper.deleteByDate(todayDate);
+            batchInfoMapper.deleteByDate(criteriaDto.getTodayDate());
             //批量插入
             batchInfoMapper.insertBatch(batchInfoList);
 

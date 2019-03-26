@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 
@@ -435,14 +436,42 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
     }
 
     /**
+     * 农户端上鸡计划列表
+     *
+     * @param dto
+     * @return
+     * @author: @Gao.
+     */
+    @Override
+    public PageInfo listPublishedChickenPlan(BreedingBatchParamDto dto) {
+        List<BreedingPlan> breedingPlans = null;
+        PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        BreedingPlanExample breedingPlanExample = new BreedingPlanExample();
+        if (currentUser != null && currentUser.getId() != null) {
+            GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
+            if (customerUser != null && customerUser.getRelevanceId() != null) {
+                breedingPlanExample
+                        .createCriteria()
+                        .andCustomerIdEqualTo(customerUser.getRelevanceId())
+                        .andEnableEqualTo(true);
+                breedingPlans = breedingPlanMapper.selectByExample(breedingPlanExample);
+            }
+        }
+        return new PageInfo(breedingPlans);
+    }
+
+    /**
      * 更新采购订单状态
      *
      * @param dto
      * @author @Gao.
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseOrder(UpdatePurchaseOrderParamDto dto) {
-        final int countVal = 4;
+        final int countVal = 3;
+        UserInfo currentUser = currentUserService.getCurrentUser();
         PurchaseOrderExample purchaseOrderExample = new PurchaseOrderExample();
         PurchaseOrderExample.Criteria criteria = purchaseOrderExample.createCriteria();
         criteria.andEnableEqualTo(true)
@@ -462,6 +491,9 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
             }
             if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
                 purchaseOrder.setSignerTime(new Date());
+                if (currentUser != null && currentUser.getId() != null) {
+                    purchaseOrder.setSignerId(currentUser.getId());
+                }
             }
             purchaseOrder
                     .setPurchaseOrderStatus(dto.getPurchaseOrderStatus());
@@ -495,32 +527,6 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                 }
             }
         }
-    }
-
-    /**
-     * 农户端上鸡计划列表
-     *
-     * @param dto
-     * @return
-     * @author: @Gao.
-     */
-    @Override
-    public PageInfo listPublishedChickenPlan(BreedingBatchParamDto dto) {
-        List<BreedingPlan> breedingPlans = null;
-        PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-        UserInfo currentUser = currentUserService.getCurrentUser();
-        BreedingPlanExample breedingPlanExample = new BreedingPlanExample();
-        if (currentUser != null && currentUser.getId() != null) {
-            GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
-            if (customerUser != null && customerUser.getRelevanceId() != null) {
-                breedingPlanExample
-                        .createCriteria()
-                        .andCustomerIdEqualTo(customerUser.getRelevanceId())
-                        .andEnableEqualTo(true);
-                breedingPlans = breedingPlanMapper.selectByExample(breedingPlanExample);
-            }
-        }
-        return new PageInfo(breedingPlans);
     }
 
     /**

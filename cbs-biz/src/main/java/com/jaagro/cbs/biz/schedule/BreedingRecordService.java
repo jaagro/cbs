@@ -1,5 +1,6 @@
 package com.jaagro.cbs.biz.schedule;
 
+import com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto;
 import com.jaagro.cbs.api.service.BatchCoopDailyService;
 import com.jaagro.cbs.api.service.BatchInfoService;
 import com.jaagro.cbs.api.service.BreedingRecordDailyService;
@@ -54,7 +55,8 @@ public class BreedingRecordService {
     public void breedingRecordDaily() {
         log.info("breedingRecordDaily:定时钟执行开始");
         try {
-            breedingRecordDailyService.breedingRecordDaily();
+            BatchInfoCriteriaDto criteriaDto = new BatchInfoCriteriaDto();
+            breedingRecordDailyService.breedingRecordDaily(criteriaDto);
         } catch (Exception ex) {
             log.error("批次养殖记录表日汇总执行错误:" + ex);
         }
@@ -70,7 +72,8 @@ public class BreedingRecordService {
     public void batchInfo() {
         log.info("batchInfo:定时钟执行开始");
         try {
-            batchInfoService.batchInfo();
+            BatchInfoCriteriaDto criteriaDto = new BatchInfoCriteriaDto();
+            batchInfoService.batchInfo(criteriaDto);
         } catch (Exception ex) {
             log.error("批次养殖情况汇总执行错误:" + ex);
         }

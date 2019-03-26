@@ -2,6 +2,7 @@ package com.jaagro.cbs.biz.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
 import com.jaagro.cbs.api.dto.order.*;
 import com.jaagro.cbs.api.dto.plan.CustomerInfoParamDto;
 import com.jaagro.cbs.api.dto.supplychain.PurchaseOrderManageCriteria;
@@ -16,8 +17,6 @@ import com.jaagro.cbs.api.service.BreedingPurchaseOrderService;
 import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
 import com.jaagro.cbs.biz.mapper.PurchaseOrderMapperExt;
 import com.jaagro.cbs.biz.service.UserClientService;
-import com.jaagro.constant.UserInfo;
-import com.jaagro.utils.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,6 @@ public class BreedingPurchaseOrderServiceImpl implements BreedingPurchaseOrderSe
     private BreedingFarmerService breedingFarmerService;
     @Autowired
     private PurchaseOrderMapperExt purchaseOrderMapper;
-
 
 
     /**
@@ -86,14 +84,13 @@ public class BreedingPurchaseOrderServiceImpl implements BreedingPurchaseOrderSe
                     }
                 }
                 if (returnPurchaseOrderPresetDto.getSignerId() != null) {
-                    BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(returnPurchaseOrderPresetDto.getSignerId());
-                    if (globalUser != null && globalUser.getData() != null) {
-                        UserInfo userInfo = globalUser.getData();
-                        if (userInfo.getName() != null) {
-                            returnPurchaseOrderPresetDto.setSignerName(userInfo.getName());
+                    GetCustomerUserDto customerUser = userClientService.getCustomerUserById(returnPurchaseOrderPresetDto.getSignerId());
+                    if (customerUser != null) {
+                        if (customerUser.getName() != null) {
+                            returnPurchaseOrderPresetDto.setSignerName(customerUser.getName());
                         }
-                        if (userInfo.getPhoneNumber() != null) {
-                            returnPurchaseOrderPresetDto.setSignerPhone(userInfo.getPhoneNumber());
+                        if (customerUser.getPhoneNumber() != null) {
+                            returnPurchaseOrderPresetDto.setSignerPhone(customerUser.getPhoneNumber());
                         }
                     }
                 }
@@ -172,6 +169,7 @@ public class BreedingPurchaseOrderServiceImpl implements BreedingPurchaseOrderSe
             criteria.setCustomerIds(listCustomerIds);
         }
         List<ReturnPurchaseOrderManageDto> returnPurchaseOrderManageDtos = purchaseOrderMapper.listPurchasingManagement(criteria);
+        //to do
         return null;
     }
 }

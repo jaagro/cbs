@@ -85,6 +85,10 @@ public class ReturnBreedingPlanDetailsDto implements Serializable {
      */
     private String createUserName;
 
+    /**
+     * 最大可养数量
+     */
+    private Integer breedingAble;
 
     /**
      * 养殖场
