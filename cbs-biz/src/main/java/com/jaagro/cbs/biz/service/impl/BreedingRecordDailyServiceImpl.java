@@ -1,5 +1,6 @@
 package com.jaagro.cbs.biz.service.impl;
 
+import com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto;
 import com.jaagro.cbs.api.model.BreedingRecordDaily;
 import com.jaagro.cbs.api.service.BreedingRecordDailyService;
 import com.jaagro.cbs.biz.mapper.BreedingRecordDailyMapperExt;
@@ -9,6 +10,7 @@ import com.jaagro.cbs.biz.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,24 +36,26 @@ public class BreedingRecordDailyServiceImpl implements BreedingRecordDailyServic
      * 批次养殖记录表日汇总
      */
     @Override
-    public void breedingRecordDaily() {
+    public void breedingRecordDaily(BatchInfoCriteriaDto criteriaDto) {
         //加锁
         long time = System.currentTimeMillis() + 10 * 1000;
         boolean success = redisLock.lock("Scheduled:redisLock:breedingRecordDaily", String.valueOf(time), null, null);
         if (!success) {
             throw new RuntimeException("请求正在处理中");
         }
-
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String todayDate = sdf.format(new Date());
+        if (StringUtils.isEmpty(criteriaDto.getTodayDate())) {
+            criteriaDto.setTodayDate(sdf.format(new Date()));
+        }
+
         //统计
-        List<BreedingRecordDaily> dailyList = breedingRecordMapper.listBreedingDailyByParams(todayDate);
+        List<BreedingRecordDaily> dailyList = breedingRecordMapper.listBreedingDailyByParams(criteriaDto);
         if (!CollectionUtils.isEmpty(dailyList)) {
             for (BreedingRecordDaily daily : dailyList) {
                 daily.setCreateUserId(1);
             }
             //删除
-            breedingRecordDailyMapper.deleteByDate(todayDate);
+            breedingRecordDailyMapper.deleteByDate(criteriaDto.getTodayDate());
             //批量插入
             breedingRecordDailyMapper.insertBatch(dailyList);
 

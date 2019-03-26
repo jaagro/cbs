@@ -1,5 +1,6 @@
 package com.jaagro.cbs.biz.mapper;
 
+import com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto;
 import com.jaagro.cbs.api.dto.farmer.BreedingRecordDto;
 import com.jaagro.cbs.api.model.*;
 import com.jaagro.cbs.biz.mapper.base.BaseMapper;
@@ -21,10 +22,10 @@ public interface BreedingRecordMapperExt extends BaseMapper<BreedingRecord, Bree
     /**
      * 查询每个批次的日汇总
      *
-     * @param todayDate
+     * @param criteriaDto
      * @return
      */
-    List<BreedingRecordDaily> listBreedingDailyByParams(@Param("todayDate") String todayDate);
+    List<BreedingRecordDaily> listBreedingDailyByParams(BatchInfoCriteriaDto criteriaDto);
 
     /**
      * 鸡舍养殖每日汇总
@@ -40,7 +41,7 @@ public interface BreedingRecordMapperExt extends BaseMapper<BreedingRecord, Bree
      * @param todayDate
      * @return
      */
-    List<BatchInfo> listBatchInfoByParams(@Param("todayDate") String todayDate);
+    List<BatchInfo> listBatchInfoByParams(BatchInfoCriteriaDto criteriaDto);
 
     /**
      * 根据条件查询养殖记录列表
