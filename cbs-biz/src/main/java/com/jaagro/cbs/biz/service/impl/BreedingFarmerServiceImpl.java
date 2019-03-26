@@ -442,7 +442,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
      */
     @Override
     public void updatePurchaseOrder(UpdatePurchaseOrderParamDto dto) {
-        final int countVal = 4;
+        final int countVal = 3;
         PurchaseOrderExample purchaseOrderExample = new PurchaseOrderExample();
         PurchaseOrderExample.Criteria criteria = purchaseOrderExample.createCriteria();
         criteria.andEnableEqualTo(true)
