@@ -471,6 +471,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseOrder(UpdatePurchaseOrderParamDto dto) {
         final int countVal = 3;
+        UserInfo currentUser = currentUserService.getCurrentUser();
         PurchaseOrderExample purchaseOrderExample = new PurchaseOrderExample();
         PurchaseOrderExample.Criteria criteria = purchaseOrderExample.createCriteria();
         criteria.andEnableEqualTo(true)
@@ -490,6 +491,9 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
             }
             if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
                 purchaseOrder.setSignerTime(new Date());
+                if (currentUser != null && currentUser.getId() != null) {
+                    purchaseOrder.setSignerId(currentUser.getId());
+                }
             }
             purchaseOrder
                     .setPurchaseOrderStatus(dto.getPurchaseOrderStatus());
