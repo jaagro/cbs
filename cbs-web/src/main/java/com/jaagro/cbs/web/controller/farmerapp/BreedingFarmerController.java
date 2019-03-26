@@ -188,12 +188,12 @@ public class BreedingFarmerController {
                 TechnicalInquiriesVo technicalInquiriesVo = new TechnicalInquiriesVo();
                 BeanUtils.copyProperties(techConsultRecord, technicalInquiriesVo);
                 if (techConsultRecord.getHandleUserId() != null) {
-                    BaseResponse<ListEmployeeDto> technician = userClientService.getTechnicianById(techConsultRecord.getHandleUserId());
-                    if (technician != null && technician.getData() != null) {
-                        ListEmployeeDto employee = technician.getData();
+                    BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(techConsultRecord.getHandleUserId());
+                    if (globalUser != null && globalUser.getData() != null) {
+                        UserInfo userInfo = globalUser.getData();
                         technicalInquiriesVo
-                                .setHandlePhone(employee.getPhone())
-                                .setHandleUser(employee.getName());
+                                .setHandlePhone(userInfo.getPhoneNumber())
+                                .setHandleUser(userInfo.getName());
                     }
                 }
                 if (techConsultRecord.getPlantId() != null) {
