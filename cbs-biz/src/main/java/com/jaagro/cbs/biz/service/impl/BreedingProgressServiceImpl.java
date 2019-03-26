@@ -363,7 +363,20 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
 
     private FeedingFactoryBo feedingRecordFactory(Integer planId, Integer coopId, Integer dayAge, Integer feedingType) {
         BreedingRecordExample breedingRecordExample = new BreedingRecordExample();
-        breedingRecordExample.createCriteria().andPlanIdEqualTo(planId).andCoopIdEqualTo(coopId).andDayAgeEqualTo(dayAge).andRecordTypeEqualTo(feedingType).andEnableEqualTo(true);
+        BreedingRecordExample.Criteria criteria = breedingRecordExample.createCriteria();
+        criteria.andPlanIdEqualTo(planId).andEnableEqualTo(true);
+        if(null != coopId)
+        {
+            criteria.andCoopIdEqualTo(coopId);
+        }
+        if(null != dayAge)
+        {
+            criteria.andDayAgeEqualTo(dayAge);
+        }
+        if(null != feedingType){
+            criteria.andRecordTypeEqualTo(feedingType);
+        }
+
         List<BreedingRecord> breedingList = breedingRecordMapper.selectByExample(breedingRecordExample);
         int feedingTimes = breedingList.size();
         BigDecimal feedingWeight = new BigDecimal(0.00);
@@ -396,6 +409,11 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
         BigDecimal totalFedFood = batchInfoMapper.accumulativeFeed(planId);
         if (null == totalFedFood) {
             totalFedFood = BigDecimal.ZERO;
+        }
+
+        if(totalFedFood.compareTo(BigDecimal.ZERO)==0){
+            FeedingFactoryBo feedingFoodBo = feedingRecordFactory(planId, null, null, null);
+            totalFedFood = feedingFoodBo.getFeedingWeight();
         }
         //剩余饲料 = 已签收的饲料总和 - 已喂养饲料总和
         BigDecimal leftFeedFood = totalSignedFood.subtract(totalFedFood);
