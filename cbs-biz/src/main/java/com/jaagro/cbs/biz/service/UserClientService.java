@@ -91,5 +91,14 @@ public interface UserClientService {
      */
     @GetMapping("/customerUser/{id}")
     GetCustomerUserDto getCustomerUserById(@PathVariable("id") Integer id);
+
+    /**
+     * 获取技术员列表
+     *
+     * @return
+     * @author
+     */
+    @GetMapping("/listTechnician/{employeeId}")
+    BaseResponse<ListEmployeeDto> getTechnicianById(@PathVariable("employeeId") Integer employeeId);
 }
 

@@ -2,6 +2,7 @@ package com.jaagro.cbs.web.controller.farmerapp;
 
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
+import com.jaagro.cbs.api.dto.base.ListEmployeeDto;
 import com.jaagro.cbs.api.dto.farmer.*;
 import com.jaagro.cbs.api.dto.message.MessageCriteriaDto;
 import com.jaagro.cbs.api.dto.order.PurchaseOrderListParamDto;
@@ -187,12 +188,12 @@ public class BreedingFarmerController {
                 TechnicalInquiriesVo technicalInquiriesVo = new TechnicalInquiriesVo();
                 BeanUtils.copyProperties(techConsultRecord, technicalInquiriesVo);
                 if (techConsultRecord.getHandleUserId() != null) {
-                    BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(techConsultRecord.getHandleUserId());
-                    if (globalUser != null && globalUser.getData() != null) {
-                        UserInfo userInfo = globalUser.getData();
+                    BaseResponse<ListEmployeeDto> technician = userClientService.getTechnicianById(techConsultRecord.getHandleUserId());
+                    if (technician != null && technician.getData() != null) {
+                        ListEmployeeDto employee = technician.getData();
                         technicalInquiriesVo
-                                .setHandlePhone(userInfo.getPhoneNumber())
-                                .setHandleUser(userInfo.getName());
+                                .setHandlePhone(employee.getPhone())
+                                .setHandleUser(employee.getName());
                     }
                 }
                 if (techConsultRecord.getPlantId() != null) {
