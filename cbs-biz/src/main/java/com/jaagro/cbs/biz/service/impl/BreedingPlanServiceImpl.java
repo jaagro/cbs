@@ -576,18 +576,8 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         if (customerId == null) {
             throw new RuntimeException("当前登录用户对应客户信息为空");
         }
-        List<BreedingPlanDetailDto> breedingPlanDetailDtoList = breedingPlanMapper.listByCustomerId(customerId);
+        List<BreedingPlanDetailDto> breedingPlanDetailDtoList = breedingPlanMapper.listBreedingBatchForFarmer(customerId);
         if (!CollectionUtils.isEmpty(breedingPlanDetailDtoList)) {
-            Iterator<BreedingPlanDetailDto> iterator = breedingPlanDetailDtoList.iterator();
-            while (iterator.hasNext()) {
-                BreedingPlanDetailDto next = iterator.next();
-                boolean flag = next.getPlanStatus().equals(PlanStatusEnum.BREEDING.getCode()) || next.getPlanStatus().equals(PlanStatusEnum.COMPLETED.getCode())
-                        || next.getPlanStatus().equals(PlanStatusEnum.SIGN_CHICKEN.getCode()) || next.getPlanStatus().equals(PlanStatusEnum.SLAUGHTER_CONFIRM.getCode())
-                        || next.getPlanStatus().equals(PlanStatusEnum.SLAUGHTER_PLAN.getCode());
-                if (!flag) {
-                    iterator.remove();
-                }
-            }
             breedingPlanDetailDtoList.forEach(breedingPlanDetailDto -> generateBatchDetail(breedingPlanDetailDto));
         }
         return new PageInfo<>(breedingPlanDetailDtoList);

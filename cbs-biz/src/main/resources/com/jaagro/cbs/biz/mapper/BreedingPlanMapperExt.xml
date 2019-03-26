@@ -70,12 +70,14 @@
         where customer_id = #{customerId,jdbcType=INTEGER}
         and enable = 1
     </select>
-    <select id="listByCustomerId" resultType="com.jaagro.cbs.api.dto.farmer.BreedingPlanDetailDto">
+    <select id="listBreedingBatchForFarmer" resultType="com.jaagro.cbs.api.dto.farmer.BreedingPlanDetailDto">
         SELECT
         <include refid="Base_Column_List"/>
         FROM breeding_plan
         WHERE customer_id = #{customerId,jdbcType=INTEGER}
         and enable = 1
+        and plan_status in (2,3,4,5,6)
+        order by plan_time desc
     </select>
     <select id="listPurchaseOrderPreset" resultType="com.jaagro.cbs.api.dto.order.ReturnPurchaseOrderPresetDto"
             parameterType="com.jaagro.cbs.api.dto.order.PurchaseOrderPresetCriteriaDto">
