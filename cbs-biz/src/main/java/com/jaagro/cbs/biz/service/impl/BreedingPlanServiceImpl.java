@@ -793,7 +793,18 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         }
         //养殖场信息
         List<Plant> plants = breedingPlantService.listPlantInfoByPlanId(breedingPlan.getId());
-        returnBreedingPlanDto.setPlants(plants);
+        List<Integer> plantIds = new ArrayList<>();
+        for (Plant plant : plants) {
+            if (plant.getId() != null) {
+                plantIds.add(plant.getId());
+            }
+        }
+        //设置最大可养数量
+        Integer breedingAble = getBreedingAble(plantIds);
+        returnBreedingPlanDto
+                .setBreedingAble(breedingAble);
+        returnBreedingPlanDto
+                .setPlants(plants);
         //养殖户信息
         CustomerInfoParamDto customerInfo = getCustomerInfo(breedingPlan.getCustomerId());
         if (customerInfo != null) {
