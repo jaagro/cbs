@@ -32,6 +32,11 @@ public class ReturnFarmerPurchaseOrderDetailsDto implements Serializable {
     private Integer planId;
 
     /**
+     * 订单货物类型（1: 种苗 2: 饲料 3: 药品）
+     */
+    private Integer productType;
+
+    /**
      * 商品采购单编号
      */
     private String purchaseNo;

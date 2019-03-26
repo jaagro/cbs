@@ -21,6 +21,11 @@ import java.util.Date;
 public class ReturnProductDto implements Serializable {
 
     /**
+     * 商品类型
+     */
+    private Integer productType;
+
+    /**
      * 产品名称
      */
     private String productName;

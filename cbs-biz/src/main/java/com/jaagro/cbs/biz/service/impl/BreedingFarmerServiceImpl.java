@@ -581,7 +581,8 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
      * @return
      * @author: @Gao.
      */
-    private Integer getDayAge(Date beginDate) throws Exception {
+    @Override
+    public Integer getDayAge(Date beginDate) throws Exception {
         Integer day = 0;
         Date endDate = new Date();
         if (beginDate == null) {

@@ -198,9 +198,22 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                         }
                     }
                 }
+                BreedingRecordDto breedingRecordDto = getBreedingRecordsById( planId,  coopId,  dayAge);
                 for (BreedingBatchParameter breedingBatchParameterDo : breedingBatchParameterDos) {
                     BreedingBatchParamTrackingDto returnDto = new BreedingBatchParamTrackingDto();
                     BeanUtils.copyProperties(breedingBatchParameterDo, returnDto);
+                    if(null !=breedingRecordDto && BreedingStandardParamEnum.DIE.getCode()==breedingBatchParameterDo.getParamType()){
+                        returnDto.setActualValue(breedingRecordDto.getDeathTotal().toString());
+                    }
+                    if(null !=breedingRecordDto && BreedingStandardParamEnum.FEEDING_WEIGHT.getCode()==breedingBatchParameterDo.getParamType()){
+                        returnDto.setActualValue(breedingRecordDto.getFeedFoodWeight().toString());
+                    }
+                    if(null !=breedingRecordDto && BreedingStandardParamEnum.FEEDING_FODDER_NUM.getCode()==breedingBatchParameterDo.getParamType()){
+                        returnDto.setActualValue(breedingRecordDto.getFeedFoodTimes().toString());
+                    }
+                    if(BreedingStandardParamEnum.WEIGHT.getCode()==breedingBatchParameterDo.getParamType()){
+                        returnDto.setActualValue("--");
+                    }
                     //养殖参数对应的设备列表
                     if (!CollectionUtils.isEmpty(coopDeviceDos)) {
                         List<CoopDevice> deviceDos = coopDeviceDos.stream().filter(c -> c.getDeviceType().equals(breedingBatchParameterDo.getParamType())).collect(Collectors.toList());
@@ -312,11 +325,13 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
             FeedingFactoryBo deathBo = feedingRecordFactory(planId, coopId, dayAge, BreedingRecordTypeEnum.DEATH_AMOUNT.getCode());
             List<BreedingRecord> deathAmountList = deathBo.getBreedingList();
             breedingRecordDto.setDeathList(deathAmountList);
+            int deathTotal = 0;
             if (!CollectionUtils.isEmpty(deathAmountList)) {
-                int deathTotal = 0;
                 for (BreedingRecord breedingRecord : deathAmountList) {
                     deathTotal += breedingRecord.getBreedingValue().intValue();
                 }
+                breedingRecordDto.setDeathTotal(deathTotal);
+            }else{
                 breedingRecordDto.setDeathTotal(deathTotal);
             }
             //养殖计划的鸡舍在某日龄上的应喂料总次数
