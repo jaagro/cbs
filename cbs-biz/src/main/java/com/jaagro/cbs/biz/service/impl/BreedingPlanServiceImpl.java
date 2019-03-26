@@ -153,7 +153,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                 if (currentUser != null && currentUser.getId() != null) {
                     batchPlantCoop.setCreateUserId(currentUser.getId());
                 }
-                if (breedingPlan != null && breedingPlan.getId() != null) {
+                if (breedingPlan.getId() != null) {
                     batchPlantCoop.setPlanId(breedingPlan.getId());
                 }
                 batchPlantCoops.add(batchPlantCoop);
@@ -1089,14 +1089,14 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             survivalStock = survivalStock.subtract(accumulativeDeadAmount);
         }
         //计算存栏量
-        BigDecimal breedingStock = null;
+        BigDecimal breedingStock = new BigDecimal(0);
         if (breedingPlan.getPlanChickenQuantity() != null) {
-            breedingStock = new BigDecimal(breedingPlan.getPlanChickenQuantity());
+            breedingStock = BigDecimal.valueOf(breedingPlan.getPlanChickenQuantity());
         }
-        if (breedingStock != null && accumulativeDeadAmount != null) {
+        if (accumulativeDeadAmount != null) {
             breedingStock = breedingStock.subtract(accumulativeDeadAmount);
         }
-        if (breedingStock != null && accumulativeSaleAmount != null) {
+        if (accumulativeSaleAmount != null) {
             breedingStock = breedingStock.subtract(accumulativeSaleAmount);
         }
         //计算成活率
@@ -1153,7 +1153,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             if (totalPlanFeedWeight != null) {
                 returnBreedingDetailsDto
                         .setPlanFeed(totalPlanFeedWeight);
-                if (totalPlanFeedWeight != null && accumulativeFeed != null) {
+                if (accumulativeFeed != null) {
                     returnBreedingDetailsDto
                             .setRemainFeed(totalPlanFeedWeight.subtract(accumulativeFeed));
                 } else {
@@ -1182,12 +1182,12 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                 returnBreedingDetailsDto.setTheoryWeight(breedingBatchParameter.getParamValue());
             }
             //计算理论料肉比
-            if (breedingBatchParameters != null && breedingBatchParameter.getParamValue() != null
+            if (breedingBatchParameter.getParamValue() != null
                     && MathUtil.isNum(breedingBatchParameter.getParamValue())) {
                 BigDecimal paramValue = new BigDecimal(breedingBatchParameter.getParamValue());
                 BigDecimal meat = paramValue.multiply(breedingStock);
-                if (meat != null && accumulativeFeed != null) {
-                    BigDecimal feedMeatRate = meat.divide(accumulativeFeed);
+                if (meat != null && accumulativeFeed != null && BigDecimal.ZERO.compareTo(accumulativeFeed) != 1) {
+                    BigDecimal feedMeatRate = meat.divide(accumulativeFeed, 2, BigDecimal.ROUND_HALF_UP);
                     returnBreedingDetailsDto.setFeedMeatRate(feedMeatRate);
                 }
             }

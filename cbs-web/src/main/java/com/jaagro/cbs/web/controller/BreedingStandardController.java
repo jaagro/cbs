@@ -21,10 +21,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -205,6 +202,7 @@ public class BreedingStandardController {
                 }
             }
         }
+        listVoList.sort(Comparator.comparingInt(BreedingStandardDrugListVo::getDayAgeStart));
         return listVoList;
     }
 
