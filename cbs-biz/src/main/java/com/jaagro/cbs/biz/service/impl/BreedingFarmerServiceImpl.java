@@ -510,7 +510,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                     example
                             .createCriteria()
                             .andEnableEqualTo(true)
-                            .andOrderPhaseEqualTo(1)
+                            .andOrderPhaseEqualTo(PurchaseOrderPhaseEnum.PHASE_ONE.getCode())
                             .andPlanIdEqualTo(purchaseOrder.getPlanId());
                     purchaseOrderList = purchaseOrderMapper.selectByExample(example);
                     for (PurchaseOrder order : purchaseOrderList) {
@@ -537,7 +537,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
      */
     @Override
     public PageInfo listTechnicalInquiries(BreedingBatchParamDto dto) {
-        List<TechConsultRecord> techConsultRecords = null;
+        List<TechConsultRecord> techConsultRecords = new ArrayList<>();
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         UserInfo currentUser = currentUserService.getCurrentUser();
         TechConsultRecordExample techConsultRecordExample = new TechConsultRecordExample();
@@ -550,7 +550,6 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                 techConsultRecords = techConsultRecordMapper.selectByExample(techConsultRecordExample);
             }
         }
-
         return new PageInfo(techConsultRecords);
     }
 

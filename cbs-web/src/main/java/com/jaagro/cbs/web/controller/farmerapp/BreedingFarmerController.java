@@ -2,6 +2,7 @@ package com.jaagro.cbs.web.controller.farmerapp;
 
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
+import com.jaagro.cbs.api.dto.base.ListEmployeeDto;
 import com.jaagro.cbs.api.dto.farmer.*;
 import com.jaagro.cbs.api.dto.message.MessageCriteriaDto;
 import com.jaagro.cbs.api.dto.order.PurchaseOrderListParamDto;
@@ -190,9 +191,14 @@ public class BreedingFarmerController {
                     BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(techConsultRecord.getHandleUserId());
                     if (globalUser != null && globalUser.getData() != null) {
                         UserInfo userInfo = globalUser.getData();
-                        technicalInquiriesVo
-                                .setHandlePhone(userInfo.getPhoneNumber())
-                                .setHandleUser(userInfo.getName());
+                        if (userInfo.getPhoneNumber() != null) {
+                            technicalInquiriesVo
+                                    .setHandlePhone(userInfo.getPhoneNumber());
+                        }
+                        if (userInfo.getName() != null) {
+                            technicalInquiriesVo
+                                    .setHandleUser(userInfo.getName());
+                        }
                     }
                 }
                 if (techConsultRecord.getPlantId() != null) {
@@ -206,6 +212,10 @@ public class BreedingFarmerController {
                     if (plant != null && plant.getCounty() != null) {
                         sb.append(plant.getCounty());
                     }
+                }
+                if (techConsultRecord.getBatchNo() != null) {
+                    technicalInquiriesVo
+                            .setBatchNo(techConsultRecord.getBatchNo());
                 }
                 technicalInquiriesVo
                         .setAddress(sb.toString());
@@ -318,9 +328,9 @@ public class BreedingFarmerController {
 
     @ApiOperation("获取农户应喂药列表")
     @GetMapping("/listBreedingRecordDrug")
-    public BaseResponse listBreedingRecordDrug(@RequestParam Integer planId,@RequestParam Integer coopId){
-        log.info("O listBreedingRecordDrug planId={},coopId={}",planId,coopId);
-        return BaseResponse.successInstance(breedingPlanService.listBreedingRecordDrug(planId,coopId));
+    public BaseResponse listBreedingRecordDrug(@RequestParam Integer planId, @RequestParam Integer coopId) {
+        log.info("O listBreedingRecordDrug planId={},coopId={}", planId, coopId);
+        return BaseResponse.successInstance(breedingPlanService.listBreedingRecordDrug(planId, coopId));
     }
 
     /**
