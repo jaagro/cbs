@@ -51,7 +51,7 @@ public class BreedingBrainSchedule {
     public void calculatePhaseTwoFoodWeight() {
         log.info("calculatePhaseTwoFoodWeight:定时钟执行开始");
         List<BreedingPlan> breedingPlanList = this.getBreedingPlanList("calculatePhaseTwoFoodWeight");
-        if (!CollectionUtils.isEmpty(breedingPlanList)){
+        if (!CollectionUtils.isEmpty(breedingPlanList)) {
             for (BreedingPlan breedingPlan : breedingPlanList) {
                 try {
                     breedingBrainService.calculatePhaseTwoFoodWeightById(breedingPlan);
@@ -75,7 +75,7 @@ public class BreedingBrainSchedule {
     public void calculatePhaseFourFoodWeight() {
         log.info("calculatePhaseFourFoodWeight:定时钟执行开始");
         List<BreedingPlan> breedingPlanList = this.getBreedingPlanList("calculatePhaseFourFoodWeight");
-        if (!CollectionUtils.isEmpty(breedingPlanList)){
+        if (!CollectionUtils.isEmpty(breedingPlanList)) {
             for (BreedingPlan breedingPlan : breedingPlanList) {
                 try {
                     breedingBrainService.calculatePhaseFourFoodWeightById(breedingPlan);
@@ -92,7 +92,7 @@ public class BreedingBrainSchedule {
         List<BreedingPlan> breedingPlanList = null;
         //加锁
         long time = System.currentTimeMillis() + 10 * 1000;
-        boolean success = redisLock.lock("Scheduled:redisLock:"+method, String.valueOf(time),10, TimeUnit.MINUTES);
+        boolean success = redisLock.lock("Scheduled:redisLock:" + method, String.valueOf(time), 10, TimeUnit.MINUTES);
         if (!success) {
             return breedingPlanList;
         }
@@ -120,7 +120,7 @@ public class BreedingBrainSchedule {
             breedingPlanList = JsonUtils.jsonToList(breedingPlanListJson, BreedingPlan.class);
         }
 
-        redisLock.unLock("Scheduled:redisLock:"+method);
+        redisLock.unLock("Scheduled:redisLock:" + method);
         return breedingPlanList;
     }
 
