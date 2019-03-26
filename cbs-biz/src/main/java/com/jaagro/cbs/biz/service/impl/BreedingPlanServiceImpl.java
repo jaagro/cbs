@@ -850,20 +850,17 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                             .setPurchaseOrderStatus(PurchaseOrderStatusEnum.getDescByCode(purchaseOrder.getPurchaseOrderStatus()));
                 }
                 //签收人信息
-                BaseResponse<UserInfo> globalUser = null;
+                GetCustomerUserDto customerUser = null;
                 if (purchaseOrder.getSignerId() != null) {
-                    globalUser = userClientService.getGlobalUser(purchaseOrder.getSignerId());
+                    customerUser = userClientService.getCustomerUserById(purchaseOrder.getSignerId());
                 }
-                if (globalUser != null && globalUser.getData() != null) {
-                    UserInfo userInfo = globalUser.getData();
-                    if (userInfo != null && userInfo.getName() != null) {
-                        returnPurchaseOrderDto
-                                .setSignerName(userInfo.getName());
-                    }
-                    if (userInfo != null && userInfo.getPhoneNumber() != null) {
-                        returnPurchaseOrderDto
-                                .setSignerPhone(userInfo.getPhoneNumber());
-                    }
+                if (customerUser != null && customerUser.getName() != null) {
+                    returnPurchaseOrderDto
+                            .setSignerName(customerUser.getName());
+                }
+                if (customerUser != null && customerUser.getPhoneNumber() != null) {
+                    returnPurchaseOrderDto
+                            .setSignerPhone(customerUser.getPhoneNumber());
                 }
                 returnPurchaseOrderDtos.add(returnPurchaseOrderDto);
             }

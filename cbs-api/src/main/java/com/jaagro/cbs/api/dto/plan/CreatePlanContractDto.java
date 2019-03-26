@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -58,6 +59,7 @@ public class CreatePlanContractDto implements Serializable{
      */
     @NotNull(message = "{babychickPrice.NotNull}")
     @Min(value = 0,message = "{babychickPrice.Min}")
+    @Max(value = 50,message = "{babychickPrice.Max}")
     private BigDecimal babychickPrice;
 
     /**
@@ -77,6 +79,7 @@ public class CreatePlanContractDto implements Serializable{
      */
     @NotNull(message = "{fodderPrice.NotNull}")
     @Min(value = 0,message = "{fodderPrice.Min}")
+    @Max(value = 5000,message = "{fodderPrice.Max}")
     private BigDecimal fodderPrice;
 
     /**
@@ -84,6 +87,7 @@ public class CreatePlanContractDto implements Serializable{
      */
     @NotNull(message = "{protectionPrice.NotNull}")
     @Min(value = 0,message = "{protectionPrice.Min}")
+    @Max(value = 100,message = "{protectionPrice.Max}")
     private BigDecimal protectionPrice;
 
     /**

@@ -54,6 +54,10 @@ public class ReturnPurchaseOrderDto implements Serializable {
      */
     private String signerPhone;
 
+    /**
+     * 签收时间
+     */
+    private Date signerTime;
 
     /**
      * 采购数量 采购重量
