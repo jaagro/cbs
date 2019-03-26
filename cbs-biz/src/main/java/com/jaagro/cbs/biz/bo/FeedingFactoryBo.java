@@ -19,4 +19,8 @@ public class FeedingFactoryBo implements Serializable {
     private int feedingTimes;
     private BigDecimal feedingWeight;
     private List<BreedingRecord> breedingList;
+    /**
+     * 喂养的计量单位
+     */
+    private String unit;
 }
