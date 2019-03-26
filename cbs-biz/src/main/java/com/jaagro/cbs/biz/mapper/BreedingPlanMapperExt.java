@@ -65,7 +65,7 @@ public interface BreedingPlanMapperExt extends BaseMapper<BreedingPlan, Breeding
      * @param customerId
      * @return
      */
-    List<BreedingPlanDetailDto> listByCustomerId(@Param("customerId") Integer customerId);
+    List<BreedingPlanDetailDto> listBreedingBatchForFarmer(@Param("customerId") Integer customerId);
 
     /**
      * @param dto
