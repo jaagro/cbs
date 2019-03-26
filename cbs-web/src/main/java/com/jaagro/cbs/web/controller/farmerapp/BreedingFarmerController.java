@@ -207,6 +207,10 @@ public class BreedingFarmerController {
                         sb.append(plant.getCounty());
                     }
                 }
+                if (techConsultRecord.getBatchNo() != null) {
+                    technicalInquiriesVo
+                            .setBatchNo(techConsultRecord.getBatchNo());
+                }
                 technicalInquiriesVo
                         .setAddress(sb.toString());
                 technicalInquiriesVo
@@ -318,9 +322,9 @@ public class BreedingFarmerController {
 
     @ApiOperation("获取农户应喂药列表")
     @GetMapping("/listBreedingRecordDrug")
-    public BaseResponse listBreedingRecordDrug(@RequestParam Integer planId,@RequestParam Integer coopId){
-        log.info("O listBreedingRecordDrug planId={},coopId={}",planId,coopId);
-        return BaseResponse.successInstance(breedingPlanService.listBreedingRecordDrug(planId,coopId));
+    public BaseResponse listBreedingRecordDrug(@RequestParam Integer planId, @RequestParam Integer coopId) {
+        log.info("O listBreedingRecordDrug planId={},coopId={}", planId, coopId);
+        return BaseResponse.successInstance(breedingPlanService.listBreedingRecordDrug(planId, coopId));
     }
 
     /**
