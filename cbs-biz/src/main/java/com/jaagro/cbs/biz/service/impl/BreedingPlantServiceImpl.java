@@ -3,6 +3,7 @@ package com.jaagro.cbs.biz.service.impl;
 import com.jaagro.cbs.api.dto.base.ShowCustomerDto;
 import com.jaagro.cbs.api.dto.plant.*;
 import com.jaagro.cbs.api.enums.CoopStatusEnum;
+import com.jaagro.cbs.api.exception.BusinessException;
 import com.jaagro.cbs.api.model.Coop;
 import com.jaagro.cbs.api.model.CoopExample;
 import com.jaagro.cbs.api.model.Plant;
@@ -232,7 +233,7 @@ public class BreedingPlantServiceImpl implements BreedingPlantService {
     public Map<String, Object> createCoop(CreateCoopDto coopDto) {
         Plant plant = plantMapper.selectByPrimaryKey(coopDto.getPlantId());
         if (plant == null) {
-            throw new RuntimeException("养殖场不存在");
+            throw new BusinessException("养殖场不存在");
         }
         Coop coop = new Coop();
         BeanUtils.copyProperties(coopDto, coop);
