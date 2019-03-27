@@ -5,6 +5,8 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.techconsult.ReturnTechConsultRecordDto;
 import com.jaagro.cbs.api.dto.techconsult.TechConsultParamDto;
 import com.jaagro.cbs.api.dto.techconsult.UpdateTechConsultDto;
+import com.jaagro.cbs.api.enums.EmergencyLevelEnum;
+import com.jaagro.cbs.api.enums.TechConsultHandleTypeEnum;
 import com.jaagro.cbs.api.enums.TechConsultStatusEnum;
 import com.jaagro.cbs.api.model.*;
 import com.jaagro.cbs.api.service.TechConsultService;
@@ -96,6 +98,10 @@ public class TechConsultServiceImpl implements TechConsultService {
         }
         BeanUtils.copyProperties(techConsultRecordDo, returnDto);
         returnDto.setStrTechConsultStatus(TechConsultStatusEnum.getDescByCode(techConsultRecordDo.getTechConsultStatus()));
+        returnDto.setStrEmergencyLevel(EmergencyLevelEnum.getDescByCode(techConsultRecordDo.getEmergencyLevel()));
+        if(null != techConsultRecordDo.getHandleType()){
+            returnDto.setStrHandleType(TechConsultHandleTypeEnum.getDescByCode(techConsultRecordDo.getHandleType()));
+        }
         int planId = techConsultRecordDo.getPlanId();
         int livingAmount = 0;
         BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
