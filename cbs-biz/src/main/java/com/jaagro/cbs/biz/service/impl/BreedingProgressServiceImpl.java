@@ -207,12 +207,15 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                     BeanUtils.copyProperties(breedingBatchParameterDo, returnDto);
                     if (null != breedingRecordDto && BreedingStandardParamEnum.DIE.getCode() == breedingBatchParameterDo.getParamType()) {
                         returnDto.setActualValue(breedingRecordDto.getDeathTotal().toString());
+                        returnDto.setUnit(breedingRecordDto.getUnit());
                     }
                     if (null != breedingRecordDto && BreedingStandardParamEnum.FEEDING_WEIGHT.getCode() == breedingBatchParameterDo.getParamType()) {
                         returnDto.setActualValue(breedingRecordDto.getFeedFoodWeight().toString());
+                        returnDto.setUnit(breedingRecordDto.getUnit());
                     }
                     if (null != breedingRecordDto && BreedingStandardParamEnum.FEEDING_FODDER_NUM.getCode() == breedingBatchParameterDo.getParamType()) {
                         returnDto.setActualValue(breedingRecordDto.getFeedFoodTimes().toString());
+                        returnDto.setUnit(breedingRecordDto.getUnit());
                     }
                     if (BreedingStandardParamEnum.WEIGHT.getCode() == breedingBatchParameterDo.getParamType()) {
                         returnDto.setActualValue("--");
@@ -231,6 +234,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                                             deviceValueDto.setDeviceId(deviceValues.get(0).getDeviceId());
                                             deviceValueDto.setCurrentValue(deviceValues.get(0).getCurrentValue());
                                             deviceValueDto.setValueType(deviceValues.get(0).getValueType());
+                                            deviceValueDto.setUnit(breedingBatchParameterDo.getUnit());
                                             actualResult.add(deviceValueDto);
                                         }
                                     }
@@ -242,6 +246,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                                         if (!CollectionUtils.isEmpty(deviceValueHistorys)) {
                                             DeviceValueDto deviceValueDto = new DeviceValueDto();
                                             BeanUtils.copyProperties(deviceValueHistorys.get(0), deviceValueDto);
+                                            deviceValueDto.setUnit(breedingBatchParameterDo.getUnit());
                                             actualResult.add(deviceValueDto);
                                         }
                                     }
@@ -381,14 +386,17 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
         List<BreedingRecord> breedingList = breedingRecordMapper.selectByExample(breedingRecordExample);
         int feedingTimes = breedingList.size();
         BigDecimal feedingWeight = new BigDecimal(0.00);
+        String feedUnit = "";
         for (BreedingRecord breedingRecordDo : breedingList) {
             feedingWeight = feedingWeight.add(breedingRecordDo.getBreedingValue());
+            feedUnit = breedingRecordDo.getUnit();
         }
 
         FeedingFactoryBo feedingFactoryBo = new FeedingFactoryBo();
         feedingFactoryBo
                 .setBreedingList(breedingList)
                 .setFeedingTimes(feedingTimes)
+                .setUnit(feedUnit)
                 .setFeedingWeight(feedingWeight);
 
         return feedingFactoryBo;
