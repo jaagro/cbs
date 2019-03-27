@@ -466,6 +466,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                     .createCriteria()
                     .andCreateUserIdEqualTo(currentUser.getId())
                     .andEnableEqualTo(true);
+            breedingPlanExample.setOrderByClause("create_time desc");
             breedingPlans = breedingPlanMapper.selectByExample(breedingPlanExample);
         }
         return new PageInfo(breedingPlans);
@@ -552,15 +553,13 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         UserInfo currentUser = currentUserService.getCurrentUser();
         TechConsultRecordExample techConsultRecordExample = new TechConsultRecordExample();
         if (currentUser != null && currentUser.getId() != null) {
-            GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
-            if (customerUser != null && customerUser.getRelevanceId() != null) {
-                techConsultRecordExample
-                        .createCriteria()
-                        .andCustomerIdEqualTo(customerUser.getRelevanceId());
-                techConsultRecordExample
-                        .setOrderByClause("create_time desc");
-                techConsultRecords = techConsultRecordMapper.selectByExample(techConsultRecordExample);
-            }
+            techConsultRecordExample
+                    .createCriteria()
+                    .andEnableEqualTo(true)
+                    .andCreateUserIdEqualTo(currentUser.getId());
+            techConsultRecordExample
+                    .setOrderByClause("create_time desc");
+            techConsultRecords = techConsultRecordMapper.selectByExample(techConsultRecordExample);
         }
         return new PageInfo(techConsultRecords);
     }

@@ -2,13 +2,12 @@ package com.jaagro.cbs.web.controller.farmerapp;
 
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
-import com.jaagro.cbs.api.dto.base.ListEmployeeDto;
+import com.jaagro.cbs.api.dto.base.ShowCustomerDto;
 import com.jaagro.cbs.api.dto.farmer.*;
 import com.jaagro.cbs.api.dto.message.MessageCriteriaDto;
 import com.jaagro.cbs.api.dto.order.PurchaseOrderListParamDto;
 import com.jaagro.cbs.api.dto.order.UpdatePurchaseOrderParamDto;
 import com.jaagro.cbs.api.dto.plan.CreateBreedingPlanDto;
-import com.jaagro.cbs.api.dto.plant.ReturnPlantDto;
 import com.jaagro.cbs.api.dto.progress.BreedingRecordDto;
 import com.jaagro.cbs.api.enums.EmergencyLevelEnum;
 import com.jaagro.cbs.api.enums.UserTypeEnum;
@@ -19,6 +18,7 @@ import com.jaagro.cbs.api.service.BreedingFarmerService;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.BreedingPlantService;
 import com.jaagro.cbs.api.service.BreedingProgressService;
+import com.jaagro.cbs.biz.service.CustomerClientService;
 import com.jaagro.cbs.biz.service.UserClientService;
 import com.jaagro.cbs.biz.service.impl.CurrentUserService;
 import com.jaagro.cbs.biz.service.impl.MessageServiceImpl;
@@ -64,6 +64,8 @@ public class BreedingFarmerController {
     private MessageServiceImpl messageService;
     @Autowired
     private BreedingProgressService breedingProgressService;
+    @Autowired
+    private CustomerClientService customerClientService;
 
 
     @GetMapping("/breedingFarmerIndexStatistical")
@@ -201,16 +203,16 @@ public class BreedingFarmerController {
                         }
                     }
                 }
-                if (techConsultRecord.getPlantId() != null) {
-                    ReturnPlantDto plant = breedingPlantService.getPlantDetailsById(techConsultRecord.getPlantId());
-                    if (plant != null && plant.getProvince() != null) {
-                        sb.append(plant.getProvince());
+                if (techConsultRecord.getCustomerId() != null) {
+                    ShowCustomerDto showCustomer = customerClientService.getShowCustomerById(techConsultRecord.getCustomerId());
+                    if (showCustomer != null && showCustomer.getProvince() != null) {
+                        sb.append(showCustomer.getProvince());
                     }
-                    if (plant != null && plant.getCity() != null) {
-                        sb.append(plant.getCity());
+                    if (showCustomer != null && showCustomer.getCity() != null) {
+                        sb.append(showCustomer.getCity());
                     }
-                    if (plant != null && plant.getCounty() != null) {
-                        sb.append(plant.getCounty());
+                    if (showCustomer != null && showCustomer.getCounty() != null) {
+                        sb.append(showCustomer.getCounty());
                     }
                 }
                 if (techConsultRecord.getBatchNo() != null) {
