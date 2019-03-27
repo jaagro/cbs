@@ -8,6 +8,7 @@ import com.jaagro.cbs.api.enums.CoopStatusEnum;
 import com.jaagro.cbs.api.enums.PlanStatusEnum;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.BreedingPlantService;
+import com.jaagro.cbs.biz.utils.DateUtil;
 import com.jaagro.cbs.web.vo.plan.BreedingPlanVo;
 import com.jaagro.cbs.web.vo.plan.coop.CheckCoopVo;
 import com.jaagro.utils.BaseResponse;
@@ -37,6 +38,7 @@ public class BreedingPlanController {
     private BreedingPlanService breedingPlanService;
     @Autowired
     private BreedingPlantService breedingPlantService;
+
 
     @PostMapping("/createBreedingPlan")
     @ApiOperation("创建养殖计划")
@@ -69,6 +71,9 @@ public class BreedingPlanController {
             List<ReturnBreedingPlanDto> returnBreedingPlanDtos = pageInfo.getList();
             for (ReturnBreedingPlanDto returnBreedingPlanDto : returnBreedingPlanDtos) {
                 BreedingPlanVo breedingPlanVo = new BreedingPlanVo();
+                if (returnBreedingPlanDto.getPlanTime() != null) {
+                    breedingPlanVo.setPlanTime(DateUtil.dateToStr(returnBreedingPlanDto.getPlanTime()));
+                }
                 BeanUtils.copyProperties(returnBreedingPlanDto, breedingPlanVo);
                 breedingPlanVo
                         .setPlanStatus(PlanStatusEnum.getDescByCode(returnBreedingPlanDto.getPlanStatus()));

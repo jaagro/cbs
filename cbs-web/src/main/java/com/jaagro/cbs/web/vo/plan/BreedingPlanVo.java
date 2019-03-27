@@ -56,7 +56,7 @@ public class BreedingPlanVo implements Serializable {
     /**
      * 上鸡时间
      */
-    private Date planTime;
+    private String planTime;
 
     /**
      * 技术员姓名

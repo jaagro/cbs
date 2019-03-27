@@ -330,7 +330,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         .andPurchaseOrderStatusIn(purchaseOrderStatus)
                         .andEnableEqualTo(true)
                         .andCustomerIdEqualTo(customerUser.getRelevanceId());
-                purchaseOrderExample.setOrderByClause("purchase_order_status asc ,delivery_time desc");
+                purchaseOrderExample.setOrderByClause("delivery_time desc");
                 List<PurchaseOrder> purchaseOrderList = purchaseOrderMapper.selectByExample(purchaseOrderExample);
                 for (PurchaseOrder purchaseOrder : purchaseOrderList) {
                     BigDecimal totalPurchaseStatistics = new BigDecimal(0);
@@ -596,6 +596,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
 
     /**
      * 根据上鸡计划时间获取当前日龄
+     *
      * @param beginDate
      * @return
      * @author: @Gao.
