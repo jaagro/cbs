@@ -215,7 +215,7 @@ public class BreedingPlantController {
         return BaseResponse.successInstance(breedingCoopDeviceService.listCoopDeviceByCoopId(coopId));
     }
 
-    @ApiOperation("查询当前客户空闲的养殖场")
+    @ApiOperation("查询当前客户有鸡舍的养殖场")
     @GetMapping("/listFreePlantByCustomerId/{customerId}")
     public BaseResponse<List<ReturnBasicPlantDto>> listFreePlantByCustomerId(@PathVariable("customerId") Integer customerId) {
         return BaseResponse.successInstance(breedingPlantService.listFreePlantByCustomerId(customerId));
