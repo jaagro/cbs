@@ -596,7 +596,6 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
 
     /**
      * 根据上鸡计划时间获取当前日龄
-     *
      * @param beginDate
      * @return
      * @author: @Gao.
