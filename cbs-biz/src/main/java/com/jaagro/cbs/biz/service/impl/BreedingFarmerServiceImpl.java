@@ -240,6 +240,10 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                             .setCustomerName(showCustomer.getCustomerName())
                             .setCreateUserId(currentUser.getId())
                             .setCustomerId(customerUser.getRelevanceId());
+                    if (breedingPlan.getTechnicianId() != null) {
+                        techConsultRecord
+                                .setHandleUserId(breedingPlan.getTechnicianId());
+                    }
                 }
             }
         }
@@ -458,14 +462,11 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         UserInfo currentUser = currentUserService.getCurrentUser();
         BreedingPlanExample breedingPlanExample = new BreedingPlanExample();
         if (currentUser != null && currentUser.getId() != null) {
-            GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
-            if (customerUser != null && customerUser.getRelevanceId() != null) {
-                breedingPlanExample
-                        .createCriteria()
-                        .andCustomerIdEqualTo(customerUser.getRelevanceId())
-                        .andEnableEqualTo(true);
-                breedingPlans = breedingPlanMapper.selectByExample(breedingPlanExample);
-            }
+            breedingPlanExample
+                    .createCriteria()
+                    .andCreateUserIdEqualTo(currentUser.getId())
+                    .andEnableEqualTo(true);
+            breedingPlans = breedingPlanMapper.selectByExample(breedingPlanExample);
         }
         return new PageInfo(breedingPlans);
     }
@@ -556,6 +557,8 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                 techConsultRecordExample
                         .createCriteria()
                         .andCustomerIdEqualTo(customerUser.getRelevanceId());
+                techConsultRecordExample
+                        .setOrderByClause("create_time desc");
                 techConsultRecords = techConsultRecordMapper.selectByExample(techConsultRecordExample);
             }
         }
