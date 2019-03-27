@@ -15,6 +15,7 @@ import com.jaagro.cbs.api.dto.progress.BreedingBatchParamTrackingDto;
 import com.jaagro.cbs.api.dto.standard.BreedingParameterDto;
 import com.jaagro.cbs.api.dto.standard.BreedingStandardDrugDto;
 import com.jaagro.cbs.api.enums.*;
+import com.jaagro.cbs.api.exception.BusinessException;
 import com.jaagro.cbs.api.model.*;
 import com.jaagro.cbs.api.service.BreedingBrainService;
 import com.jaagro.cbs.api.service.BreedingFarmerService;
@@ -122,7 +123,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         Integer planChickenQuantity = dto.getPlanChickenQuantity();
         Integer breedingAble = getBreedingAble(dto.getPlantIds());
         if (planChickenQuantity > breedingAble) {
-            throw new RuntimeException("雏鸡数量不能大于最大可养数量");
+            throw new BusinessException("雏鸡数量不能大于最大可养数量");
         }
         BreedingPlan breedingPlan = new BreedingPlan();
         UserInfo currentUser = currentUserService.getCurrentUser();
@@ -325,7 +326,6 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             breedingPlanDetailDto.setStrPlanStatus(PlanStatusEnum.getDescByCode(breedingPlanDetailDto.getPlanStatus()));
             // 存栏量,今日耗料量
             BatchInfo theLatestBatchInfo = batchInfoMapper.getTheLatestBatchInfo(planId);
-
             // 日龄
             Integer dayAge = null;
             if (theLatestBatchInfo != null) {
@@ -339,7 +339,20 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             if (dayAge == null) {
                 dayAge = (int) getDayAge(planId);
             }
+            if (dayAge == null || dayAge < 0){
+                dayAge = 0;
+            }
             breedingPlanDetailDto.setDayAge(dayAge);
+            // 上次喂鸡时间
+            BreedingRecordExample example = new BreedingRecordExample();
+            example.createCriteria().andEnableEqualTo(Boolean.TRUE).andPlanIdEqualTo(planId)
+                    .andRecordTypeEqualTo(BreedingRecordTypeEnum.FEED_FOOD.getCode());
+            example.setOrderByClause("create_time desc");
+            example.setLimit(1);
+            List<BreedingRecord> breedingRecordList = breedingRecordMapper.selectByExample(example);
+            if (!CollectionUtils.isEmpty(breedingRecordList)){
+                breedingPlanDetailDto.setLastFeedTime(breedingRecordList.get(0).getBreedingTime());
+            }
             // 计划养殖场鸡舍信息
             List<BatchPlantCoopBo> batchPlantCoopBoList = batchPlantCoopMapper.listPlantCoopInfoByPlanId(planId);
             if (!CollectionUtils.isEmpty(batchPlantCoopBoList)) {
@@ -525,7 +538,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             Integer planId = createBreedingRecordDto.getPlanId();
             BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
             if (breedingPlan == null) {
-                throw new RuntimeException("计划id=" + planId + "不存在");
+                throw new BusinessException("计划id=" + planId + "不存在");
             }
             int dayAge = (int) getDayAge(planId);
             BreedingRecord breedingRecord = new BreedingRecord();
@@ -554,7 +567,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             }
         } catch (Exception ex) {
             log.error("O uploadBreedingRecord error,param=" + createBreedingRecordDto, ex);
-            throw new RuntimeException("上传养殖记录失败");
+            throw new BusinessException("上传养殖记录失败");
         }
 
     }
@@ -571,12 +584,12 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         UserInfo currentUser = currentUserService.getCurrentUser();
         Integer currentUserId = currentUser == null ? null : currentUser.getId();
         if (currentUserId == null) {
-            throw new RuntimeException("获取当前登录用户信息失败");
+            throw new BusinessException("获取当前登录用户信息失败");
         }
         GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
         Integer customerId = customerUser == null ? null : customerUser.getRelevanceId();
         if (customerId == null) {
-            throw new RuntimeException("当前登录用户对应客户信息为空");
+            throw new BusinessException("当前登录用户对应客户信息为空");
         }
         List<BreedingPlanDetailDto> breedingPlanDetailDtoList = breedingPlanMapper.listBreedingBatchForFarmer(customerId);
         if (!CollectionUtils.isEmpty(breedingPlanDetailDtoList)) {
@@ -664,7 +677,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         Integer planId = createPlanContractDto.getPlanId();
         BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
         if (breedingPlan == null) {
-            throw new RuntimeException("养殖计划id=" + planId + "不存在");
+            throw new BusinessException("养殖计划id=" + planId + "不存在");
         }
         UserInfo currentUser = currentUserService.getCurrentUser();
         Integer currentUserId = currentUser == null ? null : currentUser.getId();
@@ -702,10 +715,10 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             List<ContractPriceSection> contractPriceSectionList = new ArrayList<>();
             for (ContractPriceSectionDto dto : contractPriceSectionDtoList) {
                 if (dto.getWeightLower().compareTo(new BigDecimal("99.99")) == 1 || dto.getWeightUpper().compareTo(new BigDecimal("99.99")) == 1) {
-                    throw new RuntimeException("鸡重起止要小于100");
+                    throw new BusinessException("鸡重起止要小于100");
                 }
                 if (dto.getRecyclingPrice().compareTo(new BigDecimal("9999.99")) == 1) {
-                    throw new RuntimeException("回收价格要小于10000");
+                    throw new BusinessException("回收价格要小于10000");
                 }
                 ContractPriceSection contractPriceSection = new ContractPriceSection();
                 BeanUtils.copyProperties(dto, contractPriceSection);
@@ -757,7 +770,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         //养殖计划信息
         BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
         if (breedingPlan == null) {
-            throw new RuntimeException("当前养殖计划 " + planId + " 不存在");
+            throw new BusinessException("当前养殖计划 " + planId + " 不存在");
         }
         BeanUtils.copyProperties(breedingPlan, returnBreedingPlanDto);
         //累计所有死淘数量
@@ -1002,10 +1015,10 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
     private BreedingPlan judgeBreedingPlan(Integer planId) {
         BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
         if (breedingPlan == null) {
-            throw new RuntimeException("养殖计划id=" + planId + "不存在");
+            throw new BusinessException("养殖计划id=" + planId + "不存在");
         }
         if (!breedingPlan.getPlanStatus().equals(PlanStatusEnum.PARAM_CORRECT.getCode())) {
-            throw new RuntimeException("只有待参数配置状态的计划才可以做参数配置");
+            throw new BusinessException("只有待参数配置状态的计划才可以做参数配置");
         }
         return breedingPlan;
     }
@@ -1071,7 +1084,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         //送料情况信息
         BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
         if (breedingPlan == null) {
-            throw new RuntimeException("当前养殖计划" + planId + "不存在");
+            throw new BusinessException("当前养殖计划" + planId + "不存在");
         }
         BatchInfo batchInfo = batchInfoMapper.getTheLatestBatchInfo(planId);
         //累计所有死淘数量

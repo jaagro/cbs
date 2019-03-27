@@ -3,6 +3,7 @@ package com.jaagro.cbs.biz.service.impl;
 import com.jaagro.cbs.api.dto.base.ShowCustomerDto;
 import com.jaagro.cbs.api.dto.plant.*;
 import com.jaagro.cbs.api.enums.CoopStatusEnum;
+import com.jaagro.cbs.api.exception.BusinessException;
 import com.jaagro.cbs.api.model.Coop;
 import com.jaagro.cbs.api.model.CoopExample;
 import com.jaagro.cbs.api.model.Plant;
@@ -232,7 +233,7 @@ public class BreedingPlantServiceImpl implements BreedingPlantService {
     public Map<String, Object> createCoop(CreateCoopDto coopDto) {
         Plant plant = plantMapper.selectByPrimaryKey(coopDto.getPlantId());
         if (plant == null) {
-            throw new RuntimeException("养殖场不存在");
+            throw new BusinessException("养殖场不存在");
         }
         Coop coop = new Coop();
         BeanUtils.copyProperties(coopDto, coop);
@@ -321,5 +322,35 @@ public class BreedingPlantServiceImpl implements BreedingPlantService {
             }
         }
         return returnPlantDtoList;
+    }
+
+    /**
+     * 查询当前客户空闲的养殖场
+     *
+     * @param customerId
+     * @return
+     */
+    @Override
+    public List<ReturnBasicPlantDto> listFreePlantByCustomerId(Integer customerId) {
+        List<ReturnBasicPlantDto> returnBasicPlantDtos = new ArrayList<>();
+        List<ReturnPlantDto> returnPlantDtos = listPlantByCustomerId(customerId);
+        if (!CollectionUtils.isEmpty(returnPlantDtos)) {
+            for (ReturnPlantDto returnPlantDto : returnPlantDtos) {
+                if (CollectionUtils.isEmpty(returnPlantDto.getReturnCoopDtos())) {
+                    continue;
+                }
+                ReturnBasicPlantDto returnBasicPlantDto = new ReturnBasicPlantDto();
+                if (returnPlantDto.getPlantName() != null) {
+                    returnBasicPlantDto
+                            .setPlantName(returnPlantDto.getPlantName());
+                }
+                if (returnPlantDto.getId() != null) {
+                    returnBasicPlantDto
+                            .setId(returnPlantDto.getId());
+                }
+                returnBasicPlantDtos.add(returnBasicPlantDto);
+            }
+        }
+        return returnBasicPlantDtos;
     }
 }

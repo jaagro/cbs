@@ -30,8 +30,7 @@ public class BreedingRecordService {
     /**
      * 鸡舍养殖每日汇总
      */
-    @Scheduled(cron = "0 30 23 1/1 * ?")
-//    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ? ")
     @Transactional(rollbackFor = Exception.class)
     public void batchCoopDaily() {
         log.info("batchCoopDaily:定时钟执行开始");

@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * @author :asus
- * @date :2019/03/21
+ * @author :gaoxin
+ * @date :2019/03/27
  */
 @Data
 @NoArgsConstructor
@@ -35,6 +35,11 @@ public class TechConsultRecord implements Serializable {
      * 客户手机号
      */
     private String customerPhoneNumber;
+
+    /**
+     * 喂养日龄
+     */
+    private Integer dayAge;
 
     /**
      * 鸡舍id

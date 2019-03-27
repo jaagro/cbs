@@ -70,6 +70,12 @@ public class BreedingPlanDetailDto implements Serializable{
      * 今日饲料耗量
      */
     private BigDecimal fodderAmount;
+
+    /**
+     * 上次喂鸡时间
+     */
+    private Date lastFeedTime;
+
     /**
      * 批次养殖场列表
      */

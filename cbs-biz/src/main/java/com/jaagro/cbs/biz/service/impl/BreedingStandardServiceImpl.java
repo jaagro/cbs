@@ -6,6 +6,7 @@ import com.jaagro.cbs.api.dto.ValidList;
 import com.jaagro.cbs.api.dto.plan.CustomerInfoParamDto;
 import com.jaagro.cbs.api.dto.standard.*;
 import com.jaagro.cbs.api.enums.*;
+import com.jaagro.cbs.api.exception.BusinessException;
 import com.jaagro.cbs.api.model.*;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.BreedingStandardService;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import sun.font.TrueTypeFont;
 
 import java.util.*;
 
@@ -86,7 +86,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         // 如果养殖天数减少则删除大于修改后养殖天数日龄的养殖参数
         if (breedingStandard.getBreedingDays() != null && dto.getBreedingDays() != null ) {
             if (breedingStandard.getBreedingDays() < dto.getBreedingDays()){
-                throw new RuntimeException("亲,不允许增加养殖天数");
+                throw new BusinessException("亲,不允许增加养殖天数");
             }
             if (breedingStandard.getBreedingDays() > dto.getBreedingDays()){
                 BreedingStandardParameterExample example = new BreedingStandardParameterExample();
@@ -360,11 +360,11 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         if (isInitParam) {
             BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(standardId);
             if (breedingStandard == null) {
-                throw new RuntimeException("模板id=" + standardId + "不存在");
+                throw new BusinessException("模板id=" + standardId + "不存在");
             }
             Integer breedingDays = breedingStandard.getBreedingDays();
             if (breedingDays == null) {
-                throw new RuntimeException("喂养天数为空");
+                throw new BusinessException("喂养天数为空");
             }
             switch (paramName) {
                 case "体重标准":
@@ -425,11 +425,11 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         List<ParameterTypeDto> result = new ArrayList<>();
         Integer sortType = dto.getSortType();
         if (!SortTypeEnum.UP.equals(sortType) && !SortTypeEnum.DOWN.equals(sortType)) {
-            throw new RuntimeException("排序类型不正确");
+            throw new BusinessException("排序类型不正确");
         }
         List<ParameterTypeDto> parameterTypeDtoList = listParameterNameByStandardId(dto.getStandardId());
         if (CollectionUtils.isEmpty(parameterTypeDtoList)) {
-            throw new RuntimeException("养殖模板参数为空");
+            throw new BusinessException("养殖模板参数为空");
         }
         List<BreedingStandardParameter> needUpdateDisplayOrderList = new ArrayList<>();
         for (ParameterTypeDto parameterTypeDto : parameterTypeDtoList) {
@@ -502,7 +502,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
                 }
             }
             if (stopDrugCount < breedingStopDrugCount){
-                throw new RuntimeException("一个养殖周期必须有两个以上停药日");
+                throw new BusinessException("一个养殖周期必须有两个以上停药日");
             }
             Integer standardId = drugList.get(0).getStandardId();
             Integer currentUserId = getCurrentUserId();
@@ -529,7 +529,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
                     .setModifyUserId(currentUserId);
             breedingStandardMapper.updateByPrimaryKeySelective(breedingStandard);
         } else {
-            throw new RuntimeException("药品配置信息列表为空");
+            throw new BusinessException("药品配置信息列表为空");
         }
     }
 
@@ -542,7 +542,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
     public void delBreedingStandard(Integer standardId) {
         BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(standardId);
         if (breedingStandard == null) {
-            throw new RuntimeException("养殖模板id=" + standardId + "不存在");
+            throw new BusinessException("养殖模板id=" + standardId + "不存在");
         }
         breedingStandardMapper.deleteByPrimaryKey(standardId);
         standardParameterMapper.deleteByStandardId(standardId);
