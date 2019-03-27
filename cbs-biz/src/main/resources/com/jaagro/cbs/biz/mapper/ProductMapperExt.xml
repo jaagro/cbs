@@ -32,7 +32,7 @@
         <if test="productType != null">
             and product_type = #{productType}
         </if>
-        and product_type in (3,4)
+        and product_type in (3,4) order by create_time desc
     </select>
 
 </mapper>
