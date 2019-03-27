@@ -216,6 +216,15 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         }
         //插入技术询问
         TechConsultRecord techConsultRecord = new TechConsultRecord();
+        try {
+            //获取当前日龄
+            if (breedingPlan.getPlanTime() != null) {
+                Integer dayAge = getDayAge(breedingPlan.getPlanTime());
+                techConsultRecord.setDayAge(dayAge);
+            }
+        } catch (Exception e) {
+            log.info("R breedingFarmerIndex getDayAge error", e);
+        }
         UserInfo currentUser = currentUserService.getCurrentUser();
         BeanUtils.copyProperties(dto, techConsultRecord);
         techConsultRecord
