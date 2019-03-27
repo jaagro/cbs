@@ -326,7 +326,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         .andPurchaseOrderStatusIn(purchaseOrderStatus)
                         .andEnableEqualTo(true)
                         .andCustomerIdEqualTo(customerUser.getRelevanceId());
-                purchaseOrderExample.setOrderByClause("create_time DESC");
+                purchaseOrderExample.setOrderByClause("purchase_order_status asc ,delivery_time desc");
                 List<PurchaseOrder> purchaseOrderList = purchaseOrderMapper.selectByExample(purchaseOrderExample);
                 for (PurchaseOrder purchaseOrder : purchaseOrderList) {
                     BigDecimal totalPurchaseStatistics = new BigDecimal(0);

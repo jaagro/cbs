@@ -339,7 +339,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             if (dayAge == null) {
                 dayAge = (int) getDayAge(planId);
             }
-            if (dayAge == null || dayAge < 0){
+            if (dayAge == null || dayAge < 0) {
                 dayAge = 0;
             }
             breedingPlanDetailDto.setDayAge(dayAge);
@@ -350,7 +350,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             example.setOrderByClause("create_time desc");
             example.setLimit(1);
             List<BreedingRecord> breedingRecordList = breedingRecordMapper.selectByExample(example);
-            if (!CollectionUtils.isEmpty(breedingRecordList)){
+            if (!CollectionUtils.isEmpty(breedingRecordList)) {
                 breedingPlanDetailDto.setLastFeedTime(breedingRecordList.get(0).getBreedingTime());
             }
             // 计划养殖场鸡舍信息
@@ -839,6 +839,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         returnChickenSignDetailsDto.setReturnBreedingPlanDetails(returnBreedingPlanDetailsDto);
         PurchaseOrderExample purchaseOrderExample = new PurchaseOrderExample();
         purchaseOrderExample.createCriteria().andPlanIdEqualTo(plantId);
+        purchaseOrderExample.setOrderByClause("purchase_order_status asc");
         //商品采购列表信息
         List<ReturnPurchaseOrderDto> returnPurchaseOrderDtos = new ArrayList<>();
         List<PurchaseOrder> purchaseOrders = purchaseOrderMapper.selectByExample(purchaseOrderExample);
