@@ -71,9 +71,6 @@ public class BreedingPlanController {
             List<ReturnBreedingPlanDto> returnBreedingPlanDtos = pageInfo.getList();
             for (ReturnBreedingPlanDto returnBreedingPlanDto : returnBreedingPlanDtos) {
                 BreedingPlanVo breedingPlanVo = new BreedingPlanVo();
-                if (returnBreedingPlanDto.getPlanTime() != null) {
-                    breedingPlanVo.setPlanTime(DateUtil.dateToStr(returnBreedingPlanDto.getPlanTime()));
-                }
                 BeanUtils.copyProperties(returnBreedingPlanDto, breedingPlanVo);
                 breedingPlanVo
                         .setPlanStatus(PlanStatusEnum.getDescByCode(returnBreedingPlanDto.getPlanStatus()));
