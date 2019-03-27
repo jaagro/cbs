@@ -59,8 +59,6 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
     @Autowired
     private ProductMapperExt productMapper;
     @Autowired
-    private BatchPlantCoopMapperExt batchPlantCoopMapper;
-    @Autowired
     private PurchaseOrderItemsMapperExt purchaseOrderItemsMapper;
 
 
@@ -115,8 +113,12 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         BigDecimal planFeedWeight = purchaseOrderItemsMapper.calculateTotalPlanFeedWeight(purchaseOrderItemsParamDto);
                         if (planFeedWeight != null && accumulativeTotalFeed != null) {
                             BigDecimal totalFeedStock = planFeedWeight.subtract(accumulativeTotalFeed);
-                            returnBreedingFarmerIndexDto
-                                    .setTotalFeedStock(totalFeedStock);
+                            if (totalFeedStock != null && BigDecimal.ZERO.compareTo(totalFeedStock) != -1) {
+                                returnBreedingFarmerIndexDto.setTotalFeedStock(BigDecimal.ZERO);
+                            } else {
+                                returnBreedingFarmerIndexDto
+                                        .setTotalFeedStock(totalFeedStock);
+                            }
                         }
                         returnBreedingFarmerIndexDto
                                 .setTotalBreedingStock(totalBreedingStock)
@@ -146,7 +148,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                 if (!CollectionUtils.isEmpty(returnBreedingBatchDetailsDtos)) {
                     for (ReturnBreedingBatchDetailsDto returnBreedingBatchDetailsDto : returnBreedingBatchDetailsDtos) {
                         Integer planId = returnBreedingBatchDetailsDto.getId();
-                        Integer dayAge = null;
+                        int dayAge = 0;
                         try {
                             //获取当前日龄
                             if (returnBreedingBatchDetailsDto.getPlanTime() != null) {
@@ -155,9 +157,11 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         } catch (Exception e) {
                             log.info("R breedingFarmerIndex getDayAge error", e);
                         }
-                        returnBreedingBatchDetailsDto.setDayAge(dayAge);
+                        dayAge = dayAge < 0 ? 0 : dayAge;
+                        returnBreedingBatchDetailsDto
+                                .setDayAge(dayAge);
                         BatchInfoExample batchInfoExample = new BatchInfoExample();
-                        if (dayAge != null) {
+                        if (dayAge > 0) {
                             //今日耗料量
                             batchInfoExample
                                     .createCriteria()
@@ -598,8 +602,8 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
      * @author: @Gao.
      */
     @Override
-    public Integer getDayAge(Date beginDate) throws Exception {
-        Integer day = 0;
+    public int getDayAge(Date beginDate) throws Exception {
+        int day = 0;
         Date endDate = new Date();
         if (beginDate == null) {
             return day;
