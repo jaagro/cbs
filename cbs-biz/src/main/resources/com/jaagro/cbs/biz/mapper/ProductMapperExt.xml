@@ -4,8 +4,10 @@
 
     <!--          自动生成扩展XML author: generator on 2019/2/21                 -->
 
-    <select id="listByCriteria" parameterType="com.jaagro.cbs.api.dto.product.ListProductCriteria" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List"/>
+    <select id="listByCriteria" parameterType="com.jaagro.cbs.api.dto.product.ListProductCriteria"
+            resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
         FROM product
         WHERE enable = 1
         <if test="productName != null and productName != ''">
@@ -14,6 +16,23 @@
         <if test="productType != null">
             and product_type = #{productType}
         </if>
+    </select>
+    <select id="listDrugStockByCriteria" parameterType="com.jaagro.cbs.api.dto.product.ListDrugCriteria"
+            resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM product
+        WHERE enable = 1
+        <if test="productName != null and productName != ''">
+            <![CDATA[and (product_name like concat('%',#{productName},'%') )]]>
+        </if>
+        <if test="skuNo!=null">
+            and sku_no like concat('%',#{skuNo},'%')
+        </if>
+        <if test="productType != null">
+            and product_type = #{productType}
+        </if>
+        and product_type in (3,4)
     </select>
 
 </mapper>
