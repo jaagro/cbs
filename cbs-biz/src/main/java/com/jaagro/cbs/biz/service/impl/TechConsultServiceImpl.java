@@ -10,7 +10,9 @@ import com.jaagro.cbs.api.model.*;
 import com.jaagro.cbs.api.service.TechConsultService;
 import com.jaagro.cbs.biz.mapper.BatchCoopDailyMapperExt;
 import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
+import com.jaagro.cbs.biz.mapper.TechConsultImagesMapperExt;
 import com.jaagro.cbs.biz.mapper.TechConsultRecordMapperExt;
+import com.jaagro.cbs.biz.utils.UrlPathUtil;
 import com.jaagro.constant.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -36,6 +38,8 @@ public class TechConsultServiceImpl implements TechConsultService {
     private BreedingPlanMapperExt breedingPlanMapper;
     @Autowired
     private BatchCoopDailyMapperExt batchCoopDailyMapper;
+    @Autowired
+    private TechConsultImagesMapperExt techConsultImagesMapperExt;
 
     /**
      * 技术询问分页列表
@@ -96,6 +100,7 @@ public class TechConsultServiceImpl implements TechConsultService {
         int livingAmount = 0;
         BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
         if (null != breedingPlan) {
+            returnDto.setBreedingDays(breedingPlan.getBreedingDays());
             int planChickenQuantity = breedingPlan.getPlanChickenQuantity();
             int coopId = techConsultRecordDo.getCoopId();
 
@@ -111,6 +116,16 @@ public class TechConsultServiceImpl implements TechConsultService {
             livingAmount = planChickenQuantity - deadAmount;
         }
         returnDto.setLivingAmount(livingAmount);
+
+        TechConsultImagesExample imagesExample = new TechConsultImagesExample();
+        imagesExample.createCriteria().andTechConsultRecordIdEqualTo(id);
+        List<TechConsultImages> images = techConsultImagesMapperExt.selectByExample(imagesExample);
+        if(!CollectionUtils.isEmpty(images)) {
+            for (TechConsultImages image : images) {
+                image.setImageUrl(UrlPathUtil.getAbstractImageUrl(image.getImageUrl()));
+            }
+        }
+        returnDto.setImagesList(images);
         return returnDto;
     }
 
