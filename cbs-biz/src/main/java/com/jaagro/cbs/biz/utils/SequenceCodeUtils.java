@@ -1,5 +1,6 @@
 package com.jaagro.cbs.biz.utils;
 
+import com.jaagro.cbs.api.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -43,7 +44,7 @@ public class SequenceCodeUtils {
             entityIdCounter = new RedisAtomicLong(prefix + currentDate, redisTemplate.getConnectionFactory());
         } catch (Exception e) {
             log.info("O genSeqCode entityIdCounter param is null");
-            throw new RuntimeException("生成序列号失败");
+            throw new BusinessException("生成序列号失败");
         }
         long incrementId = entityIdCounter.getAndIncrement() + 1;
         if (incrementId == 1) {
