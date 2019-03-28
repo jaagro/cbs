@@ -103,6 +103,6 @@ public interface BreedingFarmerService {
      * @return
      * @author: @Gao.
      */
-    Integer getDayAge(Date beginDate) throws Exception;
+    int getDayAge(Date beginDate) throws Exception;
 
 }

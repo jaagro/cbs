@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * @author :asus
- * @date :2019/03/21
+ * @author :gaoxin
+ * @date :2019/03/27
  */
 @Data
 @NoArgsConstructor
@@ -68,7 +68,7 @@ public class Product implements Serializable {
     private Integer capacityUnit;
 
     /**
-     * 包装单位(1-瓶,2-袋,3-只,4-桶,5-盒)
+     * 包装单位(1-瓶,2-袋,3-只,4-桶,5-盒, 6-吨)
      */
     private Integer packageUnit;
 

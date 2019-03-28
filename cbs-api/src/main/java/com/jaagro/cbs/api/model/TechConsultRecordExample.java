@@ -388,6 +388,66 @@ public class TechConsultRecordExample implements Serializable {
             return (Criteria) this;
         }
 
+        public Criteria andDayAgeIsNull() {
+            addCriterion("day_age is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeIsNotNull() {
+            addCriterion("day_age is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeEqualTo(Integer value) {
+            addCriterion("day_age =", value, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeNotEqualTo(Integer value) {
+            addCriterion("day_age <>", value, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeGreaterThan(Integer value) {
+            addCriterion("day_age >", value, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("day_age >=", value, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeLessThan(Integer value) {
+            addCriterion("day_age <", value, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeLessThanOrEqualTo(Integer value) {
+            addCriterion("day_age <=", value, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeIn(List<Integer> values) {
+            addCriterion("day_age in", values, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeNotIn(List<Integer> values) {
+            addCriterion("day_age not in", values, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeBetween(Integer value1, Integer value2) {
+            addCriterion("day_age between", value1, value2, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeNotBetween(Integer value1, Integer value2) {
+            addCriterion("day_age not between", value1, value2, "dayAge");
+            return (Criteria) this;
+        }
+
         public Criteria andCoopIdIsNull() {
             addCriterion("coop_id is null");
             return (Criteria) this;

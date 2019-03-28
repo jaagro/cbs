@@ -59,8 +59,6 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
     @Autowired
     private ProductMapperExt productMapper;
     @Autowired
-    private BatchPlantCoopMapperExt batchPlantCoopMapper;
-    @Autowired
     private PurchaseOrderItemsMapperExt purchaseOrderItemsMapper;
 
 
@@ -115,8 +113,12 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         BigDecimal planFeedWeight = purchaseOrderItemsMapper.calculateTotalPlanFeedWeight(purchaseOrderItemsParamDto);
                         if (planFeedWeight != null && accumulativeTotalFeed != null) {
                             BigDecimal totalFeedStock = planFeedWeight.subtract(accumulativeTotalFeed);
-                            returnBreedingFarmerIndexDto
-                                    .setTotalFeedStock(totalFeedStock);
+                            if (totalFeedStock != null && BigDecimal.ZERO.compareTo(totalFeedStock) != -1) {
+                                returnBreedingFarmerIndexDto.setTotalFeedStock(BigDecimal.ZERO);
+                            } else {
+                                returnBreedingFarmerIndexDto
+                                        .setTotalFeedStock(totalFeedStock);
+                            }
                         }
                         returnBreedingFarmerIndexDto
                                 .setTotalBreedingStock(totalBreedingStock)
@@ -146,7 +148,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                 if (!CollectionUtils.isEmpty(returnBreedingBatchDetailsDtos)) {
                     for (ReturnBreedingBatchDetailsDto returnBreedingBatchDetailsDto : returnBreedingBatchDetailsDtos) {
                         Integer planId = returnBreedingBatchDetailsDto.getId();
-                        Integer dayAge = null;
+                        int dayAge = 0;
                         try {
                             //获取当前日龄
                             if (returnBreedingBatchDetailsDto.getPlanTime() != null) {
@@ -155,9 +157,11 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         } catch (Exception e) {
                             log.info("R breedingFarmerIndex getDayAge error", e);
                         }
-                        returnBreedingBatchDetailsDto.setDayAge(dayAge);
+                        dayAge = dayAge < 0 ? 0 : dayAge;
+                        returnBreedingBatchDetailsDto
+                                .setDayAge(dayAge);
                         BatchInfoExample batchInfoExample = new BatchInfoExample();
-                        if (dayAge != null) {
+                        if (dayAge > 0) {
                             //今日耗料量
                             batchInfoExample
                                     .createCriteria()
@@ -216,6 +220,15 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         }
         //插入技术询问
         TechConsultRecord techConsultRecord = new TechConsultRecord();
+        try {
+            //获取当前日龄
+            if (breedingPlan.getPlanTime() != null) {
+                Integer dayAge = getDayAge(breedingPlan.getPlanTime());
+                techConsultRecord.setDayAge(dayAge);
+            }
+        } catch (Exception e) {
+            log.info("R breedingFarmerIndex getDayAge error", e);
+        }
         UserInfo currentUser = currentUserService.getCurrentUser();
         BeanUtils.copyProperties(dto, techConsultRecord);
         techConsultRecord
@@ -231,6 +244,10 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                             .setCustomerName(showCustomer.getCustomerName())
                             .setCreateUserId(currentUser.getId())
                             .setCustomerId(customerUser.getRelevanceId());
+                    if (breedingPlan.getTechnicianId() != null) {
+                        techConsultRecord
+                                .setHandleUserId(breedingPlan.getTechnicianId());
+                    }
                 }
             }
         }
@@ -313,7 +330,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         .andPurchaseOrderStatusIn(purchaseOrderStatus)
                         .andEnableEqualTo(true)
                         .andCustomerIdEqualTo(customerUser.getRelevanceId());
-                purchaseOrderExample.setOrderByClause("create_time DESC");
+                purchaseOrderExample.setOrderByClause("delivery_time desc");
                 List<PurchaseOrder> purchaseOrderList = purchaseOrderMapper.selectByExample(purchaseOrderExample);
                 for (PurchaseOrder purchaseOrder : purchaseOrderList) {
                     BigDecimal totalPurchaseStatistics = new BigDecimal(0);
@@ -449,14 +466,12 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         UserInfo currentUser = currentUserService.getCurrentUser();
         BreedingPlanExample breedingPlanExample = new BreedingPlanExample();
         if (currentUser != null && currentUser.getId() != null) {
-            GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
-            if (customerUser != null && customerUser.getRelevanceId() != null) {
-                breedingPlanExample
-                        .createCriteria()
-                        .andCustomerIdEqualTo(customerUser.getRelevanceId())
-                        .andEnableEqualTo(true);
-                breedingPlans = breedingPlanMapper.selectByExample(breedingPlanExample);
-            }
+            breedingPlanExample
+                    .createCriteria()
+                    .andCreateUserIdEqualTo(currentUser.getId())
+                    .andEnableEqualTo(true);
+            breedingPlanExample.setOrderByClause("create_time desc");
+            breedingPlans = breedingPlanMapper.selectByExample(breedingPlanExample);
         }
         return new PageInfo(breedingPlans);
     }
@@ -542,13 +557,13 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         UserInfo currentUser = currentUserService.getCurrentUser();
         TechConsultRecordExample techConsultRecordExample = new TechConsultRecordExample();
         if (currentUser != null && currentUser.getId() != null) {
-            GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
-            if (customerUser != null && customerUser.getRelevanceId() != null) {
-                techConsultRecordExample
-                        .createCriteria()
-                        .andCustomerIdEqualTo(customerUser.getRelevanceId());
-                techConsultRecords = techConsultRecordMapper.selectByExample(techConsultRecordExample);
-            }
+            techConsultRecordExample
+                    .createCriteria()
+                    .andEnableEqualTo(true)
+                    .andCreateUserIdEqualTo(currentUser.getId());
+            techConsultRecordExample
+                    .setOrderByClause("create_time desc");
+            techConsultRecords = techConsultRecordMapper.selectByExample(techConsultRecordExample);
         }
         return new PageInfo(techConsultRecords);
     }
@@ -587,8 +602,8 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
      * @author: @Gao.
      */
     @Override
-    public Integer getDayAge(Date beginDate) throws Exception {
-        Integer day = 0;
+    public int getDayAge(Date beginDate) throws Exception {
+        int day = 0;
         Date endDate = new Date();
         if (beginDate == null) {
             return day;

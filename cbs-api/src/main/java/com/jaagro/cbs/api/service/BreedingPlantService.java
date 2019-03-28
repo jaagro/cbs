@@ -77,5 +77,20 @@ public interface BreedingPlantService {
      */
     void deleteCoop(Integer coopId);
 
+    /**
+     * 通过养殖户id获取养殖场列表
+     *
+     * @param
+     * @return
+     * @author @Gao.
+     */
     List<ReturnPlantDto> listPlantAndCoopByPlantIds(List<Integer> planIds);
+
+    /**
+     * 查询当前客户空闲的养殖场
+     *
+     * @param customerId
+     * @return
+     */
+    List<ReturnBasicPlantDto> listFreePlantByCustomerId(Integer customerId);
 }

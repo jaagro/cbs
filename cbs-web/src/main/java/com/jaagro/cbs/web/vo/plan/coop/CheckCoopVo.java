@@ -26,7 +26,7 @@ public class CheckCoopVo implements Serializable {
     /**
      * 鸡舍编号
      */
-    private String coopNo;
+    private String coopName;
 
     /**
      * 容量

@@ -323,4 +323,34 @@ public class BreedingPlantServiceImpl implements BreedingPlantService {
         }
         return returnPlantDtoList;
     }
+
+    /**
+     * 查询当前客户空闲的养殖场
+     *
+     * @param customerId
+     * @return
+     */
+    @Override
+    public List<ReturnBasicPlantDto> listFreePlantByCustomerId(Integer customerId) {
+        List<ReturnBasicPlantDto> returnBasicPlantDtos = new ArrayList<>();
+        List<ReturnPlantDto> returnPlantDtos = listPlantByCustomerId(customerId);
+        if (!CollectionUtils.isEmpty(returnPlantDtos)) {
+            for (ReturnPlantDto returnPlantDto : returnPlantDtos) {
+                if (CollectionUtils.isEmpty(returnPlantDto.getReturnCoopDtos())) {
+                    continue;
+                }
+                ReturnBasicPlantDto returnBasicPlantDto = new ReturnBasicPlantDto();
+                if (returnPlantDto.getPlantName() != null) {
+                    returnBasicPlantDto
+                            .setPlantName(returnPlantDto.getPlantName());
+                }
+                if (returnPlantDto.getId() != null) {
+                    returnBasicPlantDto
+                            .setId(returnPlantDto.getId());
+                }
+                returnBasicPlantDtos.add(returnBasicPlantDto);
+            }
+        }
+        return returnBasicPlantDtos;
+    }
 }
