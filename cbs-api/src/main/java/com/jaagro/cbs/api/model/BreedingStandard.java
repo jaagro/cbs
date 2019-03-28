@@ -27,7 +27,7 @@ public class BreedingStandard implements Serializable {
     private String standardName;
 
     /**
-     * 养殖类型(1-平养,2-棚养,3-笼养)
+     * 养殖类型(1-平养,2-笼养,3-网养)
      */
     private Integer breedingType;
 

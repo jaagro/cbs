@@ -494,16 +494,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
     @Override
     public void configurationDrugs(ValidList<BreedingStandardDrugListDto> drugList) {
         if (!CollectionUtils.isEmpty(drugList)) {
-            // 一个养殖周期必须有两个以上停药日
-            Integer stopDrugCount = 0;
-            for (BreedingStandardDrugListDto drugListDto : drugList){
-                if (drugListDto.getStopDrugFlag() != null && drugListDto.getStopDrugFlag()){
-                    stopDrugCount++;
-                }
-            }
-            if (stopDrugCount < breedingStopDrugCount){
-                throw new BusinessException("一个养殖周期必须有两个以上停药日");
-            }
+            judgeCanConfiguration(drugList);
             Integer standardId = drugList.get(0).getStandardId();
             Integer currentUserId = getCurrentUserId();
             breedingStandardDrugMapper.delByStandardId(standardId);
@@ -530,6 +521,33 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
             breedingStandardMapper.updateByPrimaryKeySelective(breedingStandard);
         } else {
             throw new BusinessException("药品配置信息列表为空");
+        }
+    }
+
+    /**
+     * 判断是否能进行药品配置
+     * @param drugList
+     */
+    private void judgeCanConfiguration(ValidList<BreedingStandardDrugListDto> drugList) {
+        Integer standardId = drugList.get(0).getStandardId();
+        BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(standardId);
+        if(StandardStatusEnum.WAIT_DRUG_CONFIGURATION.getCode() != breedingStandard.getStandardStatus()){
+            throw new BusinessException("必要参数需要都已配置才能进行药品配置");
+        }
+        // 一个养殖周期必须有两个以上停药日
+        Integer stopDrugCount = 0;
+        for (BreedingStandardDrugListDto drugListDto : drugList){
+            if (drugListDto.getStopDrugFlag() != null && drugListDto.getStopDrugFlag()){
+                stopDrugCount++;
+            }
+        }
+        if (stopDrugCount < breedingStopDrugCount){
+            throw new BusinessException("一个养殖周期必须有两个以上停药日");
+        }
+        BreedingStandardDrugListDto drugListDto = drugList.get(drugList.size() - 1);
+        Integer dayAgeEnd = drugListDto.getDayAgeEnd();
+        if(dayAgeEnd == null || !dayAgeEnd.equals(breedingStandard.getBreedingDays())){
+            throw new BusinessException("药品配置需要配置整个养殖周期才能提交");
         }
     }
 
