@@ -714,11 +714,11 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         if (!CollectionUtils.isEmpty(contractPriceSectionDtoList)) {
             List<ContractPriceSection> contractPriceSectionList = new ArrayList<>();
             for (ContractPriceSectionDto dto : contractPriceSectionDtoList) {
-                if (dto.getWeightLower().compareTo(new BigDecimal("99.99")) == 1 || dto.getWeightUpper().compareTo(new BigDecimal("99.99")) == 1) {
-                    throw new BusinessException("鸡重起止要小于100");
+                if (dto.getWeightLower().compareTo(new BigDecimal("100")) >= 0 || dto.getWeightUpper().compareTo(new BigDecimal("100")) >= 0) {
+                    throw new BusinessException("鸡重起止不能超过100");
                 }
-                if (dto.getRecyclingPrice().compareTo(new BigDecimal("9999.99")) == 1) {
-                    throw new BusinessException("回收价格要小于10000");
+                if (dto.getRecyclingPrice().compareTo(new BigDecimal("10000")) >= 0) {
+                    throw new BusinessException("回收价格不能超过10000");
                 }
                 ContractPriceSection contractPriceSection = new ContractPriceSection();
                 BeanUtils.copyProperties(dto, contractPriceSection);
