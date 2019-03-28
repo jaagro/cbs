@@ -531,7 +531,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
     private void judgeCanConfiguration(ValidList<BreedingStandardDrugListDto> drugList) {
         Integer standardId = drugList.get(0).getStandardId();
         BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(standardId);
-        if(StandardStatusEnum.WAIT_DRUG_CONFIGURATION.getCode() != breedingStandard.getStandardStatus()){
+        if(StandardStatusEnum.WAIT_DRUG_CONFIGURATION.getCode() != breedingStandard.getStandardStatus() && StandardStatusEnum.NORMAL.getCode() != breedingStandard.getStandardStatus()){
             throw new BusinessException("必要参数需要都已配置才能进行药品配置");
         }
         // 一个养殖周期必须有两个以上停药日
