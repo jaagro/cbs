@@ -512,7 +512,8 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                                 recordItemsDto.setCapacityUnit(CapacityUnitEnum.getTypeByCode(product.getCapacityUnit()));
                             }
                             if (coopQuantityStock != null && batchQuantityStock != null && breedingBatchDrug.getFeedVolume() != null) {
-                                recordItemsDto.setBreedingValue(new BigDecimal(coopQuantityStock).divide(new BigDecimal(batchQuantityStock), 6, BigDecimal.ROUND_HALF_UP).multiply(breedingBatchDrug.getFeedVolume()).setScale(0, BigDecimal.ROUND_HALF_UP));
+                                BigDecimal scale = new BigDecimal(batchQuantityStock).divide(new BigDecimal("1000"), 4);
+                                recordItemsDto.setBreedingValue(new BigDecimal(coopQuantityStock).divide(new BigDecimal(batchQuantityStock), 6, BigDecimal.ROUND_HALF_UP).multiply(scale.multiply(breedingBatchDrug.getFeedVolume())).setScale(0, BigDecimal.ROUND_HALF_UP));
                             }
                             recordItemsDtoList.add(recordItemsDto);
                         }

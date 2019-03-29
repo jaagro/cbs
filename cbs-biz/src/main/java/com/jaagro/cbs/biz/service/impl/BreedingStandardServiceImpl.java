@@ -295,9 +295,9 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
 
     private Set<ParameterTypeDto> getInitParameterTypeDtoSet(Integer standardId) {
         Set<ParameterTypeDto> result = new HashSet<>();
-        ParameterTypeDto parameterTypeDtoWeight = new ParameterTypeDto(standardId, "体重标准", BreedingStandardParamEnum.WEIGHT.getCode(), "克", 1);
+        ParameterTypeDto parameterTypeDtoWeight = new ParameterTypeDto(standardId, "体重标准", BreedingStandardParamEnum.WEIGHT.getCode(), "克/只", 1);
         result.add(parameterTypeDtoWeight);
-        ParameterTypeDto parameterTypeDtoFeedingWeight = new ParameterTypeDto(standardId, "饲喂重量", BreedingStandardParamEnum.FEEDING_WEIGHT.getCode(), "克", 2);
+        ParameterTypeDto parameterTypeDtoFeedingWeight = new ParameterTypeDto(standardId, "饲喂重量", BreedingStandardParamEnum.FEEDING_WEIGHT.getCode(), "克/只/日", 2);
         result.add(parameterTypeDtoFeedingWeight);
         ParameterTypeDto parameterTypeDtoFeedingFodderNum = new ParameterTypeDto(standardId, "饲喂次数", BreedingStandardParamEnum.FEEDING_FODDER_NUM.getCode(), "次", 3);
         result.add(parameterTypeDtoFeedingFodderNum);
@@ -369,11 +369,11 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
             switch (paramName) {
                 case "体重标准":
                     dto.setDisplayOrder(1);
-                    dto.setUnit("克");
+                    dto.setUnit("克/只");
                     break;
                 case "饲喂重量":
                     dto.setDisplayOrder(2);
-                    dto.setUnit("克");
+                    dto.setUnit("克/只/日");
                     break;
                 case "饲喂次数":
                     dto.setDisplayOrder(3);

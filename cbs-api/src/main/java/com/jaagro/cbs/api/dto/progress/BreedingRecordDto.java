@@ -70,7 +70,19 @@ public class BreedingRecordDto implements Serializable {
      */
     private Integer shouldFeedWaterTimes;
     /**
-     * 喂养的计量单位
+     * 喂料的计量单位
      */
-    private String unit;
+    private String foodUnit;
+    /**
+     * 喂水的计量单位
+     */
+    private String waterUnit;
+    /**
+     * 喂药的计量单位
+     */
+    private String medicineUnit;
+    /**
+     * 死淘的计量单位
+     */
+    private String deathUnit;
 }

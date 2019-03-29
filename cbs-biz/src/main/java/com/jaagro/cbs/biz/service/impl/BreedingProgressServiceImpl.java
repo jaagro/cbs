@@ -207,15 +207,14 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                     BeanUtils.copyProperties(breedingBatchParameterDo, returnDto);
                     if (null != breedingRecordDto && BreedingStandardParamEnum.DIE.getCode() == breedingBatchParameterDo.getParamType()) {
                         returnDto.setActualValue(breedingRecordDto.getDeathTotal().toString());
-                        returnDto.setUnit(breedingRecordDto.getUnit());
+                        returnDto.setUnit(breedingRecordDto.getDeathUnit());
                     }
                     if (null != breedingRecordDto && BreedingStandardParamEnum.FEEDING_WEIGHT.getCode() == breedingBatchParameterDo.getParamType()) {
                         returnDto.setActualValue(breedingRecordDto.getFeedFoodWeight().toString());
-                        returnDto.setUnit(breedingRecordDto.getUnit());
+                        returnDto.setUnit(breedingRecordDto.getFoodUnit());
                     }
                     if (null != breedingRecordDto && BreedingStandardParamEnum.FEEDING_FODDER_NUM.getCode() == breedingBatchParameterDo.getParamType()) {
                         returnDto.setActualValue(breedingRecordDto.getFeedFoodTimes().toString());
-                        returnDto.setUnit(breedingRecordDto.getUnit());
                     }
                     if (BreedingStandardParamEnum.WEIGHT.getCode() == breedingBatchParameterDo.getParamType()) {
                         returnDto.setActualValue("--");
@@ -317,17 +316,20 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
             breedingRecordDto.setFeedFoodList(feedingFoodBo.getBreedingList());
             breedingRecordDto.setFeedFoodTimes(feedingFoodBo.getFeedingTimes());
             breedingRecordDto.setFeedFoodWeight(feedingFoodBo.getFeedingWeight());
+            breedingRecordDto.setFoodUnit(feedingFoodBo.getUnit());
 
             //养殖计划的鸡舍在某日龄上的喂水记录
             FeedingFactoryBo feedingWaterBo = feedingRecordFactory(planId, coopId, dayAge, BreedingRecordTypeEnum.FEED_WATER.getCode());
             breedingRecordDto.setFeedWaterList(feedingWaterBo.getBreedingList());
             breedingRecordDto.setFeedWaterTimes(feedingWaterBo.getFeedingTimes());
+            breedingRecordDto.setWaterUnit(feedingWaterBo.getUnit());
 
             //养殖计划的鸡舍在某日龄上的喂药记录
             FeedingFactoryBo feedingMedicineBo = feedingRecordFactory(planId, coopId, dayAge, BreedingRecordTypeEnum.FEED_MEDICINE.getCode());
             breedingRecordDto.setFeedMedicineWeight(feedingMedicineBo.getFeedingWeight());
             breedingRecordDto.setFeedMedicineList(feedingMedicineBo.getBreedingList());
             breedingRecordDto.setFeedMedicineTimes(feedingMedicineBo.getFeedingTimes());
+            breedingRecordDto.setMedicineUnit(feedingMedicineBo.getUnit());
 
             //养殖计划的鸡舍在某日龄上的死淘记录
             FeedingFactoryBo deathBo = feedingRecordFactory(planId, coopId, dayAge, BreedingRecordTypeEnum.DEATH_AMOUNT.getCode());
@@ -342,6 +344,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
             } else {
                 breedingRecordDto.setDeathTotal(deathTotal);
             }
+            breedingRecordDto.setDeathUnit(deathBo.getUnit());
             //养殖计划的鸡舍在某日龄上的应喂料总次数
             Integer shouldFeedFoodTimes = getShouldFeedTime(planId, dayAge, BreedingStandardParamEnum.FEEDING_FODDER_NUM.getCode());
             breedingRecordDto.setShouldFeedFoodTimes(shouldFeedFoodTimes);
