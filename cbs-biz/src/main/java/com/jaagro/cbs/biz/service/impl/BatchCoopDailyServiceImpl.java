@@ -1,11 +1,12 @@
 package com.jaagro.cbs.biz.service.impl;
 
 import com.jaagro.cbs.api.model.BatchCoopDaily;
-import com.jaagro.cbs.api.model.BreedingPlan;
+import com.jaagro.cbs.api.model.Coop;
 import com.jaagro.cbs.api.service.BatchCoopDailyService;
 import com.jaagro.cbs.biz.mapper.BatchCoopDailyMapperExt;
 import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
 import com.jaagro.cbs.biz.mapper.BreedingRecordMapperExt;
+import com.jaagro.cbs.biz.mapper.CoopMapperExt;
 import com.jaagro.cbs.biz.utils.RedisLock;
 import com.jaagro.cbs.biz.utils.RedisUtil;
 import org.apache.commons.lang.time.DateUtils;
@@ -36,6 +37,9 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
     private RedisLock redisLock;
     @Autowired
     private RedisUtil redis;
+    @Autowired
+    private CoopMapperExt coopMapperExt;
+
 
     /**
      * 鸡舍养殖每日汇总
@@ -58,11 +62,8 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
         if (!CollectionUtils.isEmpty(breedingRecordList)) {
             for (BatchCoopDaily batchCoopDaily : breedingRecordList) {
                 try {
-                    //查询不到记录，就用breeding_plan的计划上鸡数量
-                    BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(batchCoopDaily.getPlanId());
-                    if (breedingPlan == null) {
-                        throw new RuntimeException("计划有误");
-                    }
+                    //查询不到记录，就用coop的在养数量
+                    Coop coop = coopMapperExt.selectByPrimaryKey(batchCoopDaily.getCoopId());
                     // 查询昨日剩余喂养数量 来当做今天的起始喂养数量
                     BatchCoopDaily coopDaily = new BatchCoopDaily();
                     BeanUtils.copyProperties(batchCoopDaily, coopDaily);
@@ -74,13 +75,13 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
                     if (startAmount != null && startAmount > 0) {
                         batchCoopDaily.setStartAmount(startAmount);
                     } else {
-                        batchCoopDaily.setStartAmount(breedingPlan.getPlanChickenQuantity());
+                        batchCoopDaily.setStartAmount(coop.getBreedingValue());
                     }
                     if (batchCoopDaily.getDeadAmount() != null) {
                         // 剩余喂养数量=起始-死淘
                         batchCoopDaily.setCurrentAmount(batchCoopDaily.getStartAmount() - batchCoopDaily.getDeadAmount());
                     } else {
-                        batchCoopDaily.setCurrentAmount(breedingPlan.getPlanChickenQuantity());
+                        batchCoopDaily.setCurrentAmount(coop.getBreedingValue());
                     }
 
                     //出栏数量 待定
