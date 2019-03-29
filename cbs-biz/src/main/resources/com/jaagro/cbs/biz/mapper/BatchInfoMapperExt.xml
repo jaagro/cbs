@@ -8,6 +8,10 @@
         delete from batch_info
         where DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{todayDate}, '%Y-%m-%d' )
     </delete>
+    <delete id="deleteByDateAge" parameterType="java.lang.Integer">
+        delete from batch_info
+        where day_age = #{dayAge}
+    </delete>
     <insert id="insertBatch" parameterType="com.jaagro.cbs.api.model.BatchInfo">
         <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
@@ -98,5 +102,31 @@
                 </foreach>
             </if>
         </where>
+    </select>
+    <select id="listYestodayData" resultMap="BaseResultMap"
+            parameterType="com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto">
+        SELECT
+        plan_id,
+        batch_no,
+        start_amount,
+        current_amount,
+        start_day,
+        finish_day,
+        case when day_age > 0 then day_age + 1 end as day_age,
+        technician_id,
+        technician,
+        create_user_id,
+        enable
+        FROM
+        batch_info
+        WHERE
+        ENABLE = 1
+        <if test="todayDate != null">
+            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{todayDate}, '%Y-%m-%d' )
+        </if>
+        GROUP BY
+        plan_id
+        ORDER BY
+        create_time DESC
     </select>
 </mapper>

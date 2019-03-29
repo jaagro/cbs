@@ -1,5 +1,6 @@
 package com.jaagro.cbs.biz.mapper;
 
+import com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto;
 import com.jaagro.cbs.api.model.BatchInfo;
 import com.jaagro.cbs.api.model.BatchInfoExample;
 import com.jaagro.cbs.biz.mapper.base.BaseMapper;
@@ -27,6 +28,13 @@ public interface BatchInfoMapperExt extends BaseMapper<BatchInfo, BatchInfoExamp
      * @param todayDate
      */
     void deleteByDate(@Param("todayDate") String todayDate);
+
+    /**
+     * 根据日龄删除
+     *
+     * @param todayDate
+     */
+    void deleteByDateAge(@Param("dayAge") Integer dayAge);
 
     /**
      * 批量插入
@@ -99,5 +107,11 @@ public interface BatchInfoMapperExt extends BaseMapper<BatchInfo, BatchInfoExamp
      */
     BigDecimal accumulativeTotalSaleAmount(@Param("planIds") Set planIds);
 
-
+    /**
+     * 查询昨日数据
+     *
+     * @param criteriaDto
+     * @return
+     */
+    List<BatchInfo> listYestodayData(BatchInfoCriteriaDto criteriaDto);
 }

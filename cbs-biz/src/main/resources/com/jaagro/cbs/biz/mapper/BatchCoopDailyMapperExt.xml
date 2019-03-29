@@ -16,7 +16,7 @@
             AND coop_id = #{coopId}
             AND plan_id = #{planId}
             AND day_age = #{dayAge}
-        OEDER BY create_time desc
+        ORDER BY create_time desc
         LIMIT 1
     </select>
     <insert id="batchInsert" parameterType="com.jaagro.cbs.api.model.BatchCoopDaily">

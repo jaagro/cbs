@@ -38,7 +38,7 @@ public interface BreedingRecordMapperExt extends BaseMapper<BreedingRecord, Bree
     /**
      * 批次养殖情况汇总
      *
-     * @param todayDate
+     * @param criteriaDto
      * @return
      */
     List<BatchInfo> listBatchInfoByParams(BatchInfoCriteriaDto criteriaDto);
