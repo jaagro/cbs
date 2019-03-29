@@ -207,11 +207,15 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                     BeanUtils.copyProperties(breedingBatchParameterDo, returnDto);
                     if (null != breedingRecordDto && BreedingStandardParamEnum.DIE.getCode() == breedingBatchParameterDo.getParamType()) {
                         returnDto.setActualValue(breedingRecordDto.getDeathTotal().toString());
-                        returnDto.setUnit(breedingRecordDto.getDeathUnit());
+                        if (StringUtils.hasText(breedingRecordDto.getDeathUnit())){
+                            returnDto.setUnit(breedingRecordDto.getDeathUnit());
+                        }
                     }
                     if (null != breedingRecordDto && BreedingStandardParamEnum.FEEDING_WEIGHT.getCode() == breedingBatchParameterDo.getParamType()) {
                         returnDto.setActualValue(breedingRecordDto.getFeedFoodWeight().toString());
-                        returnDto.setUnit(breedingRecordDto.getFoodUnit());
+                        if (StringUtils.hasText(breedingRecordDto.getFoodUnit())){
+                            returnDto.setUnit(breedingRecordDto.getFoodUnit());
+                        }
                     }
                     if (null != breedingRecordDto && BreedingStandardParamEnum.FEEDING_FODDER_NUM.getCode() == breedingBatchParameterDo.getParamType()) {
                         returnDto.setActualValue(breedingRecordDto.getFeedFoodTimes().toString());
