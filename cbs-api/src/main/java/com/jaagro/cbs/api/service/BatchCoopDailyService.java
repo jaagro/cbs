@@ -9,5 +9,5 @@ public interface BatchCoopDailyService {
     /**
      * 鸡舍养殖每日汇总
      */
-    void batchCoopDaily();
+    void batchCoopDaily(String todayDates);
 }
