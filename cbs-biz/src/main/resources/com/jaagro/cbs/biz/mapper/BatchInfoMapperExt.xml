@@ -21,7 +21,7 @@
         day_age, technician, technician_id,
         dead_amount, sale_amount, fodder_amount,
         fodder_value, babychick_value, drug_value,
-        sale_value, balance, enable, create_user_id)
+        sale_value, balance, enable, create_user_id,create_time)
         values
         <foreach collection="batchInfoList" item="item" separator=",">
             (#{item.planId,jdbcType=INTEGER}, #{item.batchNo,jdbcType=VARCHAR}, #{item.startAmount,jdbcType=INTEGER},
@@ -32,7 +32,7 @@
             #{item.fodderValue,jdbcType=DECIMAL}, #{item.babychickValue,jdbcType=DECIMAL},
             #{item.drugValue,jdbcType=DECIMAL},
             #{item.saleValue,jdbcType=DECIMAL}, #{item.balance,jdbcType=DECIMAL}, #{item.enable,jdbcType=BIT},
-            #{item.createUserId,jdbcType=INTEGER})
+            #{item.createUserId,jdbcType=INTEGER},#{item.createTime,jdbcType=TIMESTAMP})
         </foreach>
     </insert>
     <select id="getStartAmountByPlanId" parameterType="com.jaagro.cbs.api.model.BatchInfo"

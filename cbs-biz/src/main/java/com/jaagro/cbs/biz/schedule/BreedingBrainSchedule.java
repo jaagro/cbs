@@ -46,7 +46,6 @@ public class BreedingBrainSchedule {
      * 每天晚上11点跑一次
      */
 //    @Scheduled(cron = "0 50 23 1/1 * ?")
-    @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void calculatePhaseTwoFoodWeight() {
         log.info("calculatePhaseTwoFoodWeight:定时钟执行开始");

@@ -25,19 +25,19 @@
         </selectKey>
         insert into batch_coop_daily (plan_id, batch_no, coop_id,
         day_age, start_amount, current_amount,
-        dead_amount, sale_amount, fodder_times,
-        fodder_amount,
-        create_user_id
+        dead_amount, fodder_times,
+        fodder_amount,create_user_id,create_time
         )
         values
         <foreach collection="dailyList" item="item" separator=",">
             (#{item.planId,jdbcType=INTEGER}, #{item.batchNo,jdbcType=VARCHAR}, #{item.coopId,jdbcType=INTEGER},
             #{item.dayAge,jdbcType=INTEGER}, #{item.startAmount,jdbcType=INTEGER},
             #{item.currentAmount,jdbcType=INTEGER},
-            #{item.deadAmount,jdbcType=INTEGER}, #{item.saleAmount,jdbcType=INTEGER},
+            #{item.deadAmount,jdbcType=INTEGER},
             #{item.fodderTimes,jdbcType=INTEGER},
             #{item.fodderAmount,jdbcType=DECIMAL},
-            #{item.createUserId,jdbcType=INTEGER}
+            #{item.createUserId,jdbcType=INTEGER},
+            #{item.createTime,jdbcType=TIMESTAMP}
             )
         </foreach>
     </insert>
@@ -45,4 +45,30 @@
     delete from batch_coop_daily
     where DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{todayDate}, '%Y-%m-%d' )
   </delete>
+    <delete id="deleteByDayAge" parameterType="java.lang.Integer">
+    delete from batch_coop_daily
+    where day_age = #{dayAge}
+    </delete>
+    <select id="listYesterdayData" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT
+            plan_id,
+            batch_no,
+            coop_id,
+            day_age + 1 as day_age,
+            start_amount,
+            current_amount,
+            ENABLE,
+            create_user_id,
+            0 as dead_amount,
+            0 as fodder_times,
+            0 as fodder_amount
+        FROM
+            batch_coop_daily
+        WHERE
+            ENABLE = 1
+            and DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{todayDate}, '%Y-%m-%d' )
+        GROUP BY
+            plan_id,
+            coop_id
+    </select>
 </mapper>

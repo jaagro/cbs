@@ -53,63 +53,65 @@ public class BatchInfoServiceImpl implements BatchInfoService {
         if (StringUtils.isEmpty(criteriaDto.getTodayDate())) {
             criteriaDto.setTodayDate(sdf.format(new Date()));
         }
-        // 从breedingRecord统计
-        // 得到批次养殖情况汇总列表
-        List<BatchInfo> batchInfoList = breedingRecordMapper.listBatchInfoByParams(criteriaDto);
-        if (!CollectionUtils.isEmpty(batchInfoList)) {
-            for (BatchInfo info : batchInfoList) {
-                // 计划
-                BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(info.getPlanId());
-                if (breedingPlan == null) {
-                    throw new RuntimeException("计划有误");
-                }
-                // 昨日的剩余喂养数量
-                info.setCreateTime(DateUtils.addDays(new Date(), -1)).setDayAge(info.getDayAge() - 1);
-                Integer currentAmount = batchInfoMapper.getStartAmountByPlanId(info);
-                if (currentAmount != null && currentAmount > 0) {
-                    info.setStartAmount(currentAmount);
-                    // 剩余喂养数量=起始-死淘
-                    if (info.getDeadAmount() != null && info.getDeadAmount() > 0) {
-                        info.setCurrentAmount(info.getStartAmount() - info.getDeadAmount());
+        try {
+            // 得到批次养殖情况汇总列表
+            List<BatchInfo> batchInfoList = breedingRecordMapper.listBatchInfoByParams(criteriaDto);
+            if (!CollectionUtils.isEmpty(batchInfoList)) {
+                for (BatchInfo batchInfo : batchInfoList) {
+                    // 计划
+                    BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(batchInfo.getPlanId());
+                    if (breedingPlan == null) {
+                        throw new RuntimeException("计划有误");
                     }
-                } else {
-                    //查询不到记录，就用breeding_plan的计划上鸡数量
-                    info.setStartAmount(breedingPlan.getPlanChickenQuantity());
-                    // 剩余喂养数量 = 计划上鸡数量
-                    info.setCurrentAmount(breedingPlan.getPlanChickenQuantity());
+                    // 昨日的剩余喂养数量
+                    batchInfo.setCreateTime(DateUtils.addDays(sdf.parse(criteriaDto.getTodayDate()), -1)).setDayAge(batchInfo.getDayAge() - 1);
+                    Integer currentAmount = batchInfoMapper.getStartAmountByPlanId(batchInfo);
+                    if (currentAmount != null && currentAmount > 0) {
+                        batchInfo.setStartAmount(currentAmount);
+                    } else {
+                        //查询不到记录，就用breeding_plan的计划上鸡数量
+                        batchInfo.setStartAmount(breedingPlan.getPlanChickenQuantity());
+                    }
+                    // 剩余喂养数量=起始-死淘
+                    if (batchInfo.getDeadAmount() != null && batchInfo.getDeadAmount() > 0) {
+                        batchInfo.setCurrentAmount(batchInfo.getStartAmount() - batchInfo.getDeadAmount());
+                    } else {
+                        batchInfo.setCurrentAmount(breedingPlan.getPlanChickenQuantity());
+                    }
+                    //填充其他数据
+                    batchInfo
+                            .setCreateTime(sdf.parse(criteriaDto.getTodayDate()))
+                            .setEnable(true)
+                            .setCreateUserId(1)
+                            .setDayAge(batchInfo.getDayAge() + 1)
+                            .setStartDay(breedingPlan.getPlanTime())
+                            .setTechnician(breedingPlan.getTechnician())
+                            .setTechnicianId(breedingPlan.getTechnicianId());
                 }
-                //填充其他数据
-                info
-                        .setEnable(true)
-                        .setCreateUserId(1)
-                        .setDayAge(info.getDayAge() + 1)
-                        .setStartDay(breedingPlan.getPlanTime())
-                        .setTechnician(breedingPlan.getTechnician())
-                        .setTechnicianId(breedingPlan.getTechnicianId());
-            }
-            //删除
-            batchInfoMapper.deleteByDateAge(batchInfoList.get(0).getDayAge());
-            //批量插入
-            batchInfoMapper.insertBatch(batchInfoList);
+                //删除
+                batchInfoMapper.deleteByDateAge(batchInfoList.get(0).getDayAge());
+                //批量插入
+                batchInfoMapper.insertBatch(batchInfoList);
 
-        } else {
-            //今日若没有上传数据，将昨日数据拷贝【日龄+1、其余数据为零(死淘,喂养)】
-            try {
+            } else {
+                //今日若没有上传数据，将昨日数据拷贝【日龄+1、其余数据为零(死淘,喂养)】
                 criteriaDto.setTodayDate(sdf.format(DateUtils.addDays(sdf.parse(criteriaDto.getTodayDate()), -1)));
                 batchInfoList = batchInfoMapper.listYestodayData(criteriaDto);
                 if (!CollectionUtils.isEmpty(batchInfoList)) {
-                    //删除
-                    criteriaDto.setTodayDate(sdf.format(DateUtils.addDays(sdf.parse(criteriaDto.getTodayDate()), 1)));
-                    batchInfoMapper.deleteByDateAge(batchInfoList.get(0).getDayAge());
+                    for (BatchInfo batchInfo : batchInfoList) {
+                        //删除
+                        batchInfoMapper.deleteByDateAge(batchInfo.getDayAge());
+                    }
                     //批量插入
                     batchInfoMapper.insertBatch(batchInfoList);
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                throw new RuntimeException(ex.getMessage());
-            }
 
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(ex.getMessage());
         }
+
         redisLock.unLock("Scheduled:redisLock:batchInfo");
     }
 }
