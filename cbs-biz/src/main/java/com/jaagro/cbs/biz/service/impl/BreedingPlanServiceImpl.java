@@ -322,26 +322,14 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
      */
     private void generateBatchDetail(BreedingPlanDetailDto breedingPlanDetailDto) {
         Integer planId = breedingPlanDetailDto.getId();
+        BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
         try {
             breedingPlanDetailDto.setStrPlanStatus(PlanStatusEnum.getDescByCode(breedingPlanDetailDto.getPlanStatus()));
-            // 存栏量,今日耗料量
-            BatchInfo theLatestBatchInfo = batchInfoMapper.getTheLatestBatchInfo(planId);
-            // 日龄
-            Integer dayAge = null;
-            if (theLatestBatchInfo != null) {
-                breedingPlanDetailDto.setBreedingStock(new BigDecimal(theLatestBatchInfo.getCurrentAmount()))
-                        .setFodderAmount(theLatestBatchInfo.getFodderAmount());
-                dayAge = theLatestBatchInfo.getDayAge();
-            } else {
-                breedingPlanDetailDto.setBreedingStock(new BigDecimal(breedingPlanDetailDto.getPlanChickenQuantity()));
-                breedingPlanDetailDto.setFodderAmount(new BigDecimal("0"));
-            }
-            if (dayAge == null) {
-                dayAge = (int) getDayAge(planId);
-            }
-            if (dayAge == null || dayAge < 0) {
-                dayAge = 0;
-            }
+            // 存栏量
+            breedingPlanDetailDto.setBreedingStock(getBreedingStock(breedingPlan));
+            Integer dayAge = (int) getDayAge(planId);
+            // 今日耗料量
+            breedingPlanDetailDto.setFodderAmount(getTodayFodderAmt(breedingPlan,dayAge));
             breedingPlanDetailDto.setDayAge(dayAge);
             // 上次喂鸡时间
             BreedingRecordExample example = new BreedingRecordExample();
@@ -404,6 +392,39 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         } catch (Exception ex) {
             log.info("O getBatchDetail error planId=" + planId, ex);
         }
+    }
+
+    private BigDecimal getTodayFodderAmt(BreedingPlan breedingPlan,Integer dayAge) {
+        BatchInfoExample example = new BatchInfoExample();
+        example.createCriteria().andEnableEqualTo(Boolean.TRUE)
+                .andPlanIdEqualTo(breedingPlan.getId())
+                .andDayAgeEqualTo(dayAge);
+        example.setOrderByClause("create_time desc");
+        example.setLimit(1);
+        List<BatchInfo> batchInfoList = batchInfoMapper.selectByExample(example);
+        if (!CollectionUtils.isEmpty(batchInfoList)){
+            return batchInfoList.get(0).getFodderAmount();
+        }
+        return null;
+    }
+
+    private BigDecimal getBreedingStock(BreedingPlan breedingPlan) {
+        //累计所有死淘数量
+        BigDecimal accumulativeDeadAmount = batchInfoMapper.accumulativeDeadAmount(breedingPlan.getId());
+        //累计所有的出栏量
+        BigDecimal accumulativeSaleAmount = batchInfoMapper.accumulativeSaleAmount(breedingPlan.getId());
+        //计算存栏量
+        BigDecimal breedingStock = new BigDecimal(0);
+        if (breedingPlan.getPlanChickenQuantity() != null) {
+            breedingStock = BigDecimal.valueOf(breedingPlan.getPlanChickenQuantity());
+        }
+        if (accumulativeDeadAmount != null) {
+            breedingStock = breedingStock.subtract(accumulativeDeadAmount);
+        }
+        if (accumulativeSaleAmount != null) {
+            breedingStock = breedingStock.subtract(accumulativeSaleAmount);
+        }
+        return breedingStock;
     }
 
     /**
@@ -495,13 +516,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                         coopQuantityStock = coop.getBreedingValue();
                     }
                     // 当前计划存栏量
-                    Integer batchQuantityStock;
-                    BatchInfo theLatestBatchInfo = batchInfoMapper.getTheLatestBatchInfo(planId);
-                    if (theLatestBatchInfo != null) {
-                        batchQuantityStock = theLatestBatchInfo.getCurrentAmount();
-                    } else {
-                        batchQuantityStock = breedingPlan.getPlanChickenQuantity();
-                    }
+                    BigDecimal batchQuantityStock = getBreedingStock(breedingPlan);
                     for (BreedingBatchDrug breedingBatchDrug : breedingBatchDrugList) {
                         BreedingRecordItemsDto recordItemsDto = new BreedingRecordItemsDto();
                         Product product = productMapper.selectByPrimaryKey(breedingBatchDrug.getProductId());
@@ -512,8 +527,8 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                                 recordItemsDto.setCapacityUnit(CapacityUnitEnum.getTypeByCode(product.getCapacityUnit()));
                             }
                             if (coopQuantityStock != null && batchQuantityStock != null && breedingBatchDrug.getFeedVolume() != null) {
-                                BigDecimal scale = new BigDecimal(batchQuantityStock).divide(new BigDecimal("1000"), 4);
-                                recordItemsDto.setBreedingValue(new BigDecimal(coopQuantityStock).divide(new BigDecimal(batchQuantityStock), 6, BigDecimal.ROUND_HALF_UP).multiply(scale.multiply(breedingBatchDrug.getFeedVolume())).setScale(0, BigDecimal.ROUND_HALF_UP));
+                                BigDecimal scale = batchQuantityStock.divide(new BigDecimal("1000"), 4);
+                                recordItemsDto.setBreedingValue(new BigDecimal(coopQuantityStock).divide(batchQuantityStock, 6, BigDecimal.ROUND_HALF_UP).multiply(scale.multiply(breedingBatchDrug.getFeedVolume())).setScale(0, BigDecimal.ROUND_HALF_UP));
                             }
                             recordItemsDtoList.add(recordItemsDto);
                         }
