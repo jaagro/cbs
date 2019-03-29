@@ -88,13 +88,13 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
                     batchCoopDaily
                             .setCreateTime(sdf.parse(todayDate))
                             .setCreateUserId(1);
+                    //插入前先删除
+                    batchCoopDailyMapper.deleteByDayAge(batchCoopDaily.getDayAge());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     throw new RuntimeException(ex.getMessage());
                 }
             }
-            //插入前先删除
-            batchCoopDailyMapper.deleteByDayAge(breedingRecordList.get(0).getDayAge());
             //插入鸡舍养殖每日汇总
             batchCoopDailyMapper.batchInsert(breedingRecordList);
 

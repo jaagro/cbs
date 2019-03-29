@@ -60,8 +60,8 @@
             breeding_record
         WHERE
             enable = 1
-            AND DATE_FORMAT(create_time, '%Y-%m-%d') = #{todayDate}
-            GROUP BY plan_id,coop_id
+            AND DATE_FORMAT(create_time, '%Y-%m-%d') = DATE_FORMAT(#{todayDate}, '%Y-%m-%d')
+            GROUP BY plan_id,coop_id,day_age
     </select>
     <select id="listBatchInfoByParams" resultType="com.jaagro.cbs.api.model.BatchInfo"
             parameterType="com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto">
