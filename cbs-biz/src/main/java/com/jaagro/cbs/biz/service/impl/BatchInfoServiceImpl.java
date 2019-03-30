@@ -87,26 +87,27 @@ public class BatchInfoServiceImpl implements BatchInfoService {
                             .setStartDay(breedingPlan.getPlanTime())
                             .setTechnician(breedingPlan.getTechnician())
                             .setTechnicianId(breedingPlan.getTechnicianId());
+                    //删除
+                    batchInfoMapper.deleteByDateAge(batchInfo.getDayAge(), batchInfo.getPlanId());
                 }
-                //删除
-                batchInfoMapper.deleteByDateAge(batchInfoList.get(0).getDayAge());
                 //批量插入
                 batchInfoMapper.insertBatch(batchInfoList);
 
-            } else {
-                //今日若没有上传数据，将昨日数据拷贝【日龄+1、其余数据为零(死淘,喂养)】
-                criteriaDto.setTodayDate(sdf.format(DateUtils.addDays(sdf.parse(criteriaDto.getTodayDate()), -1)));
-                batchInfoList = batchInfoMapper.listYestodayData(criteriaDto);
-                if (!CollectionUtils.isEmpty(batchInfoList)) {
-                    for (BatchInfo batchInfo : batchInfoList) {
-                        //删除
-                        batchInfoMapper.deleteByDateAge(batchInfo.getDayAge());
-                    }
-                    //批量插入
-                    batchInfoMapper.insertBatch(batchInfoList);
-                }
-
             }
+            //今日若没有上传数据，将昨日数据拷贝【日龄+1、其余数据为零(死淘,喂养)】
+            criteriaDto.setTodayDate(sdf.format(DateUtils.addDays(sdf.parse(criteriaDto.getTodayDate()), -1)));
+            batchInfoList = batchInfoMapper.listYestodayData(criteriaDto);
+            criteriaDto.setTodayDate(sdf.format(DateUtils.addDays(sdf.parse(criteriaDto.getTodayDate()), 1)));
+            if (!CollectionUtils.isEmpty(batchInfoList)) {
+                for (BatchInfo batchInfo : batchInfoList) {
+                    batchInfo.setCreateTime(sdf.parse(criteriaDto.getTodayDate()));
+                    //删除
+                    batchInfoMapper.deleteByDateAge(batchInfo.getDayAge(), batchInfo.getPlanId());
+                }
+                //批量插入
+                batchInfoMapper.insertBatch(batchInfoList);
+            }
+
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex.getMessage());

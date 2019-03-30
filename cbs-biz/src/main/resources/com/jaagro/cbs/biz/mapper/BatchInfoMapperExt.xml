@@ -10,7 +10,7 @@
     </delete>
     <delete id="deleteByDateAge" parameterType="java.lang.Integer">
         delete from batch_info
-        where day_age = #{dayAge}
+        where day_age = #{dayAge} and plan_id = #{planId}
     </delete>
     <insert id="insertBatch" parameterType="com.jaagro.cbs.api.model.BatchInfo">
         <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
@@ -108,7 +108,7 @@
         SELECT
         plan_id,
         batch_no,
-        start_amount,
+        current_amount as start_amount,
         current_amount,
         start_day,
         finish_day,

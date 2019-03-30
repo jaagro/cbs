@@ -27,6 +27,7 @@ import com.jaagro.cbs.biz.service.CustomerClientService;
 import com.jaagro.cbs.biz.service.UserClientService;
 import com.jaagro.cbs.biz.utils.DateUtil;
 import com.jaagro.cbs.biz.utils.MathUtil;
+import com.jaagro.cbs.biz.utils.RedisLock;
 import com.jaagro.cbs.biz.utils.SequenceCodeUtils;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.utils.BaseResponse;
@@ -42,6 +43,7 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -109,6 +111,8 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
     private BreedingStandardDrugMapperExt breedingStandardDrugMapper;
     @Autowired
     private BreedingFarmerService breedingFarmerService;
+    @Autowired
+    private RedisLock redisLock;
 
     /**
      * 创建养殖计划
@@ -504,19 +508,11 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                 }
                 if (!CollectionUtils.isEmpty(breedingBatchDrugList)) {
                     BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
-                    Integer coopQuantityStock;
                     Coop coop = coopMapper.selectByPrimaryKey(coopId);
                     // 当前鸡舍存栏量
-                    BatchCoopDailyExample batchCoopDailyExample = new BatchCoopDailyExample();
-                    batchCoopDailyExample.createCriteria().andDayAgeEqualTo(dayAge).andPlanIdEqualTo(planId).andCoopIdEqualTo(coopId);
-                    List<BatchCoopDaily> batchCoopDailyList = batchCoopDailyMapper.selectByExample(batchCoopDailyExample);
-                    if (!CollectionUtils.isEmpty(batchCoopDailyList)) {
-                        coopQuantityStock = batchCoopDailyList.get(0).getCurrentAmount();
-                    } else {
-                        coopQuantityStock = coop.getBreedingValue();
-                    }
+                    Integer coopBreedingValue = coop.getBreedingValue();
                     // 当前计划存栏量
-                    BigDecimal batchQuantityStock = getBreedingStock(breedingPlan);
+                    BigDecimal batchQuantity = new BigDecimal(breedingPlan.getPlanChickenQuantity());
                     for (BreedingBatchDrug breedingBatchDrug : breedingBatchDrugList) {
                         BreedingRecordItemsDto recordItemsDto = new BreedingRecordItemsDto();
                         Product product = productMapper.selectByPrimaryKey(breedingBatchDrug.getProductId());
@@ -526,9 +522,11 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                             if (product.getCapacityUnit() != null) {
                                 recordItemsDto.setCapacityUnit(CapacityUnitEnum.getTypeByCode(product.getCapacityUnit()));
                             }
-                            if (coopQuantityStock != null && batchQuantityStock != null && breedingBatchDrug.getFeedVolume() != null) {
-                                BigDecimal scale = batchQuantityStock.divide(new BigDecimal("1000"), 4);
-                                recordItemsDto.setBreedingValue(new BigDecimal(coopQuantityStock).divide(batchQuantityStock, 6, BigDecimal.ROUND_HALF_UP).multiply(scale.multiply(breedingBatchDrug.getFeedVolume())).setScale(0, BigDecimal.ROUND_HALF_UP));
+                            if (coopBreedingValue != null && batchQuantity != null && breedingBatchDrug.getFeedVolume() != null) {
+                                BigDecimal scale = batchQuantity.divide(new BigDecimal("1000"),4,BigDecimal.ROUND_HALF_UP);
+                                BigDecimal rate = new BigDecimal(coopBreedingValue).divide(batchQuantity, 6, BigDecimal.ROUND_HALF_UP);
+                                BigDecimal feedVal = breedingBatchDrug.getFeedVolume().multiply(scale).multiply(rate).setScale(0,BigDecimal.ROUND_HALF_UP);
+                                recordItemsDto.setBreedingValue(feedVal);
                             }
                             recordItemsDtoList.add(recordItemsDto);
                         }
@@ -953,6 +951,8 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void breedingPlanParamConfiguration(BreedingPlanParamConfigurationDto dto) {
+        String key = "paramConfiguration_"+dto.getPlanId();
+        redisLock.lock(key,System.currentTimeMillis()+"",5, TimeUnit.SECONDS);
         List<BreedingPlanCoopDto> breedingPlanCoopDtoList = dto.getBreedingPlanCoopDtoList();
         UserInfo currentUser = currentUserService.getCurrentUser();
         Integer currentUserId = currentUser == null ? null : currentUser.getId();
@@ -1027,6 +1027,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         // 生成第一批鸡苗,饲料,药品采购单
         breedingBrainService.calculateDrugPurchaseOrderById(breedingPlan);
         breedingBrainService.calculatePhaseOneFoodWeightById(breedingPlan);
+        redisLock.unLock(key);
     }
 
     private BreedingPlan judgeBreedingPlan(Integer planId) {

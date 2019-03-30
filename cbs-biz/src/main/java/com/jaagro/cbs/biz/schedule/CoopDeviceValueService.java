@@ -6,7 +6,6 @@ import com.jaagro.cbs.biz.utils.RedisLock;
 import com.jaagro.cbs.biz.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -45,7 +44,7 @@ public class CoopDeviceValueService {
      * 批次养殖情况汇总
      */
 //    @Scheduled(cron = "0 10 23 1/1 * ?")
-    @Scheduled(cron = "0 * * * * ?")
+//    @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void coopDeviceValue() {
         log.info("coopDeviceValue:定时钟执行开始");
