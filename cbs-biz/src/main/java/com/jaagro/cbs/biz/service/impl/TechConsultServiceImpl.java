@@ -117,7 +117,7 @@ public class TechConsultServiceImpl implements TechConsultService {
             int deadAmount = 0;
             if (!CollectionUtils.isEmpty(batchCoopDailyList)) {
                 for (BatchCoopDaily batchCoopDaily : batchCoopDailyList) {
-                    if(!StringUtils.isEmpty(batchCoopDaily.getDeadAmount()+"")) {
+                    if(!StringUtils.isEmpty(batchCoopDaily.getDeadAmount())) {
                         deadAmount = deadAmount + batchCoopDaily.getDeadAmount();
                     }
                 }
