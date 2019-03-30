@@ -34,7 +34,7 @@ public interface BatchInfoMapperExt extends BaseMapper<BatchInfo, BatchInfoExamp
      *
      * @param todayDate
      */
-    void deleteByDateAge(@Param("dayAge") Integer dayAge);
+    void deleteByDateAge(@Param("dayAge") Integer dayAge, @Param("planId") Integer planId);
 
     /**
      * 批量插入

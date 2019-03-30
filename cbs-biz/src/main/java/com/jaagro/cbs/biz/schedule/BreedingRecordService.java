@@ -6,7 +6,6 @@ import com.jaagro.cbs.api.service.BatchInfoService;
 import com.jaagro.cbs.api.service.BreedingRecordDailyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +30,7 @@ public class BreedingRecordService {
      * 鸡舍养殖每日汇总
      */
 //    @Scheduled(cron = "0 0/1 * * * ? ")
-    @Scheduled(cron = "0 * * * * ?")
+//    @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void batchCoopDaily() {
         log.info("batchCoopDaily:定时钟执行开始");
@@ -50,7 +49,7 @@ public class BreedingRecordService {
      * 批次养殖记录表日汇总
      */
 //    @Scheduled(cron = "0 20 23 1/1 * ?")
-    @Scheduled(cron = "0 * * * * ?")
+//    @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void breedingRecordDaily() {
         log.info("breedingRecordDaily:定时钟执行开始");
@@ -68,7 +67,7 @@ public class BreedingRecordService {
      */
 
 //    @Scheduled(cron = "0 0 0/1 * * ? ")
-    @Scheduled(cron = "0 * * * * ?")
+//    @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void batchInfo() {
         log.info("batchInfo:定时钟执行开始");
