@@ -333,7 +333,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             breedingPlanDetailDto.setBreedingStock(getBreedingStock(breedingPlan));
             Integer dayAge = (int) getDayAge(planId);
             // 今日耗料量
-            breedingPlanDetailDto.setFodderAmount(getTodayFodderAmt(breedingPlan,dayAge));
+            breedingPlanDetailDto.setFodderAmount(getTodayFodderAmt(breedingPlan, dayAge));
             breedingPlanDetailDto.setDayAge(dayAge);
             // 上次喂鸡时间
             BreedingRecordExample example = new BreedingRecordExample();
@@ -398,7 +398,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         }
     }
 
-    private BigDecimal getTodayFodderAmt(BreedingPlan breedingPlan,Integer dayAge) {
+    private BigDecimal getTodayFodderAmt(BreedingPlan breedingPlan, Integer dayAge) {
         BatchInfoExample example = new BatchInfoExample();
         example.createCriteria().andEnableEqualTo(Boolean.TRUE)
                 .andPlanIdEqualTo(breedingPlan.getId())
@@ -406,7 +406,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         example.setOrderByClause("create_time desc");
         example.setLimit(1);
         List<BatchInfo> batchInfoList = batchInfoMapper.selectByExample(example);
-        if (!CollectionUtils.isEmpty(batchInfoList)){
+        if (!CollectionUtils.isEmpty(batchInfoList)) {
             return batchInfoList.get(0).getFodderAmount();
         }
         return null;
@@ -1097,7 +1097,6 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
      */
     @Override
     public ReturnBreedingDetailsDto breedingDetails(Integer planId) {
-        HashMap<Integer, BigDecimal> calculatePlanFeedWeightMap = new HashMap<>(16);
         ReturnBreedingDetailsDto returnBreedingDetailsDto = new ReturnBreedingDetailsDto();
         //送料情况信息
         BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
@@ -1157,40 +1156,53 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             if (ProductTypeEnum.VACCINE.getCode() == productTypeEnum.getCode()) {
                 continue;
             }
-            BigDecimal planPurchaseValue = null;
-            BigDecimal deliverPurchaseValue = null;
             int productType = productTypeEnum.getCode();
+            PurchaseOrderExample purchaseOrderExample = new PurchaseOrderExample();
+            purchaseOrderExample
+                    .createCriteria()
+                    .andPlanIdEqualTo(planId)
+                    .andEnableEqualTo(true)
+                    .andProductTypeEqualTo(productType);
             CalculatePurchaseOrderDto calculatePurchaseOrderDto = new CalculatePurchaseOrderDto();
-            HashMap<Integer, BigDecimal> calculatePurchaseOrderAllMap = calculatePurchaseOrder(planId, productType, null);
-            if (calculatePurchaseOrderAllMap != null && calculatePurchaseOrderAllMap.get(productType) != null) {
-                planPurchaseValue = calculatePurchaseOrderAllMap.get(productType);
-                if (ProductTypeEnum.FEED.getCode() == productType) {
-                    calculatePlanFeedWeightMap.put(productType, planPurchaseValue);
+            purchaseOrderExample.setOrderByClause("order_phase desc");
+            purchaseOrderExample.setLimit(1);
+            List<PurchaseOrder> purchaseOrderList = purchaseOrderMapper.selectByExample(purchaseOrderExample);
+            if (!CollectionUtils.isEmpty(purchaseOrderList)) {
+                PurchaseOrder purchaseOrder = purchaseOrderList.get(0);
+                if (purchaseOrder.getOrderPhase() != null) {
+                    calculatePurchaseOrderDto
+                            .setDeliverPurchaseValue(BigDecimal.valueOf(purchaseOrder.getOrderPhase()));
                 }
+                calculatePurchaseOrderDto
+                        .setProductType(productType);
             }
-            HashMap<Integer, BigDecimal> calculatePurchaseOrderMap = calculatePurchaseOrder(planId, productType, PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode());
-            if (calculatePurchaseOrderMap.get(productType) != null) {
-                deliverPurchaseValue = calculatePurchaseOrderMap.get(productType);
+            if (ProductTypeEnum.SPROUT.getCode() == productTypeEnum.getCode()) {
+                calculatePurchaseOrderDto
+                        .setPlanPurchaseValue(BigDecimal.valueOf(1));
             }
-            calculatePurchaseOrderDto
-                    .setProductType(productType)
-                    .setPlanPurchaseValue(planPurchaseValue)
-                    .setDeliverPurchaseValue(deliverPurchaseValue);
+            if (ProductTypeEnum.DRUG.getCode() == productTypeEnum.getCode()) {
+                calculatePurchaseOrderDto
+                        .setPlanPurchaseValue(BigDecimal.valueOf(2));
+            }
+            if (ProductTypeEnum.FEED.getCode() == productTypeEnum.getCode()) {
+                calculatePurchaseOrderDto
+                        .setPlanPurchaseValue(BigDecimal.valueOf(4));
+            }
             calculatePurchaseOrderDtos.add(calculatePurchaseOrderDto);
         }
+        HashMap<Integer, BigDecimal> calculatePlanFeedWeightMap = calculatePurchaseOrder(planId, ProductTypeEnum.FEED.getCode(), null);
         //计算计划饲料 剩余饲料
-        if (calculatePlanFeedWeightMap.get(ProductTypeEnum.FEED.getCode()) != null) {
+        if (calculatePlanFeedWeightMap != null && calculatePlanFeedWeightMap.get(ProductTypeEnum.FEED.getCode()) != null) {
             BigDecimal totalPlanFeedWeight = calculatePlanFeedWeightMap.get(ProductTypeEnum.FEED.getCode());
-            if (totalPlanFeedWeight != null) {
+            totalPlanFeedWeight = totalPlanFeedWeight.multiply(BigDecimal.valueOf(1000));
+            returnBreedingDetailsDto
+                    .setPlanFeed(totalPlanFeedWeight);
+            if (accumulativeFeed != null) {
                 returnBreedingDetailsDto
-                        .setPlanFeed(totalPlanFeedWeight);
-                if (accumulativeFeed != null) {
-                    returnBreedingDetailsDto
-                            .setRemainFeed(totalPlanFeedWeight.subtract(accumulativeFeed));
-                } else {
-                    returnBreedingDetailsDto
-                            .setRemainFeed(totalPlanFeedWeight);
-                }
+                        .setRemainFeed(totalPlanFeedWeight.subtract(accumulativeFeed));
+            } else {
+                returnBreedingDetailsDto
+                        .setRemainFeed(totalPlanFeedWeight);
             }
         }
         //计算理论体重值

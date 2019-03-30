@@ -46,6 +46,7 @@ public class BreedingBrainSchedule {
      * 每天晚上11点跑一次
      */
 //    @Scheduled(cron = "0 50 23 1/1 * ?")
+    @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void calculatePhaseTwoFoodWeight() {
         log.info("calculatePhaseTwoFoodWeight:定时钟执行开始");
@@ -54,9 +55,16 @@ public class BreedingBrainSchedule {
             for (BreedingPlan breedingPlan : breedingPlanList) {
                 try {
                     breedingBrainService.calculatePhaseTwoFoodWeightById(breedingPlan);
+                } catch (Exception ex) {
+                    log.error("第二阶段(15->19天)510饲料订单自动生成时失败,planId:" + breedingPlan.getId() + ",原因：" + ex);
+                    continue;
+                }
+            }
+            for (BreedingPlan breedingPlan : breedingPlanList) {
+                try {
                     breedingBrainService.calculatePhaseThreeFoodWeightById(breedingPlan);
                 } catch (Exception ex) {
-                    log.error("第二阶段510饲料、511饲料自动生成养殖计划采购订单失败,planId:" + breedingPlan.getId() + ",原因：" + ex);
+                    log.error("第二阶段(20->28天)的511饲料订单自动生成时失败,planId:" + breedingPlan.getId() + ",原因：" + ex);
                     continue;
                 }
             }
