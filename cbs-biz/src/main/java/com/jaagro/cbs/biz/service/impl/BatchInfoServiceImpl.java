@@ -87,9 +87,9 @@ public class BatchInfoServiceImpl implements BatchInfoService {
                             .setStartDay(breedingPlan.getPlanTime())
                             .setTechnician(breedingPlan.getTechnician())
                             .setTechnicianId(breedingPlan.getTechnicianId());
+                    //删除
+                    batchInfoMapper.deleteByDateAge(batchInfo.getDayAge());
                 }
-                //删除
-                batchInfoMapper.deleteByDateAge(batchInfoList.get(0).getDayAge());
                 //批量插入
                 batchInfoMapper.insertBatch(batchInfoList);
 
