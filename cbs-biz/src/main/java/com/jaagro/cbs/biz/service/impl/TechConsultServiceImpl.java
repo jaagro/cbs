@@ -21,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -116,7 +117,9 @@ public class TechConsultServiceImpl implements TechConsultService {
             int deadAmount = 0;
             if (!CollectionUtils.isEmpty(batchCoopDailyList)) {
                 for (BatchCoopDaily batchCoopDaily : batchCoopDailyList) {
-                    deadAmount = deadAmount + batchCoopDaily.getDeadAmount();
+                    if(!StringUtils.isEmpty(batchCoopDaily.getDeadAmount()+"")) {
+                        deadAmount = deadAmount + batchCoopDaily.getDeadAmount();
+                    }
                 }
             }
             livingAmount = planChickenQuantity - deadAmount;
