@@ -59,4 +59,17 @@
         AND poi.`enable` = 1;
 
     </select>
+    <select id="listFarmerPurchaseOrder" resultType="com.jaagro.cbs.api.dto.order.PurchaseOrderDto"
+            parameterType="com.jaagro.cbs.api.dto.order.PurchaseOrderCriteriaDto">
+        select
+        <include refid="Base_Column_List"/>
+        from purchase_order
+        where enable=1 and customer_id=#{customerId}
+        <if test="purchaseOrderStatus!=null">
+            and purchase_order_status in
+            <foreach collection="purchaseOrderStatus" open="(" separator="," close=")" item="item">
+                ${item}
+            </foreach>
+        </if>
+    </select>
 </mapper>

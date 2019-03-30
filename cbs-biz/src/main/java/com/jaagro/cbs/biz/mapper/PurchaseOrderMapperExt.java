@@ -2,6 +2,8 @@ package com.jaagro.cbs.biz.mapper;
 
 import javax.annotation.Resource;
 
+import com.jaagro.cbs.api.dto.order.PurchaseOrderCriteriaDto;
+import com.jaagro.cbs.api.dto.order.PurchaseOrderDto;
 import com.jaagro.cbs.api.dto.supplychain.PurchaseOrderManageCriteria;
 import com.jaagro.cbs.api.dto.supplychain.ReturnPurchaseOrderManageDto;
 import com.jaagro.cbs.api.model.PurchaseOrder;
@@ -52,5 +54,11 @@ public interface PurchaseOrderMapperExt extends BaseMapper<PurchaseOrder, Purcha
      * @return
      */
     BigDecimal getTotalSignedFoodByPlanId(Integer planId);
+
+    /**
+     * @param criteriaDto
+     * @return
+     */
+    List<PurchaseOrderDto> listFarmerPurchaseOrder(PurchaseOrderCriteriaDto criteriaDto);
 
 }
