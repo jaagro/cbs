@@ -46,7 +46,7 @@
   </delete>
     <delete id="deleteByDayAge" parameterType="java.lang.Integer">
     delete from batch_coop_daily
-    where day_age = #{dayAge}
+    where day_age = #{dayAge} and plan_id = #{planId} and coop_id = #{coopId}
     </delete>
     <select id="listYesterdayData" resultMap="BaseResultMap" parameterType="java.lang.String">
         SELECT

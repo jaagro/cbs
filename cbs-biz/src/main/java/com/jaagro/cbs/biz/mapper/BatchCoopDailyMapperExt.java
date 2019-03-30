@@ -46,7 +46,7 @@ public interface BatchCoopDailyMapperExt extends BaseMapper<BatchCoopDaily, Batc
      *
      * @param todayDate
      */
-    void deleteByDayAge(@Param("dayAge") Integer dayAge);
+    void deleteByDayAge(@Param("dayAge") Integer dayAge, @Param("planId") Integer planId, @Param("coopId") Integer coopId);
 
     /**
      * 查询昨天数据

@@ -52,16 +52,16 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
         if (!success) {
             throw new RuntimeException("请求正在处理中");
         }
-        //格式化今日
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        if (StringUtils.isEmpty(todayDate)) {
-            todayDate = sdf.format(new Date());
-        }
-        //从BreedingRecord统计
-        List<BatchCoopDaily> breedingRecordList = breedingRecordMapper.listCoopDailyByParams(todayDate);
-        if (!CollectionUtils.isEmpty(breedingRecordList)) {
-            for (BatchCoopDaily batchCoopDaily : breedingRecordList) {
-                try {
+        try {
+            //格式化今日
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            if (StringUtils.isEmpty(todayDate)) {
+                todayDate = sdf.format(new Date());
+            }
+            //从BreedingRecord统计
+            List<BatchCoopDaily> breedingRecordList = breedingRecordMapper.listCoopDailyByParams(todayDate);
+            if (!CollectionUtils.isEmpty(breedingRecordList)) {
+                for (BatchCoopDaily batchCoopDaily : breedingRecordList) {
                     //查询不到记录，就用coop的在养数量
                     Coop coop = coopMapperExt.selectByPrimaryKey(batchCoopDaily.getCoopId());
                     // 查询昨日剩余喂养数量 来当做今天的起始喂养数量
@@ -83,38 +83,34 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
                     } else {
                         batchCoopDaily.setCurrentAmount(coop.getBreedingValue());
                     }
-
                     //出栏数量 待定
                     //创建人
                     batchCoopDaily
                             .setCreateTime(sdf.parse(todayDate))
                             .setCreateUserId(1);
                     //插入前先删除
-                    batchCoopDailyMapper.deleteByDayAge(batchCoopDaily.getDayAge());
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    throw new RuntimeException(ex.getMessage());
+                    batchCoopDailyMapper.deleteByDayAge(batchCoopDaily.getDayAge(), batchCoopDaily.getPlanId(), batchCoopDaily.getCoopId());
                 }
+                //插入鸡舍养殖每日汇总
+                batchCoopDailyMapper.batchInsert(breedingRecordList);
             }
-            //插入鸡舍养殖每日汇总
-            batchCoopDailyMapper.batchInsert(breedingRecordList);
+            /**
+             * 今天没有上传数据的
+             */
+            breedingRecordList = batchCoopDailyMapper.listYesterdayData(sdf.format(DateUtils.addDays(sdf.parse(todayDate), -1)));
+            if (!CollectionUtils.isEmpty(breedingRecordList)) {
+                for (BatchCoopDaily coopDaily : breedingRecordList) {
+                    coopDaily.setCreateTime(sdf.parse(todayDate));
+                    //插入前先删除
+                    batchCoopDailyMapper.deleteByDayAge(coopDaily.getDayAge(), coopDaily.getPlanId(), coopDaily.getCoopId());
+                }
+                //插入鸡舍养殖每日汇总
+                batchCoopDailyMapper.batchInsert(breedingRecordList);
+            }
 
-        } else {
-            try {
-                breedingRecordList = batchCoopDailyMapper.listYesterdayData(sdf.format(DateUtils.addDays(sdf.parse(todayDate), -1)));
-                if (!CollectionUtils.isEmpty(breedingRecordList)) {
-                    for (BatchCoopDaily coopDaily : breedingRecordList) {
-                        coopDaily.setCreateTime(sdf.parse(todayDate));
-                        //插入前先删除
-                        batchCoopDailyMapper.deleteByDayAge(coopDaily.getDayAge());
-                    }
-                    //插入鸡舍养殖每日汇总
-                    batchCoopDailyMapper.batchInsert(breedingRecordList);
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                throw new RuntimeException(ex.getMessage());
-            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(ex.getMessage());
         }
         //去锁
         redisLock.unLock("Scheduled:redisLock:batchCoopDaily");
