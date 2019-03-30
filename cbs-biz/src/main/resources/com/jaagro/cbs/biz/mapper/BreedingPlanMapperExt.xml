@@ -141,4 +141,12 @@
         AND plan_status = 3
         AND plan_time &lt;= CURRENT_DATE() - (breeding_days - 7)
     </select>
+    <select id="listTodayPlanInteger" resultType="java.lang.Integer">
+    SELECT
+        temp_a.id
+    FROM
+        ( SELECT id FROM breeding_plan WHERE DATE_FORMAT( create_time, "%Y-%m-%d" ) = DATE_FORMAT( now(), "%Y-%m-%d" ) AND ENABLE = 1 ) temp_a
+    WHERE
+        temp_a.id NOT IN ( SELECT plan_id FROM breeding_record WHERE ENABLE = 1 AND DATE_FORMAT( create_time, "%Y-%m-%d" ) = DATE_FORMAT(now(), "%Y-%m-%d" ) GROUP BY plan_id )
+    </select>
 </mapper>

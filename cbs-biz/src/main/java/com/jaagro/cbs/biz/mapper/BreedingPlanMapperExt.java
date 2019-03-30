@@ -1,7 +1,5 @@
 package com.jaagro.cbs.biz.mapper;
 
-import javax.annotation.Resource;
-
 import com.jaagro.cbs.api.dto.farmer.BreedingPlanDetailDto;
 import com.jaagro.cbs.api.dto.farmer.ReturnBreedingBatchDetailsDto;
 import com.jaagro.cbs.api.dto.order.PurchaseOrderPresetCriteriaDto;
@@ -15,6 +13,7 @@ import com.jaagro.cbs.api.model.BreedingPlanExample;
 import com.jaagro.cbs.biz.mapper.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 
@@ -88,4 +87,11 @@ public interface BreedingPlanMapperExt extends BaseMapper<BreedingPlan, Breeding
      * @return
      */
     List<BreedingPlan> listToSlaughterConfirm();
+
+    /**
+     * 查询今日创建的、未提交喂料记录的批次
+     *
+     * @return
+     */
+    List<Integer> listTodayPlanInteger();
 }

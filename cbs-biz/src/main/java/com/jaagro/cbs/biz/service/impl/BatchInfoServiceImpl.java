@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -117,7 +118,37 @@ public class BatchInfoServiceImpl implements BatchInfoService {
                 batchInfoMapper.insertBatch(batchInfoList);
 
             }
-
+            /**
+             * 查询今日创建的、未提交喂料记录的批次
+             */
+            List<Integer> planIdList = breedingPlanMapper.listTodayPlanInteger();
+            if (!CollectionUtils.isEmpty(planIdList)) {
+                List<BatchInfo> todayNewBatchInfoList = new ArrayList<>();
+                for (Integer id : planIdList) {
+                    BatchInfo batchInfo = new BatchInfo();
+                    BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(id);
+                    if (breedingPlan == null) {
+                        throw new RuntimeException("计划有误");
+                    }
+                    batchInfo
+                            .setPlanId(id)
+                            .setBatchNo(breedingPlan.getBatchNo())
+                            .setStartDay(breedingPlan.getPlanTime())
+                            .setStartAmount(breedingPlan.getPlanChickenQuantity())
+                            .setCurrentAmount(breedingPlan.getPlanChickenQuantity())
+                            .setCreateTime(sdf.parse(criteriaDto.getTodayDate()))
+                            .setEnable(true)
+                            .setCreateUserId(1)
+                            .setDayAge(1)
+                            .setStartDay(breedingPlan.getPlanTime())
+                            .setTechnician(breedingPlan.getTechnician())
+                            .setTechnicianId(breedingPlan.getTechnicianId());
+                    //删除
+                    batchInfoMapper.deleteByDateAge(batchInfo.getDayAge(), batchInfo.getPlanId());
+                    todayNewBatchInfoList.add(batchInfo);
+                }
+                batchInfoMapper.insertBatch(todayNewBatchInfoList);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex.getMessage());
