@@ -99,6 +99,7 @@ public class BatchInfoServiceImpl implements BatchInfoService {
                 batchInfoList = batchInfoMapper.listYestodayData(criteriaDto);
                 if (!CollectionUtils.isEmpty(batchInfoList)) {
                     for (BatchInfo batchInfo : batchInfoList) {
+                        batchInfo.setCreateTime(sdf.parse(criteriaDto.getTodayDate()));
                         //删除
                         batchInfoMapper.deleteByDateAge(batchInfo.getDayAge());
                     }
