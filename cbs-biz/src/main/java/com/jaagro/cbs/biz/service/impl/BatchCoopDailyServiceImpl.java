@@ -60,6 +60,29 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
             }
             //从BreedingRecord统计
             List<BatchCoopDaily> breedingRecordList = breedingRecordMapper.listCoopDailyByParams(todayDate);
+
+            /**
+             * 今天没有上传数据的 查询昨日的数据
+             */
+            List<BatchCoopDaily> coopDailyList = batchCoopDailyMapper.listYesterdayData(sdf.format(DateUtils.addDays(sdf.parse(todayDate), -1)));
+            if (!CollectionUtils.isEmpty(coopDailyList)) {
+                for (BatchCoopDaily coopDaily : coopDailyList) {
+                    Boolean flag = true;
+                    for (BatchCoopDaily daily : breedingRecordList) {
+                        if (daily.getPlanId().equals(coopDaily.getPlanId()) && coopDaily.getDayAge() + 1 == daily.getDayAge() && daily.getCoopId().equals(coopDaily.getCoopId())) {
+                            flag = false;
+                        }
+                    }
+                    if (flag) {
+                        coopDaily.setCreateTime(sdf.parse(todayDate));
+                        //插入前先删除
+                        batchCoopDailyMapper.deleteByDayAge(coopDaily.getDayAge(), coopDaily.getPlanId(), coopDaily.getCoopId());
+                        batchCoopDailyMapper.insertSelective(coopDaily);
+                    }
+
+                }
+            }
+
             if (!CollectionUtils.isEmpty(breedingRecordList)) {
                 for (BatchCoopDaily batchCoopDaily : breedingRecordList) {
                     //查询不到记录，就用coop的在养数量
@@ -90,19 +113,6 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
                             .setCreateUserId(1);
                     //插入前先删除
                     batchCoopDailyMapper.deleteByDayAge(batchCoopDaily.getDayAge(), batchCoopDaily.getPlanId(), batchCoopDaily.getCoopId());
-                }
-                //插入鸡舍养殖每日汇总
-                batchCoopDailyMapper.batchInsert(breedingRecordList);
-            }
-            /**
-             * 今天没有上传数据的
-             */
-            breedingRecordList = batchCoopDailyMapper.listYesterdayData(sdf.format(DateUtils.addDays(sdf.parse(todayDate), -1)));
-            if (!CollectionUtils.isEmpty(breedingRecordList)) {
-                for (BatchCoopDaily coopDaily : breedingRecordList) {
-                    coopDaily.setCreateTime(sdf.parse(todayDate));
-                    //插入前先删除
-                    batchCoopDailyMapper.deleteByDayAge(coopDaily.getDayAge(), coopDaily.getPlanId(), coopDaily.getCoopId());
                 }
                 //插入鸡舍养殖每日汇总
                 batchCoopDailyMapper.batchInsert(breedingRecordList);

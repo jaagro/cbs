@@ -56,6 +56,29 @@ public class BatchInfoServiceImpl implements BatchInfoService {
         try {
             // 得到批次养殖情况汇总列表
             List<BatchInfo> batchInfoList = breedingRecordMapper.listBatchInfoByParams(criteriaDto);
+
+            //今日若没有上传数据，将昨日数据拷贝【日龄+1、其余数据为零(死淘,喂养)】
+            criteriaDto.setTodayDate(sdf.format(DateUtils.addDays(sdf.parse(criteriaDto.getTodayDate()), -1)));
+            List<BatchInfo> infoList = batchInfoMapper.listYestodayData(criteriaDto);
+            criteriaDto.setTodayDate(sdf.format(DateUtils.addDays(sdf.parse(criteriaDto.getTodayDate()), 1)));
+            if (!CollectionUtils.isEmpty(infoList)) {
+                for (BatchInfo info : infoList) {
+                    Boolean flag = true;
+                    for (BatchInfo batchInfo : batchInfoList) {
+                        if (info.getDayAge() + 1 == batchInfo.getDayAge() && info.getPlanId().equals(batchInfo.getPlanId())) {
+                            flag = false;
+                        }
+                    }
+                    if (flag) {
+                        info.setCreateTime(sdf.parse(criteriaDto.getTodayDate()));
+                        //删除
+                        batchInfoMapper.deleteByDateAge(info.getDayAge(), info.getPlanId());
+                        batchInfoMapper.insertSelective(info);
+                    }
+
+                }
+            }
+
             if (!CollectionUtils.isEmpty(batchInfoList)) {
                 for (BatchInfo batchInfo : batchInfoList) {
                     // 计划
@@ -93,19 +116,6 @@ public class BatchInfoServiceImpl implements BatchInfoService {
                 //批量插入
                 batchInfoMapper.insertBatch(batchInfoList);
 
-            }
-            //今日若没有上传数据，将昨日数据拷贝【日龄+1、其余数据为零(死淘,喂养)】
-            criteriaDto.setTodayDate(sdf.format(DateUtils.addDays(sdf.parse(criteriaDto.getTodayDate()), -1)));
-            batchInfoList = batchInfoMapper.listYestodayData(criteriaDto);
-            criteriaDto.setTodayDate(sdf.format(DateUtils.addDays(sdf.parse(criteriaDto.getTodayDate()), 1)));
-            if (!CollectionUtils.isEmpty(batchInfoList)) {
-                for (BatchInfo batchInfo : batchInfoList) {
-                    batchInfo.setCreateTime(sdf.parse(criteriaDto.getTodayDate()));
-                    //删除
-                    batchInfoMapper.deleteByDateAge(batchInfo.getDayAge(), batchInfo.getPlanId());
-                }
-                //批量插入
-                batchInfoMapper.insertBatch(batchInfoList);
             }
 
         } catch (Exception ex) {
