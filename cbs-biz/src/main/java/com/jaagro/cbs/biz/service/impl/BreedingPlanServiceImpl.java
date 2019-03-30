@@ -508,19 +508,11 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                 }
                 if (!CollectionUtils.isEmpty(breedingBatchDrugList)) {
                     BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
-                    Integer coopQuantityStock;
                     Coop coop = coopMapper.selectByPrimaryKey(coopId);
                     // 当前鸡舍存栏量
-                    BatchCoopDailyExample batchCoopDailyExample = new BatchCoopDailyExample();
-                    batchCoopDailyExample.createCriteria().andDayAgeEqualTo(dayAge).andPlanIdEqualTo(planId).andCoopIdEqualTo(coopId);
-                    List<BatchCoopDaily> batchCoopDailyList = batchCoopDailyMapper.selectByExample(batchCoopDailyExample);
-                    if (!CollectionUtils.isEmpty(batchCoopDailyList)) {
-                        coopQuantityStock = batchCoopDailyList.get(0).getCurrentAmount();
-                    } else {
-                        coopQuantityStock = coop.getBreedingValue();
-                    }
+                    Integer coopBreedingValue = coop.getBreedingValue();
                     // 当前计划存栏量
-                    BigDecimal batchQuantityStock = getBreedingStock(breedingPlan);
+                    BigDecimal batchQuantity = new BigDecimal(breedingPlan.getPlanChickenQuantity());
                     for (BreedingBatchDrug breedingBatchDrug : breedingBatchDrugList) {
                         BreedingRecordItemsDto recordItemsDto = new BreedingRecordItemsDto();
                         Product product = productMapper.selectByPrimaryKey(breedingBatchDrug.getProductId());
@@ -530,9 +522,9 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                             if (product.getCapacityUnit() != null) {
                                 recordItemsDto.setCapacityUnit(CapacityUnitEnum.getTypeByCode(product.getCapacityUnit()));
                             }
-                            if (coopQuantityStock != null && batchQuantityStock != null && breedingBatchDrug.getFeedVolume() != null) {
-                                BigDecimal scale = batchQuantityStock.divide(new BigDecimal("1000"),4,BigDecimal.ROUND_HALF_UP);
-                                BigDecimal rate = new BigDecimal(coopQuantityStock).divide(batchQuantityStock, 6, BigDecimal.ROUND_HALF_UP);
+                            if (coopBreedingValue != null && batchQuantity != null && breedingBatchDrug.getFeedVolume() != null) {
+                                BigDecimal scale = batchQuantity.divide(new BigDecimal("1000"),4,BigDecimal.ROUND_HALF_UP);
+                                BigDecimal rate = new BigDecimal(coopBreedingValue).divide(batchQuantity, 6, BigDecimal.ROUND_HALF_UP);
                                 BigDecimal feedVal = breedingBatchDrug.getFeedVolume().multiply(scale).multiply(rate).setScale(0,BigDecimal.ROUND_HALF_UP);
                                 recordItemsDto.setBreedingValue(feedVal);
                             }
