@@ -139,7 +139,7 @@
         WHERE
         enable = 1
         AND plan_status = 3
-        AND plan_time &lt;= CURRENT_DATE() - (breeding_days - 7)
+        AND plan_time &lt;= DATE_SUB(CURRENT_DATE (), INTERVAL breeding_days-7 DAY )
     </select>
     <select id="listTodayPlanInteger" resultType="java.lang.Integer">
     SELECT
