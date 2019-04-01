@@ -69,7 +69,7 @@
             c.breeding_value
         FROM
             batch_plant_coop bpc
-        LEFT JOIN plant p ON bpc.plan_id = p.id
+        LEFT JOIN plant p ON bpc.plant_id = p.id
         LEFT JOIN coop c on bpc.coop_id = c.id
         WHERE bpc.plan_id = #{planId,jdbcType=INTEGER}
         AND bpc.coop_id is not null;
