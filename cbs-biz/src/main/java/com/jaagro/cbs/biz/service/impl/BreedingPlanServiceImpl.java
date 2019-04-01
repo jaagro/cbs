@@ -354,6 +354,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                 for (Integer plantId : plantIdSet) {
                     BatchPlantDto batchPlantDto = new BatchPlantDto();
                     batchPlantDto.setId(plantId);
+                    batchPlantDto.setPlantName(batchPlantCoopBoList.get(0).getPlantName());
                     List<BatchCoopDto> batchCoopDtoList = new ArrayList<>();
                     batchPlantDto.setBatchCoopDtoList(batchCoopDtoList);
                     batchPlantDtoList.add(batchPlantDto);
