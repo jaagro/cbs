@@ -248,6 +248,66 @@ public class LoanApplyRecordExample implements Serializable {
             return (Criteria) this;
         }
 
+        public Criteria andLoanTypeIsNull() {
+            addCriterion("loan_type is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLoanTypeIsNotNull() {
+            addCriterion("loan_type is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLoanTypeEqualTo(Integer value) {
+            addCriterion("loan_type =", value, "loanType");
+            return (Criteria) this;
+        }
+
+        public Criteria andLoanTypeNotEqualTo(Integer value) {
+            addCriterion("loan_type <>", value, "loanType");
+            return (Criteria) this;
+        }
+
+        public Criteria andLoanTypeGreaterThan(Integer value) {
+            addCriterion("loan_type >", value, "loanType");
+            return (Criteria) this;
+        }
+
+        public Criteria andLoanTypeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("loan_type >=", value, "loanType");
+            return (Criteria) this;
+        }
+
+        public Criteria andLoanTypeLessThan(Integer value) {
+            addCriterion("loan_type <", value, "loanType");
+            return (Criteria) this;
+        }
+
+        public Criteria andLoanTypeLessThanOrEqualTo(Integer value) {
+            addCriterion("loan_type <=", value, "loanType");
+            return (Criteria) this;
+        }
+
+        public Criteria andLoanTypeIn(List<Integer> values) {
+            addCriterion("loan_type in", values, "loanType");
+            return (Criteria) this;
+        }
+
+        public Criteria andLoanTypeNotIn(List<Integer> values) {
+            addCriterion("loan_type not in", values, "loanType");
+            return (Criteria) this;
+        }
+
+        public Criteria andLoanTypeBetween(Integer value1, Integer value2) {
+            addCriterion("loan_type between", value1, value2, "loanType");
+            return (Criteria) this;
+        }
+
+        public Criteria andLoanTypeNotBetween(Integer value1, Integer value2) {
+            addCriterion("loan_type not between", value1, value2, "loanType");
+            return (Criteria) this;
+        }
+
         public Criteria andPlanIdIsNull() {
             addCriterion("plan_id is null");
             return (Criteria) this;
@@ -305,6 +365,76 @@ public class LoanApplyRecordExample implements Serializable {
 
         public Criteria andPlanIdNotBetween(Integer value1, Integer value2) {
             addCriterion("plan_id not between", value1, value2, "planId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoIsNull() {
+            addCriterion("batch_no is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoIsNotNull() {
+            addCriterion("batch_no is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoEqualTo(String value) {
+            addCriterion("batch_no =", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoNotEqualTo(String value) {
+            addCriterion("batch_no <>", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoGreaterThan(String value) {
+            addCriterion("batch_no >", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoGreaterThanOrEqualTo(String value) {
+            addCriterion("batch_no >=", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoLessThan(String value) {
+            addCriterion("batch_no <", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoLessThanOrEqualTo(String value) {
+            addCriterion("batch_no <=", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoLike(String value) {
+            addCriterion("batch_no like", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoNotLike(String value) {
+            addCriterion("batch_no not like", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoIn(List<String> values) {
+            addCriterion("batch_no in", values, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoNotIn(List<String> values) {
+            addCriterion("batch_no not in", values, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoBetween(String value1, String value2) {
+            addCriterion("batch_no between", value1, value2, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoNotBetween(String value1, String value2) {
+            addCriterion("batch_no not between", value1, value2, "batchNo");
             return (Criteria) this;
         }
 

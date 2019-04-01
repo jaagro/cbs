@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * @author :asus
- * @date :2019/03/29
+ * @author :gaoxin
+ * @date :2019/04/01
  */
 @Data
 @NoArgsConstructor
@@ -27,9 +27,19 @@ public class LoanApplyRecord implements Serializable {
     private Integer customerId;
 
     /**
+     * 贷款类型(1-批次贷款,2-采购单贷款)
+     */
+    private Integer loanType;
+
+    /**
      * 计划id
      */
     private Integer planId;
+
+    /**
+     * 批次号
+     */
+    private String batchNo;
 
     /**
      * 采购订单id
@@ -50,6 +60,11 @@ public class LoanApplyRecord implements Serializable {
      * 更新时间
      */
     private Date modifyTime;
+
+    /**
+     * 采购单号
+     */
+    private byte[] purchaseOrderNo;
 
     private static final long serialVersionUID = 1L;
 }
