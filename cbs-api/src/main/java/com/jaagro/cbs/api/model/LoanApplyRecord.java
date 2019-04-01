@@ -47,6 +47,11 @@ public class LoanApplyRecord implements Serializable {
     private Integer purchaseOrderId;
 
     /**
+     * 采购单号
+     */
+    private String purchaseOrderNo;
+
+    /**
      * 是否有效(0-无效,1-有效)
      */
     private Boolean enable;
@@ -60,11 +65,6 @@ public class LoanApplyRecord implements Serializable {
      * 更新时间
      */
     private Date modifyTime;
-
-    /**
-     * 采购单号
-     */
-    private byte[] purchaseOrderNo;
 
     private static final long serialVersionUID = 1L;
 }

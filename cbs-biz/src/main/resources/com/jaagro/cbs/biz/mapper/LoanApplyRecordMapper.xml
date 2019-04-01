@@ -8,12 +8,10 @@
     <result column="plan_id" property="planId" jdbcType="INTEGER" />
     <result column="batch_no" property="batchNo" jdbcType="VARCHAR" />
     <result column="purchase_order_id" property="purchaseOrderId" jdbcType="INTEGER" />
+    <result column="purchase_order_no" property="purchaseOrderNo" jdbcType="VARCHAR" />
     <result column="enable" property="enable" jdbcType="BIT" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
-  </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.jaagro.cbs.api.model.LoanApplyRecord" extends="BaseResultMap" >
-    <result column="purchase_order_no" property="purchaseOrderNo" jdbcType="VARBINARY" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -45,29 +43,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    id, customer_id, loan_type, plan_id, batch_no, purchase_order_id, enable, create_time, 
-    modify_time
+    id, customer_id, loan_type, plan_id, batch_no, purchase_order_id, purchase_order_no, 
+    enable, create_time, modify_time
   </sql>
-  <sql id="Blob_Column_List" >
-    purchase_order_no
-  </sql>
-  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.jaagro.cbs.api.model.LoanApplyRecordExample" >
-    select
-    <if test="distinct" >
-      distinct
-    </if>
-    'false' as QUERYID,
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from loan_apply_record
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null" >
-      order by ${orderByClause}
-    </if>
-  </select>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.jaagro.cbs.api.model.LoanApplyRecordExample" >
     select
     <if test="distinct" >
@@ -91,11 +69,9 @@
       </if>
     </if>
   </select>
-  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
     from loan_apply_record
     where id = #{id,jdbcType=INTEGER}
   </select>
@@ -108,12 +84,12 @@
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into loan_apply_record (customer_id, loan_type, plan_id, 
-      batch_no, purchase_order_id, enable, 
-      create_time, modify_time, purchase_order_no
+      batch_no, purchase_order_id, purchase_order_no, 
+      enable, create_time, modify_time
       )
     values (#{customerId,jdbcType=INTEGER}, #{loanType,jdbcType=INTEGER}, #{planId,jdbcType=INTEGER}, 
-      #{batchNo,jdbcType=VARCHAR}, #{purchaseOrderId,jdbcType=INTEGER}, #{enable,jdbcType=BIT}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{purchaseOrderNo,jdbcType=VARBINARY}
+      #{batchNo,jdbcType=VARCHAR}, #{purchaseOrderId,jdbcType=INTEGER}, #{purchaseOrderNo,jdbcType=VARCHAR}, 
+      #{enable,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.jaagro.cbs.api.model.LoanApplyRecord" >
@@ -137,6 +113,9 @@
       <if test="purchaseOrderId != null" >
         purchase_order_id,
       </if>
+      <if test="purchaseOrderNo != null" >
+        purchase_order_no,
+      </if>
       <if test="enable != null" >
         enable,
       </if>
@@ -145,9 +124,6 @@
       </if>
       <if test="modifyTime != null" >
         modify_time,
-      </if>
-      <if test="purchaseOrderNo != null" >
-        purchase_order_no,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -166,6 +142,9 @@
       <if test="purchaseOrderId != null" >
         #{purchaseOrderId,jdbcType=INTEGER},
       </if>
+      <if test="purchaseOrderNo != null" >
+        #{purchaseOrderNo,jdbcType=VARCHAR},
+      </if>
       <if test="enable != null" >
         #{enable,jdbcType=BIT},
       </if>
@@ -174,9 +153,6 @@
       </if>
       <if test="modifyTime != null" >
         #{modifyTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="purchaseOrderNo != null" >
-        #{purchaseOrderNo,jdbcType=VARBINARY},
       </if>
     </trim>
   </insert>
@@ -204,6 +180,9 @@
       <if test="purchaseOrderId != null" >
         purchase_order_id = #{purchaseOrderId,jdbcType=INTEGER},
       </if>
+      <if test="purchaseOrderNo != null" >
+        purchase_order_no = #{purchaseOrderNo,jdbcType=VARCHAR},
+      </if>
       <if test="enable != null" >
         enable = #{enable,jdbcType=BIT},
       </if>
@@ -213,23 +192,7 @@
       <if test="modifyTime != null" >
         modify_time = #{modifyTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="purchaseOrderNo != null" >
-        purchase_order_no = #{purchaseOrderNo,jdbcType=VARBINARY},
-      </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.jaagro.cbs.api.model.LoanApplyRecord" >
-    update loan_apply_record
-    set customer_id = #{customerId,jdbcType=INTEGER},
-      loan_type = #{loanType,jdbcType=INTEGER},
-      plan_id = #{planId,jdbcType=INTEGER},
-      batch_no = #{batchNo,jdbcType=VARCHAR},
-      purchase_order_id = #{purchaseOrderId,jdbcType=INTEGER},
-      enable = #{enable,jdbcType=BIT},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
-      purchase_order_no = #{purchaseOrderNo,jdbcType=VARBINARY}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.jaagro.cbs.api.model.LoanApplyRecord" >
@@ -239,6 +202,7 @@
       plan_id = #{planId,jdbcType=INTEGER},
       batch_no = #{batchNo,jdbcType=VARCHAR},
       purchase_order_id = #{purchaseOrderId,jdbcType=INTEGER},
+      purchase_order_no = #{purchaseOrderNo,jdbcType=VARCHAR},
       enable = #{enable,jdbcType=BIT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       modify_time = #{modifyTime,jdbcType=TIMESTAMP}
