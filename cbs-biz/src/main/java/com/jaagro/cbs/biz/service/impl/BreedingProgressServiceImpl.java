@@ -414,7 +414,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                         BeanUtils.copyProperties(item, itemsDto);
                         Product product = productMapper.selectByPrimaryKey(item.getProductId());
                         if (null != product) {
-                            itemsDto.setCapacityUnit(CapacityUnitEnum.getDescByCode(product.getCapacityUnit()));
+                            itemsDto.setCapacityUnit(product.getCapacityUnit() == null ? "" : CapacityUnitEnum.getTypeByCode(product.getCapacityUnit()));
                             itemsDto.setProductName(product.getProductName());
                         }
 
