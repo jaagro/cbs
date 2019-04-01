@@ -24,19 +24,19 @@ public class BreedingRecordDto implements Serializable {
     /**
      * 养殖计划的鸡舍在某日龄上的喂料记录
      */
-    private List<BreedingRecord> feedFoodList;
+    private List<com.jaagro.cbs.api.dto.farmer.BreedingRecordDto> feedFoodList;
     /**
      * 养殖计划的鸡舍在某日龄上的喂水记录
      */
-    private List<BreedingRecord> feedWaterList;
+    private List<com.jaagro.cbs.api.dto.farmer.BreedingRecordDto> feedWaterList;
     /**
      * 养殖计划的鸡舍在某日龄上的喂药记录
      */
-    private List<BreedingRecord> feedMedicineList;
+    private List<com.jaagro.cbs.api.dto.farmer.BreedingRecordDto> feedMedicineList;
     /**
      * 养殖计划的鸡舍在某日龄上的死淘记录
      */
-    private List<BreedingRecord> deathList;
+    private List<com.jaagro.cbs.api.dto.farmer.BreedingRecordDto> deathList;
     /**
      * 养殖计划的鸡舍在某日龄上的死淘总数量
      */

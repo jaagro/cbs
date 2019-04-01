@@ -17,6 +17,8 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class BreedingRecord implements Serializable {
+
+    private static final long serialVersionUID = 7851980325624011806L;
     /**
      * 批次养殖记录表id
      */
@@ -92,5 +94,4 @@ public class BreedingRecord implements Serializable {
      */
     private Integer modifyUserId;
 
-    private static final long serialVersionUID = 1L;
 }

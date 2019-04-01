@@ -482,7 +482,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             List<BreedingRecordDto> breedingRecordDtoList = breedingRecordMapper.listByParams(params);
             if (!CollectionUtils.isEmpty(breedingRecordDtoList)) {
                 for (BreedingRecordDto breedingRecordDto : breedingRecordDtoList) {
-                    List<BreedingRecordItems> breedingRecordItemsList = breedingRecordDto.getBreedingRecordItemsList();
+                    List<com.jaagro.cbs.api.dto.progress.BreedingRecordItemsDto> breedingRecordItemsList = breedingRecordDto.getBreedingRecordItemsList();
                     if (!CollectionUtils.isEmpty(breedingRecordItemsList)) {
                         for (BreedingRecordItems breedingRecordItems : breedingRecordItemsList) {
                             BreedingRecordItemsDto breedingRecordItemsDto = new BreedingRecordItemsDto();
