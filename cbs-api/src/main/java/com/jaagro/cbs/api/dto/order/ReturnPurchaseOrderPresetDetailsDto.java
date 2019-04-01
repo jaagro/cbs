@@ -1,5 +1,6 @@
 package com.jaagro.cbs.api.dto.order;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jaagro.cbs.api.dto.farmer.ReturnProductDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -53,6 +54,7 @@ public class ReturnPurchaseOrderPresetDetailsDto implements Serializable {
     /**
      * 计划送达时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planDeliveryTime;
 
     /**

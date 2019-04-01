@@ -51,6 +51,16 @@ public class PurchaseOrderDto implements Serializable {
     private String strUnit;
 
     /**
+     * 订单阶段：1-第一阶段；2-第二阶段；3-第三阶段
+     */
+    private Integer orderPhase;
+
+    /**
+     * 状态(1-已下单 ,2－待送达 ,3-已签收)
+     */
+    private Integer purchaseOrderStatus;
+
+    /**
      * 状态(0-待审核,1-审核通过,2－已完成送货 ,3-审核拒绝)
      */
     private String strPurchaseOrderStatus;
@@ -64,5 +74,4 @@ public class PurchaseOrderDto implements Serializable {
      *
      */
     private String strOrderPhase;
-
 }
