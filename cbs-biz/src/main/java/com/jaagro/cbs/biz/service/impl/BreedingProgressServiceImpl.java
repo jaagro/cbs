@@ -1,10 +1,8 @@
 package com.jaagro.cbs.biz.service.impl;
 
+import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
-import com.jaagro.cbs.api.dto.progress.BreedingBatchParamTrackingDto;
-import com.jaagro.cbs.api.dto.progress.BreedingProgressDto;
-import com.jaagro.cbs.api.dto.progress.BreedingRecordDto;
-import com.jaagro.cbs.api.dto.progress.DeviceValueDto;
+import com.jaagro.cbs.api.dto.progress.*;
 import com.jaagro.cbs.api.enums.*;
 import com.jaagro.cbs.api.model.*;
 import com.jaagro.cbs.api.service.BreedingBrainService;
@@ -14,6 +12,7 @@ import com.jaagro.cbs.biz.bo.FeedingFactoryBo;
 import com.jaagro.cbs.biz.mapper.*;
 import com.jaagro.cbs.biz.service.CustomerClientService;
 import com.jaagro.cbs.biz.utils.DateUtil;
+import com.netflix.discovery.converters.Auto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.BeanUtils;
@@ -47,6 +46,8 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
     @Autowired
     private BreedingRecordMapperExt breedingRecordMapper;
     @Autowired
+    private BreedingRecordItemsMapperExt breedingRecordItemsMapper;
+    @Autowired
     private BreedingBatchParameterMapperExt breedingBatchParameterMapper;
     @Autowired
     private CoopDeviceMapperExt coopDeviceMapper;
@@ -64,6 +65,8 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
     private BreedingBrainService breedingBrainService;
     @Autowired
     private BreedingPlanService breedingPlanService;
+    @Autowired
+    private ProductMapperExt productMapper;
 
     /**
      * 根据养殖计划Id、养殖厂Id获取养殖过程喂养头信息
@@ -207,13 +210,13 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                     BeanUtils.copyProperties(breedingBatchParameterDo, returnDto);
                     if (null != breedingRecordDto && BreedingStandardParamEnum.DIE.getCode() == breedingBatchParameterDo.getParamType()) {
                         returnDto.setActualValue(breedingRecordDto.getDeathTotal().toString());
-                        if (StringUtils.hasText(breedingRecordDto.getDeathUnit())){
+                        if (StringUtils.hasText(breedingRecordDto.getDeathUnit())) {
                             returnDto.setUnit(breedingRecordDto.getDeathUnit());
                         }
                     }
                     if (null != breedingRecordDto && BreedingStandardParamEnum.FEEDING_WEIGHT.getCode() == breedingBatchParameterDo.getParamType()) {
                         returnDto.setActualValue(breedingRecordDto.getFeedFoodWeight().toString());
-                        if (StringUtils.hasText(breedingRecordDto.getFoodUnit())){
+                        if (StringUtils.hasText(breedingRecordDto.getFoodUnit())) {
                             returnDto.setUnit(breedingRecordDto.getFoodUnit());
                         }
                     }
@@ -337,7 +340,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
 
             //养殖计划的鸡舍在某日龄上的死淘记录
             FeedingFactoryBo deathBo = feedingRecordFactory(planId, coopId, dayAge, BreedingRecordTypeEnum.DEATH_AMOUNT.getCode());
-            List<BreedingRecord> deathAmountList = deathBo.getBreedingList();
+            List<com.jaagro.cbs.api.dto.farmer.BreedingRecordDto> deathAmountList = deathBo.getBreedingList();
             breedingRecordDto.setDeathList(deathAmountList);
             int deathTotal = 0;
             if (!CollectionUtils.isEmpty(deathAmountList)) {
@@ -391,17 +394,46 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
         }
 
         List<BreedingRecord> breedingList = breedingRecordMapper.selectByExample(breedingRecordExample);
+        List<com.jaagro.cbs.api.dto.farmer.BreedingRecordDto> breedingRecordDtoList = new ArrayList<>();
         int feedingTimes = breedingList.size();
         BigDecimal feedingWeight = new BigDecimal(0.00);
         String feedUnit = "";
-        for (BreedingRecord breedingRecordDo : breedingList) {
-            feedingWeight = feedingWeight.add(breedingRecordDo.getBreedingValue());
-            feedUnit = breedingRecordDo.getUnit();
-        }
+        if (!CollectionUtils.isEmpty(breedingList)) {
+            for (BreedingRecord breedingRecordDo : breedingList) {
+                com.jaagro.cbs.api.dto.farmer.BreedingRecordDto breedingRecordDto = new com.jaagro.cbs.api.dto.farmer.BreedingRecordDto();
+                BeanUtils.copyProperties(breedingRecordDo, breedingRecordDto);
+                //某个日龄喂养药品数量和单位
+                BreedingRecordItemsExample itemsExample = new BreedingRecordItemsExample();
+                itemsExample.createCriteria().andEnableEqualTo(true).andBreedingRecordIdEqualTo(breedingRecordDo.getId());
+                itemsExample.setOrderByClause("breeding_time");
+                List<BreedingRecordItems> items = breedingRecordItemsMapper.selectByExample(itemsExample);
+                List<BreedingRecordItemsDto> itemDtoList = new ArrayList<>();
+                if (!CollectionUtils.isEmpty(items)) {
+                    for (BreedingRecordItems item : items) {
+                        BreedingRecordItemsDto itemsDto = new BreedingRecordItemsDto();
+                        BeanUtils.copyProperties(item, itemsDto);
+                        Product product = productMapper.selectByPrimaryKey(item.getProductId());
+                        if (null != product) {
+                            itemsDto.setCapacityUnit(CapacityUnitEnum.getDescByCode(product.getCapacityUnit()));
+                            itemsDto.setProductName(product.getProductName());
+                        }
 
+                        itemDtoList.add(itemsDto);
+                    }
+                }
+
+                breedingRecordDto.setBreedingRecordItemsList(itemDtoList);
+
+                breedingRecordDtoList.add(breedingRecordDto);
+
+                //计算某个日龄喂养饲料的总和
+                feedingWeight = feedingWeight.add(breedingRecordDo.getBreedingValue());
+                feedUnit = breedingRecordDo.getUnit();
+            }
+        }
         FeedingFactoryBo feedingFactoryBo = new FeedingFactoryBo();
         feedingFactoryBo
-                .setBreedingList(breedingList)
+                .setBreedingList(breedingRecordDtoList)
                 .setFeedingTimes(feedingTimes)
                 .setUnit(feedUnit)
                 .setFeedingWeight(feedingWeight);

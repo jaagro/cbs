@@ -1,6 +1,6 @@
 package com.jaagro.cbs.biz.bo;
 
-import com.jaagro.cbs.api.model.BreedingRecord;
+import com.jaagro.cbs.api.dto.farmer.BreedingRecordDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -18,7 +18,7 @@ public class FeedingFactoryBo implements Serializable {
 
     private int feedingTimes;
     private BigDecimal feedingWeight;
-    private List<BreedingRecord> breedingList;
+    private List<com.jaagro.cbs.api.dto.farmer.BreedingRecordDto> breedingList;
     /**
      * 喂养的计量单位
      */
