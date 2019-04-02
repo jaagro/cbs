@@ -1,9 +1,13 @@
 package com.jaagro.cbs.web.controller;
 
 import com.jaagro.cbs.api.model.BatchPlantCoop;
+import com.jaagro.cbs.api.model.BreedingPlan;
 import com.jaagro.cbs.api.model.Product;
 import com.jaagro.cbs.api.model.ProductExample;
+import com.jaagro.cbs.api.service.BreedingFarmerService;
+import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.biz.mapper.BatchPlantCoopMapperExt;
+import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
 import com.jaagro.cbs.biz.mapper.ProductMapperExt;
 import com.jaagro.cbs.biz.utils.SequenceCodeUtils;
 import com.netflix.discovery.converters.Auto;
@@ -13,6 +17,7 @@ import io.swagger.annotations.ExampleProperty;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,6 +41,12 @@ public class TestController {
     private SequenceCodeUtils sequenceCodeUtils;
     @Autowired
     private BatchPlantCoopMapperExt batchPlantCoopMapper;
+    @Autowired
+    private BreedingPlanService breedingPlanService;
+    @Autowired
+    private BreedingFarmerService breedingFarmerService;
+    @Autowired
+    private BreedingPlanMapperExt breedingPlanMapper;
 
     @PostMapping("/createProduct")
     public void createProduct() {
@@ -66,7 +77,7 @@ public class TestController {
     }
 
     @GetMapping("/testInsertBatchCoop")
-    public void testInsertBatchCoop(){
+    public void testInsertBatchCoop() {
         List<BatchPlantCoop> list = new ArrayList<>();
         BatchPlantCoop coop = new BatchPlantCoop();
         coop.setCreateTime(new Date())
@@ -76,14 +87,19 @@ public class TestController {
                 .setCoopId(999)
                 .setPlanId(999);
         BatchPlantCoop coop1 = new BatchPlantCoop();
-        BeanUtils.copyProperties(coop,coop1);
+        BeanUtils.copyProperties(coop, coop1);
         list.add(coop);
         list.add(coop1);
         batchPlantCoopMapper.insertBatch(list);
     }
 
-    public void test(){
+    @GetMapping("/teettta/{planID}")
+    public void test(@PathVariable Integer planID) throws Exception {
+        BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planID);
 
+
+        System.out.println(breedingFarmerService.getDayAge(breedingPlan.getPlanTime()));
+        // System.out.println(breedingPlanService.getDayAge(planID));
     }
 
 }
