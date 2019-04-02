@@ -501,6 +501,10 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
             List<BreedingStandardDrug> standardDrugList = new ArrayList<>();
             for (BreedingStandardDrugListDto dto : drugList) {
                 List<BreedingStandardDrugItemDto> drugItemVoList = dto.getBreedingStandardDrugItemVoList();
+               boolean flag =  (dto.getStopDrugFlag() == null || !dto.getStopDrugFlag()) && CollectionUtils.isEmpty(drugItemVoList);
+                if (flag){
+                    throw new BusinessException("非停药日必须要配置药品");
+                }
                 if (CollectionUtils.isEmpty(drugItemVoList)) {
                     BreedingStandardDrug drug = generateStandardDrug(dto, currentUserId);
                     standardDrugList.add(drug);
