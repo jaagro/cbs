@@ -419,11 +419,22 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                                     .andEnableEqualTo(true);
                             List<Product> products = productMapper.selectByExample(productExample);
                             if (!CollectionUtils.isEmpty(products)) {
+                                StringBuilder sb = new StringBuilder();
                                 Product product = products.get(0);
                                 if (product.getProductName() != null) {
                                     returnProductDto
                                             .setProductName(product.getProductName());
                                 }
+                                if (product.getProductCapacity() != null) {
+                                    sb.append(product.getProductCapacity());
+                                }
+                                if (product.getCapacityUnit() != null) {
+                                    sb.append(CapacityUnitEnum.getDescByCode(product.getCapacityUnit()));
+                                }
+                                if (product.getPackageUnit() != null) {
+                                    sb.append("/").append(PackageUnitEnum.getDescByCode(product.getPackageUnit()));
+                                }
+                                returnProductDto.setSpecification(sb.toString());
                             }
                         }
                         if (purchaseOrderItem.getUnit() != null) {

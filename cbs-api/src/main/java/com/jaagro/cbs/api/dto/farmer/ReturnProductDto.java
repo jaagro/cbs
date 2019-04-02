@@ -31,6 +31,11 @@ public class ReturnProductDto implements Serializable {
     private String productName;
 
     /**
+     * 规格
+     */
+    private String specification;
+
+    /**
      * 购买数量 重量
      */
     private BigDecimal quantity;

@@ -40,6 +40,7 @@ public class ReturnPurchaseOrderPresetDetailsDto implements Serializable {
     /**
      * 上鸡时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planTime;
 
     /**
