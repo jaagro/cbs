@@ -97,10 +97,10 @@ public class BatchInfoServiceImpl implements BatchInfoService {
                         batchInfo.setStartAmount(breedingPlan.getPlanChickenQuantity());
                     }
                     // 剩余喂养数量=起始-死淘
-                    if (batchInfo.getDeadAmount() != null && batchInfo.getDeadAmount() > 0) {
+                    if (!StringUtils.isEmpty(batchInfo.getDeadAmount())) {
                         batchInfo.setCurrentAmount(batchInfo.getStartAmount() - batchInfo.getDeadAmount());
                     } else {
-                        batchInfo.setCurrentAmount(breedingPlan.getPlanChickenQuantity());
+                        batchInfo.setCurrentAmount(batchInfo.getStartAmount());
                     }
                     //填充其他数据
                     batchInfo

@@ -104,7 +104,7 @@ public class BatchCoopDailyServiceImpl implements BatchCoopDailyService {
                         // 剩余喂养数量=起始-死淘
                         batchCoopDaily.setCurrentAmount(batchCoopDaily.getStartAmount() - batchCoopDaily.getDeadAmount());
                     } else {
-                        batchCoopDaily.setCurrentAmount(coop.getBreedingValue());
+                        batchCoopDaily.setCurrentAmount(batchCoopDaily.getStartAmount());
                     }
                     //出栏数量 待定
                     //创建人
