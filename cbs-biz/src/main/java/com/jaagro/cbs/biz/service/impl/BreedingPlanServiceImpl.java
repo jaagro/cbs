@@ -733,10 +733,13 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                 if (flag){
                     throw new BusinessException("回收价格不能为空");
                 }
-                if (dto.getWeightLower().compareTo(new BigDecimal("100")) == 1 || dto.getWeightUpper().compareTo(new BigDecimal("100")) == 1) {
-                    throw new BusinessException("鸡重起止不能超过100");
+                if (dto.getWeightLower() != null && dto.getWeightLower().compareTo(new BigDecimal("100")) == 1) {
+                    throw new BusinessException("鸡重区间起始不能超过100");
                 }
-                if (dto.getRecyclingPrice().compareTo(new BigDecimal("10000")) == 1) {
+                if (dto.getWeightUpper() != null && dto.getWeightUpper().compareTo(new BigDecimal("100")) == 1) {
+                    throw new BusinessException("鸡重区间结束不能超过100");
+                }
+                if (dto.getRecyclingPrice() != null && dto.getRecyclingPrice().compareTo(new BigDecimal("10000")) == 1) {
                     throw new BusinessException("回收价格不能超过10000");
                 }
                 ContractPriceSection contractPriceSection = new ContractPriceSection();
