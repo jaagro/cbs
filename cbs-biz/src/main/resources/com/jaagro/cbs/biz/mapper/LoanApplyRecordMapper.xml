@@ -4,8 +4,11 @@
   <resultMap id="BaseResultMap" type="com.jaagro.cbs.api.model.LoanApplyRecord" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="customer_id" property="customerId" jdbcType="INTEGER" />
+    <result column="loan_type" property="loanType" jdbcType="INTEGER" />
     <result column="plan_id" property="planId" jdbcType="INTEGER" />
+    <result column="batch_no" property="batchNo" jdbcType="VARCHAR" />
     <result column="purchase_order_id" property="purchaseOrderId" jdbcType="INTEGER" />
+    <result column="purchase_order_no" property="purchaseOrderNo" jdbcType="VARCHAR" />
     <result column="enable" property="enable" jdbcType="BIT" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
@@ -40,7 +43,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    id, customer_id, plan_id, purchase_order_id, enable, create_time, modify_time
+    id, customer_id, loan_type, plan_id, batch_no, purchase_order_id, purchase_order_no, 
+    enable, create_time, modify_time
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.jaagro.cbs.api.model.LoanApplyRecordExample" >
     select
@@ -79,10 +83,12 @@
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into loan_apply_record (customer_id, plan_id, purchase_order_id, 
+    insert into loan_apply_record (customer_id, loan_type, plan_id, 
+      batch_no, purchase_order_id, purchase_order_no, 
       enable, create_time, modify_time
       )
-    values (#{customerId,jdbcType=INTEGER}, #{planId,jdbcType=INTEGER}, #{purchaseOrderId,jdbcType=INTEGER}, 
+    values (#{customerId,jdbcType=INTEGER}, #{loanType,jdbcType=INTEGER}, #{planId,jdbcType=INTEGER}, 
+      #{batchNo,jdbcType=VARCHAR}, #{purchaseOrderId,jdbcType=INTEGER}, #{purchaseOrderNo,jdbcType=VARCHAR}, 
       #{enable,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}
       )
   </insert>
@@ -95,11 +101,20 @@
       <if test="customerId != null" >
         customer_id,
       </if>
+      <if test="loanType != null" >
+        loan_type,
+      </if>
       <if test="planId != null" >
         plan_id,
       </if>
+      <if test="batchNo != null" >
+        batch_no,
+      </if>
       <if test="purchaseOrderId != null" >
         purchase_order_id,
+      </if>
+      <if test="purchaseOrderNo != null" >
+        purchase_order_no,
       </if>
       <if test="enable != null" >
         enable,
@@ -115,11 +130,20 @@
       <if test="customerId != null" >
         #{customerId,jdbcType=INTEGER},
       </if>
+      <if test="loanType != null" >
+        #{loanType,jdbcType=INTEGER},
+      </if>
       <if test="planId != null" >
         #{planId,jdbcType=INTEGER},
       </if>
+      <if test="batchNo != null" >
+        #{batchNo,jdbcType=VARCHAR},
+      </if>
       <if test="purchaseOrderId != null" >
         #{purchaseOrderId,jdbcType=INTEGER},
+      </if>
+      <if test="purchaseOrderNo != null" >
+        #{purchaseOrderNo,jdbcType=VARCHAR},
       </if>
       <if test="enable != null" >
         #{enable,jdbcType=BIT},
@@ -144,11 +168,20 @@
       <if test="customerId != null" >
         customer_id = #{customerId,jdbcType=INTEGER},
       </if>
+      <if test="loanType != null" >
+        loan_type = #{loanType,jdbcType=INTEGER},
+      </if>
       <if test="planId != null" >
         plan_id = #{planId,jdbcType=INTEGER},
       </if>
+      <if test="batchNo != null" >
+        batch_no = #{batchNo,jdbcType=VARCHAR},
+      </if>
       <if test="purchaseOrderId != null" >
         purchase_order_id = #{purchaseOrderId,jdbcType=INTEGER},
+      </if>
+      <if test="purchaseOrderNo != null" >
+        purchase_order_no = #{purchaseOrderNo,jdbcType=VARCHAR},
       </if>
       <if test="enable != null" >
         enable = #{enable,jdbcType=BIT},
@@ -165,8 +198,11 @@
   <update id="updateByPrimaryKey" parameterType="com.jaagro.cbs.api.model.LoanApplyRecord" >
     update loan_apply_record
     set customer_id = #{customerId,jdbcType=INTEGER},
+      loan_type = #{loanType,jdbcType=INTEGER},
       plan_id = #{planId,jdbcType=INTEGER},
+      batch_no = #{batchNo,jdbcType=VARCHAR},
       purchase_order_id = #{purchaseOrderId,jdbcType=INTEGER},
+      purchase_order_no = #{purchaseOrderNo,jdbcType=VARCHAR},
       enable = #{enable,jdbcType=BIT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       modify_time = #{modifyTime,jdbcType=TIMESTAMP}

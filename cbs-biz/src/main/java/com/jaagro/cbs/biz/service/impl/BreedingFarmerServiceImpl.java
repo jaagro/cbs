@@ -284,7 +284,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         if (currentUser != null && currentUser.getId() != null && currentUser.getLoginName() != null) {
             farmerPersonalCenterDto
                     .setPhoneNumber(currentUser.getPhoneNumber())
-                    .setLoginName(currentUser.getLoginName());
+                    .setLoginName(currentUser.getName());
             GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
             if (customerUser != null && customerUser.getRelevanceId() != null) {
                 farmerPersonalCenterDto
@@ -307,7 +307,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
      */
     @Override
     public PageInfo listPurchaseOrder(PurchaseOrderListParamDto dto) {
-        List<PurchaseOrderDto> purchaseOrderDtos=new ArrayList<>();
+        List<PurchaseOrderDto> purchaseOrderDtos = new ArrayList<>();
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         List<Integer> purchaseOrderStatus = new ArrayList<>();
         if (dto.getPurchaseOrderStatus() == null) {
@@ -328,7 +328,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                 purchaseOrderCriteriaDto
                         .setCustomerId(customerUser.getRelevanceId())
                         .setPurchaseOrderStatus(purchaseOrderStatus);
-                 purchaseOrderDtos = purchaseOrderMapper.listFarmerPurchaseOrder(purchaseOrderCriteriaDto);
+                purchaseOrderDtos = purchaseOrderMapper.listFarmerPurchaseOrder(purchaseOrderCriteriaDto);
                 for (PurchaseOrderDto purchaseOrderDto : purchaseOrderDtos) {
                     BigDecimal totalPurchaseStatistics = new BigDecimal(0);
                     if (ProductTypeEnum.SPROUT.getCode() == purchaseOrderDto.getProductType()) {
