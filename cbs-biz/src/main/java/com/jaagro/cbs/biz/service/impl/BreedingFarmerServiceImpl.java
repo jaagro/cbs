@@ -24,10 +24,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * @description: 农户端app 相关api
@@ -602,10 +599,14 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         if (beginDate == null) {
             return day;
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         beginDate = sdf.parse(sdf.format(beginDate));
         endDate = sdf.parse(sdf.format(endDate));
-        day = (int) (endDate.getTime() - beginDate.getTime()) / (24 * 60 * 60 * 1000);
-        return day + 1;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(beginDate);
+        long time1 = cal.getTimeInMillis();
+        cal.setTime(endDate);
+        long time2 = cal.getTimeInMillis();
+        return Integer.parseInt(String.valueOf((time2 - time1) / (1000 * 3600 * 24))) + 1;
     }
 }
