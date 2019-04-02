@@ -98,8 +98,7 @@ public class BreedingStandardController {
     @PostMapping("/breedingStandardParameter")
     public BaseResponse breedingStandardParameter(@RequestBody @Validated BreedingParameterListDto dto) {
         log.info("O breedingStandardParameter param={}", dto);
-        breedingStandardService.saveOrUpdateParameter(dto);
-        return BaseResponse.successInstance("保存成功");
+        return BaseResponse.successInstance(breedingStandardService.saveOrUpdateParameter(dto));
     }
 
     @ApiOperation("排序变更")

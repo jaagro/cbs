@@ -143,7 +143,8 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
      * @param dto
      */
     @Override
-    public void saveOrUpdateParameter(BreedingParameterListDto dto) {
+    public Map<String,Object> saveOrUpdateParameter(BreedingParameterListDto dto) {
+        Map<String,Object> result = new HashMap<>(2);
         List<BreedingStandardParameterItemDto> breedingStandardParameterList = dto.getBreedingStandardParameterList();
         if (!CollectionUtils.isEmpty(breedingStandardParameterList)) {
             List<BreedingStandardParameterItemDto> newParameterList = new ArrayList<>();
@@ -196,6 +197,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
                     .andStandardIdEqualTo(dto.getStandardId())
                     .andParamNameIn(necessaryParamList);
             List<BreedingStandardParameter> parameterList = standardParameterMapper.selectByExample(example);
+            Set<String> necessaryParamSet = new HashSet<>();
             BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(dto.getStandardId());
             if (!CollectionUtils.isEmpty(parameterList) && parameterList.size() == breedingStandard.getBreedingDays()*necessaryParamTypeNum){
                 if (breedingStandard.getStandardStatus() != null &&  StandardStatusEnum.NORMAL.getCode() != breedingStandard.getStandardStatus()){
@@ -204,8 +206,28 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
                     breedingStandardMapper.updateByPrimaryKeySelective(breedingStandard);
                 }
             }
+            putConfigureMessage(parameterList,necessaryParamSet,result);
+        }else {
+            throw new BusinessException("参数列表为空");
         }
+        return result;
+    }
 
+    private void putConfigureMessage(List<BreedingStandardParameter> parameterList, Set<String> necessaryParamSet, Map<String,Object> result) {
+        if (!CollectionUtils.isEmpty(parameterList)){
+            parameterList.forEach(parameter->necessaryParamSet.add(parameter.getParamName()));
+        }
+        parameterList.removeAll(necessaryParamSet);
+        if (CollectionUtils.isEmpty(parameterList)){
+            result.put("necessaryAllConfigured",true);
+        }else {
+            result.put("necessaryAllConfigured",false);
+            StringBuffer sb = new StringBuffer();
+            parameterList.forEach(paramName->sb.append(paramName).append(","));
+            sb.deleteCharAt(sb.lastIndexOf(","));
+            sb.append("未配置");
+            result.put("unConfiguredMessage",sb.toString());
+        }
     }
 
     /**

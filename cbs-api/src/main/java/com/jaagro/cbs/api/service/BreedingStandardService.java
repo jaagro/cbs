@@ -10,6 +10,7 @@ import com.jaagro.cbs.api.model.BreedingStandardParameter;
 import org.jboss.logging.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 养殖大脑管理
@@ -54,7 +55,7 @@ public interface BreedingStandardService {
      * 创建或者更新养殖模板参数
      * @param dto
      */
-    void saveOrUpdateParameter(BreedingParameterListDto dto);
+    Map<String,Object> saveOrUpdateParameter(BreedingParameterListDto dto);
 
     /**
      * 养殖大脑 养殖参数列表
