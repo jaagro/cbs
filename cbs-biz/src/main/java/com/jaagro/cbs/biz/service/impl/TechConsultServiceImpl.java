@@ -56,25 +56,25 @@ public class TechConsultServiceImpl implements TechConsultService {
 
         TechConsultRecordExample example = new TechConsultRecordExample();
         TechConsultRecordExample.Criteria criteriaOne = example.createCriteria();
-        if(null != dto.getStatus()) {
+        if (null != dto.getStatus()) {
             criteriaOne.andTechConsultStatusEqualTo(dto.getStatus());
         }
-        if(null != dto.getBatchNo()) {
-            criteriaOne.andBatchNoLike(dto.getBatchNo() + "%");
+        if (null != dto.getBatchNo()) {
+            criteriaOne.andBatchNoLike("%" + dto.getBatchNo() + "%");
         }
-        if(null != dto.getKeyWord()) {
-            criteriaOne.andCustomerNameLike(dto.getKeyWord() + "%");
+        if (null != dto.getKeyWord()) {
+            criteriaOne.andCustomerNameLike("%" + dto.getKeyWord() + "%");
         }
 
         TechConsultRecordExample.Criteria criteriaTwo = example.createCriteria();
-        if(null != dto.getStatus()) {
+        if (null != dto.getStatus()) {
             criteriaTwo.andTechConsultStatusEqualTo(dto.getStatus());
         }
-        if(null != dto.getBatchNo()) {
-            criteriaTwo.andBatchNoLike(dto.getBatchNo() + "%");
+        if (null != dto.getBatchNo()) {
+            criteriaTwo.andBatchNoLike("%" + dto.getBatchNo() + "%");
         }
-        if(null != dto.getKeyWord()) {
-            criteriaTwo.andCustomerPhoneNumberLike(dto.getKeyWord() + "%");
+        if (null != dto.getKeyWord()) {
+            criteriaTwo.andCustomerPhoneNumberLike("%" + dto.getKeyWord() + "%");
         }
         example.or(criteriaTwo);
         List<TechConsultRecord> techConsultRecordDos = techConsultRecordMapper.selectByExample(example);
@@ -93,14 +93,13 @@ public class TechConsultServiceImpl implements TechConsultService {
 
         ReturnTechConsultRecordDto returnDto = new ReturnTechConsultRecordDto();
         TechConsultRecord techConsultRecordDo = techConsultRecordMapper.selectByPrimaryKey(id);
-        if(null == techConsultRecordDo)
-        {
+        if (null == techConsultRecordDo) {
             throw new RuntimeException("技术询问id=" + id + "不存在");
         }
         BeanUtils.copyProperties(techConsultRecordDo, returnDto);
         returnDto.setStrTechConsultStatus(TechConsultStatusEnum.getDescByCode(techConsultRecordDo.getTechConsultStatus()));
         returnDto.setStrEmergencyLevel(EmergencyLevelEnum.getDescByCode(techConsultRecordDo.getEmergencyLevel()));
-        if(null != techConsultRecordDo.getHandleType()){
+        if (null != techConsultRecordDo.getHandleType()) {
             returnDto.setStrHandleType(TechConsultHandleTypeEnum.getDescByCode(techConsultRecordDo.getHandleType()));
         }
         int planId = techConsultRecordDo.getPlanId();
@@ -117,7 +116,7 @@ public class TechConsultServiceImpl implements TechConsultService {
             int deadAmount = 0;
             if (!CollectionUtils.isEmpty(batchCoopDailyList)) {
                 for (BatchCoopDaily batchCoopDaily : batchCoopDailyList) {
-                    if(!StringUtils.isEmpty(batchCoopDaily.getDeadAmount())) {
+                    if (!StringUtils.isEmpty(batchCoopDaily.getDeadAmount())) {
                         deadAmount = deadAmount + batchCoopDaily.getDeadAmount();
                     }
                 }
@@ -129,7 +128,7 @@ public class TechConsultServiceImpl implements TechConsultService {
         TechConsultImagesExample imagesExample = new TechConsultImagesExample();
         imagesExample.createCriteria().andTechConsultRecordIdEqualTo(id);
         List<TechConsultImages> images = techConsultImagesMapperExt.selectByExample(imagesExample);
-        if(!CollectionUtils.isEmpty(images)) {
+        if (!CollectionUtils.isEmpty(images)) {
             for (TechConsultImages image : images) {
                 image.setImageUrl(UrlPathUtil.getAbstractImageUrl(image.getImageUrl()));
             }
