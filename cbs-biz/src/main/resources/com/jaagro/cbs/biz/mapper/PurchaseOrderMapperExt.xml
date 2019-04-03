@@ -71,5 +71,6 @@
                 ${item}
             </foreach>
         </if>
+        order by delivery_time desc
     </select>
 </mapper>

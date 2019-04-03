@@ -425,16 +425,21 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                                     returnProductDto
                                             .setProductName(product.getProductName());
                                 }
-                                if (product.getProductCapacity() != null) {
-                                    sb.append(product.getProductCapacity());
+                                if (ProductTypeEnum.DRUG.getCode() == product.getProductType()
+                                        || ProductTypeEnum.SPROUT.getCode() == product.getProductType()) {
+                                    if (product.getProductCapacity() != null) {
+                                        sb.append(product.getProductCapacity());
+                                    }
+                                    if (product.getCapacityUnit() != null) {
+                                        sb.append(CapacityUnitEnum.getDescByCode(product.getCapacityUnit()));
+                                    }
+                                    if (product.getPackageUnit() != null) {
+                                        sb.append("/").append(PackageUnitEnum.getDescByCode(product.getPackageUnit()));
+                                    }
+                                    returnProductDto.setSpecification(sb.toString());
+                                } else {
+                                    returnProductDto.setSpecification("");
                                 }
-                                if (product.getCapacityUnit() != null) {
-                                    sb.append(CapacityUnitEnum.getDescByCode(product.getCapacityUnit()));
-                                }
-                                if (product.getPackageUnit() != null) {
-                                    sb.append("/").append(PackageUnitEnum.getDescByCode(product.getPackageUnit()));
-                                }
-                                returnProductDto.setSpecification(sb.toString());
                             }
                         }
                         if (purchaseOrderItem.getUnit() != null) {
