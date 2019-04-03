@@ -206,24 +206,24 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
                     breedingStandardMapper.updateByPrimaryKeySelective(breedingStandard);
                 }
             }
-            putConfigureMessage(parameterList,necessaryParamSet,result);
+            putConfigureMessage(necessaryParamList,parameterList,necessaryParamSet,result);
         }else {
             throw new BusinessException("参数列表为空");
         }
         return result;
     }
 
-    private void putConfigureMessage(List<BreedingStandardParameter> parameterList, Set<String> necessaryParamSet, Map<String,Object> result) {
+    private void putConfigureMessage(List<String> necessaryParamList,List<BreedingStandardParameter> parameterList, Set<String> necessaryParamSet, Map<String,Object> result) {
         if (!CollectionUtils.isEmpty(parameterList)){
             parameterList.forEach(parameter->necessaryParamSet.add(parameter.getParamName()));
         }
-        parameterList.removeAll(necessaryParamSet);
-        if (CollectionUtils.isEmpty(parameterList)){
+        necessaryParamList.removeAll(necessaryParamSet);
+        if (CollectionUtils.isEmpty(necessaryParamList)){
             result.put("necessaryAllConfigured",true);
         }else {
             result.put("necessaryAllConfigured",false);
             StringBuffer sb = new StringBuffer();
-            parameterList.forEach(paramName->sb.append(paramName).append(","));
+            necessaryParamList.forEach(paramName->sb.append(paramName).append(","));
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("未配置");
             result.put("unConfiguredMessage",sb.toString());
