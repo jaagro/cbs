@@ -477,7 +477,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                     .createCriteria()
                     .andCreateUserIdEqualTo(currentUser.getId())
                     .andEnableEqualTo(true);
-            breedingPlanExample.setOrderByClause("create_time desc");
+            breedingPlanExample.setOrderByClause("plan_time desc");
             breedingPlans = breedingPlanMapper.selectByExample(breedingPlanExample);
         }
         return new PageInfo(breedingPlans);
