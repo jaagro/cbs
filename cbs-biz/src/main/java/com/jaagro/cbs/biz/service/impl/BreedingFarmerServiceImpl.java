@@ -243,7 +243,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                             .setCustomerId(customerUser.getRelevanceId());
                     if (breedingPlan.getTechnicianId() != null) {
                         techConsultRecord
-                                .setHandleUserId(breedingPlan.getTechnicianId());
+                                .setTechnicianId(breedingPlan.getTechnicianId());
                     }
                 }
             }

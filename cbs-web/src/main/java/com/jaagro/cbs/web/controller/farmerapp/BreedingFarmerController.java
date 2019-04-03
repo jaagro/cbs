@@ -190,7 +190,7 @@ public class BreedingFarmerController {
                 TechnicalInquiriesVo technicalInquiriesVo = new TechnicalInquiriesVo();
                 BeanUtils.copyProperties(techConsultRecord, technicalInquiriesVo);
                 if (techConsultRecord.getHandleUserId() != null) {
-                    BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(techConsultRecord.getHandleUserId());
+                    BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(techConsultRecord.getTechnicianId());
                     if (globalUser != null && globalUser.getData() != null) {
                         UserInfo userInfo = globalUser.getData();
                         if (userInfo.getPhoneNumber() != null) {
@@ -337,6 +337,7 @@ public class BreedingFarmerController {
 
     /**
      * 上传养殖记录
+     *
      * @param createBreedingRecordDto
      * @return
      * @author yj

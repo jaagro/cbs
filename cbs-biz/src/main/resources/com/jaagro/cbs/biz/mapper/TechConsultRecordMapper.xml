@@ -17,6 +17,7 @@
     <result column="problem_desc" property="problemDesc" jdbcType="VARCHAR" />
     <result column="tech_consult_status" property="techConsultStatus" jdbcType="INTEGER" />
     <result column="handle_time" property="handleTime" jdbcType="TIMESTAMP" />
+    <result column="technician_id" property="technicianId" jdbcType="INTEGER" />
     <result column="handle_user_id" property="handleUserId" jdbcType="INTEGER" />
     <result column="handle_desc" property="handleDesc" jdbcType="VARCHAR" />
     <result column="handle_type" property="handleType" jdbcType="INTEGER" />
@@ -58,8 +59,8 @@
   <sql id="Base_Column_List" >
     id, customer_id, customer_name, customer_phone_number, day_age, coop_id, coop_name, 
     plant_id, plant_name, plan_id, batch_no, emergency_level, problem_desc, tech_consult_status, 
-    handle_time, handle_user_id, handle_desc, handle_type, enable, create_time, create_user_id, 
-    modify_time, modify_user_id
+    handle_time, technician_id, handle_user_id, handle_desc, handle_type, enable, create_time, 
+    create_user_id, modify_time, modify_user_id
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.jaagro.cbs.api.model.TechConsultRecordExample" >
     select
@@ -102,18 +103,18 @@
       day_age, coop_id, coop_name, 
       plant_id, plant_name, plan_id, 
       batch_no, emergency_level, problem_desc, 
-      tech_consult_status, handle_time, handle_user_id, 
-      handle_desc, handle_type, enable, 
-      create_time, create_user_id, modify_time, 
-      modify_user_id)
+      tech_consult_status, handle_time, technician_id, 
+      handle_user_id, handle_desc, handle_type, 
+      enable, create_time, create_user_id, 
+      modify_time, modify_user_id)
     values (#{customerId,jdbcType=INTEGER}, #{customerName,jdbcType=VARCHAR}, #{customerPhoneNumber,jdbcType=VARCHAR}, 
       #{dayAge,jdbcType=INTEGER}, #{coopId,jdbcType=INTEGER}, #{coopName,jdbcType=VARCHAR}, 
       #{plantId,jdbcType=INTEGER}, #{plantName,jdbcType=VARCHAR}, #{planId,jdbcType=INTEGER}, 
       #{batchNo,jdbcType=VARCHAR}, #{emergencyLevel,jdbcType=INTEGER}, #{problemDesc,jdbcType=VARCHAR}, 
-      #{techConsultStatus,jdbcType=INTEGER}, #{handleTime,jdbcType=TIMESTAMP}, #{handleUserId,jdbcType=INTEGER}, 
-      #{handleDesc,jdbcType=VARCHAR}, #{handleType,jdbcType=INTEGER}, #{enable,jdbcType=BIT}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{createUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, 
-      #{modifyUserId,jdbcType=INTEGER})
+      #{techConsultStatus,jdbcType=INTEGER}, #{handleTime,jdbcType=TIMESTAMP}, #{technicianId,jdbcType=INTEGER}, 
+      #{handleUserId,jdbcType=INTEGER}, #{handleDesc,jdbcType=VARCHAR}, #{handleType,jdbcType=INTEGER}, 
+      #{enable,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, #{createUserId,jdbcType=INTEGER}, 
+      #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.jaagro.cbs.api.model.TechConsultRecord" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -162,6 +163,9 @@
       </if>
       <if test="handleTime != null" >
         handle_time,
+      </if>
+      <if test="technicianId != null" >
+        technician_id,
       </if>
       <if test="handleUserId != null" >
         handle_user_id,
@@ -230,6 +234,9 @@
       </if>
       <if test="handleTime != null" >
         #{handleTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="technicianId != null" >
+        #{technicianId,jdbcType=INTEGER},
       </if>
       <if test="handleUserId != null" >
         #{handleUserId,jdbcType=INTEGER},
@@ -308,6 +315,9 @@
       <if test="handleTime != null" >
         handle_time = #{handleTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="technicianId != null" >
+        technician_id = #{technicianId,jdbcType=INTEGER},
+      </if>
       <if test="handleUserId != null" >
         handle_user_id = #{handleUserId,jdbcType=INTEGER},
       </if>
@@ -351,6 +361,7 @@
       problem_desc = #{problemDesc,jdbcType=VARCHAR},
       tech_consult_status = #{techConsultStatus,jdbcType=INTEGER},
       handle_time = #{handleTime,jdbcType=TIMESTAMP},
+      technician_id = #{technicianId,jdbcType=INTEGER},
       handle_user_id = #{handleUserId,jdbcType=INTEGER},
       handle_desc = #{handleDesc,jdbcType=VARCHAR},
       handle_type = #{handleType,jdbcType=INTEGER},
