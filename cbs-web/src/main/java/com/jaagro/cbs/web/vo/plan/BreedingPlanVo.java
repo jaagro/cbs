@@ -1,5 +1,6 @@
 package com.jaagro.cbs.web.vo.plan;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jaagro.cbs.api.model.Plant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -56,6 +57,7 @@ public class BreedingPlanVo implements Serializable {
     /**
      * 上鸡时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planTime;
 
     /**

@@ -1,5 +1,6 @@
 package com.jaagro.cbs.biz.mapper;
 
+import com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto;
 import com.jaagro.cbs.api.model.BreedingRecordDaily;
 import com.jaagro.cbs.api.model.BreedingRecordDailyExample;
 import com.jaagro.cbs.biz.mapper.base.BaseMapper;
@@ -31,4 +32,12 @@ public interface BreedingRecordDailyMapperExt extends BaseMapper<BreedingRecordD
      * @param dailyList
      */
     void insertBatch(@Param("dailyList") List<BreedingRecordDaily> dailyList);
+
+    /**
+     * 查询昨日数据
+     *
+     * @param criteriaDto
+     * @return
+     */
+    List<BreedingRecordDaily> listYestodayData(BatchInfoCriteriaDto criteriaDto);
 }

@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 public class DeviceValueDto implements Serializable {
 
-    private static final long serialVersionUID = -5832695247760330729L;
+    private static final long serialVersionUID = -7533894644856917703L;
     /**
      * 设备id
      */
@@ -33,4 +33,9 @@ public class DeviceValueDto implements Serializable {
      * 当前值
      */
     private BigDecimal currentValue;
+
+    /**
+     * 设备的计量单位
+     */
+    private String unit;
 }

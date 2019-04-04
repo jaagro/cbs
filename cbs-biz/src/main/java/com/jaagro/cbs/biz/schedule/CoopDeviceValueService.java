@@ -6,13 +6,11 @@ import com.jaagro.cbs.biz.utils.RedisLock;
 import com.jaagro.cbs.biz.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -45,7 +43,8 @@ public class CoopDeviceValueService {
     /**
      * 批次养殖情况汇总
      */
-    @Scheduled(cron = "0 0/10 * * * ?")
+//    @Scheduled(cron = "0 10 23 1/1 * ?")
+//    @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void coopDeviceValue() {
         log.info("coopDeviceValue:定时钟执行开始");
@@ -64,15 +63,11 @@ public class CoopDeviceValueService {
                 deviceValueMapper.deleteByValue(history);
                 //检测是否需要警报
                 deviceAlarm(history);
-                history.setCreateTime(new Date());
             }
-            if (!CollectionUtils.isEmpty(historyList)) {
-                //批量插入
-                deviceValueMapper.insertBatch(historyList);
-            }
+            //批量插入
+            deviceValueMapper.insertBatch(historyList);
 
-
-            redis.del("Scheduled:redisLock:coopDeviceValue");
+            redisLock.unLock("Scheduled:redisLock:coopDeviceValue");
         }
         log.info("coopDeviceValue:定时钟执行结束");
     }

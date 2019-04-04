@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 
 /**
  * @author :gaoxin
- * @date :2019/03/19
+ * @date :2019/04/03
  */
 @Data
 @NoArgsConstructor
@@ -27,7 +27,7 @@ public class BreedingStandard implements Serializable {
     private String standardName;
 
     /**
-     * 养殖类型(1-平养,2-棚养,3-笼养)
+     * 养殖类型(1-平养,2-笼养,3-网养)
      */
     private Integer breedingType;
 
@@ -35,6 +35,11 @@ public class BreedingStandard implements Serializable {
      * 养殖天数
      */
     private Integer breedingDays;
+
+    /**
+     * 模板状态(0-待参数配置,1-可用)
+     */
+    private Integer standardStatus;
 
     /**
      * 是否有效(0-无效,1-有效)

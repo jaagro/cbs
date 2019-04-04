@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 
 /**
  * @author :gaoxin
- * @date :2019/03/19
+ * @date :2019/04/03
  */
 @Data
 @NoArgsConstructor
@@ -73,7 +73,7 @@ public class BreedingStandardParameter implements Serializable {
     private String paramValue;
 
     /**
-     * 临界值方向(1->=,2<=)
+     * 临界值方向(1>=,2<=)
      */
     private Integer thresholdDirection;
 

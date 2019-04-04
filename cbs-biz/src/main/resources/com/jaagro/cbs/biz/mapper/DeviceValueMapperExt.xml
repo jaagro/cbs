@@ -22,5 +22,6 @@
         delete from device_value
         where device_id = #{deviceId,jdbcType=INTEGER}
         and value_type = #{valueType,jdbcType=INTEGER}
+        and DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{createTime}, '%Y-%m-%d' )
     </delete>
 </mapper>

@@ -12,9 +12,11 @@
             batch_coop_daily
         WHERE
             enable = 1
-            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{createTime}, '%Y-%m-%d' )
             AND coop_id = #{coopId}
             AND plan_id = #{planId}
+            AND day_age = #{dayAge}
+        ORDER BY create_time desc
+        LIMIT 1
     </select>
     <insert id="batchInsert" parameterType="com.jaagro.cbs.api.model.BatchCoopDaily">
         <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
@@ -22,24 +24,50 @@
         </selectKey>
         insert into batch_coop_daily (plan_id, batch_no, coop_id,
         day_age, start_amount, current_amount,
-        dead_amount, sale_amount, fodder_times,
-        fodder_amount,
-        create_user_id
+        dead_amount, fodder_times,
+        fodder_amount,create_user_id,create_time
         )
         values
         <foreach collection="dailyList" item="item" separator=",">
             (#{item.planId,jdbcType=INTEGER}, #{item.batchNo,jdbcType=VARCHAR}, #{item.coopId,jdbcType=INTEGER},
             #{item.dayAge,jdbcType=INTEGER}, #{item.startAmount,jdbcType=INTEGER},
             #{item.currentAmount,jdbcType=INTEGER},
-            #{item.deadAmount,jdbcType=INTEGER}, #{item.saleAmount,jdbcType=INTEGER},
+            #{item.deadAmount,jdbcType=INTEGER},
             #{item.fodderTimes,jdbcType=INTEGER},
             #{item.fodderAmount,jdbcType=DECIMAL},
-            #{item.createUserId,jdbcType=INTEGER}
+            #{item.createUserId,jdbcType=INTEGER},
+            #{item.createTime,jdbcType=TIMESTAMP}
             )
         </foreach>
     </insert>
     <delete id="deleteByDate" parameterType="java.lang.String">
     delete from batch_coop_daily
-    where DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{todayDate}
+    where DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{todayDate}, '%Y-%m-%d' )
   </delete>
+    <delete id="deleteByDayAge" parameterType="java.lang.Integer">
+    delete from batch_coop_daily
+    where day_age = #{dayAge} and plan_id = #{planId} and coop_id = #{coopId}
+    </delete>
+    <select id="listYesterdayData" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT
+            plan_id,
+            batch_no,
+            coop_id,
+            day_age + 1 as day_age,
+            start_amount,
+            current_amount,
+            ENABLE,
+            create_user_id,
+            0 as dead_amount,
+            0 as fodder_times,
+            0 as fodder_amount
+        FROM
+            batch_coop_daily
+        WHERE
+            ENABLE = 1
+            and DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{todayDate}, '%Y-%m-%d' )
+        GROUP BY
+            plan_id,
+            coop_id
+    </select>
 </mapper>

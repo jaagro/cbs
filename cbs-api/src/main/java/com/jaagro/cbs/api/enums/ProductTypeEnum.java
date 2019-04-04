@@ -10,7 +10,8 @@ public enum ProductTypeEnum {
      */
     SPROUT(1, "SPROUT", "种苗"),
     FEED(2, "FEED", "饲料"),
-    DRUG(3, "DRUG", "药品");
+    DRUG(3, "DRUG", "药品"),
+    VACCINE(4, "VACCINE", "疫苗");
 
 
     private int code;

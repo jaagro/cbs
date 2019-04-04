@@ -6,6 +6,7 @@
     <result column="customer_id" property="customerId" jdbcType="INTEGER" />
     <result column="customer_name" property="customerName" jdbcType="VARCHAR" />
     <result column="customer_phone_number" property="customerPhoneNumber" jdbcType="VARCHAR" />
+    <result column="day_age" property="dayAge" jdbcType="INTEGER" />
     <result column="coop_id" property="coopId" jdbcType="INTEGER" />
     <result column="coop_name" property="coopName" jdbcType="VARCHAR" />
     <result column="plant_id" property="plantId" jdbcType="INTEGER" />
@@ -16,6 +17,7 @@
     <result column="problem_desc" property="problemDesc" jdbcType="VARCHAR" />
     <result column="tech_consult_status" property="techConsultStatus" jdbcType="INTEGER" />
     <result column="handle_time" property="handleTime" jdbcType="TIMESTAMP" />
+    <result column="technician_id" property="technicianId" jdbcType="INTEGER" />
     <result column="handle_user_id" property="handleUserId" jdbcType="INTEGER" />
     <result column="handle_desc" property="handleDesc" jdbcType="VARCHAR" />
     <result column="handle_type" property="handleType" jdbcType="INTEGER" />
@@ -55,10 +57,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    id, customer_id, customer_name, customer_phone_number, coop_id, coop_name, plant_id, 
-    plant_name, plan_id, batch_no, emergency_level, problem_desc, tech_consult_status, 
-    handle_time, handle_user_id, handle_desc, handle_type, enable, create_time, create_user_id, 
-    modify_time, modify_user_id
+    id, customer_id, customer_name, customer_phone_number, day_age, coop_id, coop_name, 
+    plant_id, plant_name, plan_id, batch_no, emergency_level, problem_desc, tech_consult_status, 
+    handle_time, technician_id, handle_user_id, handle_desc, handle_type, enable, create_time, 
+    create_user_id, modify_time, modify_user_id
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.jaagro.cbs.api.model.TechConsultRecordExample" >
     select
@@ -98,21 +100,21 @@
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into tech_consult_record (customer_id, customer_name, customer_phone_number, 
-      coop_id, coop_name, plant_id, 
-      plant_name, plan_id, batch_no, 
-      emergency_level, problem_desc, tech_consult_status, 
-      handle_time, handle_user_id, handle_desc, 
-      handle_type, enable, create_time, 
-      create_user_id, modify_time, modify_user_id
-      )
+      day_age, coop_id, coop_name, 
+      plant_id, plant_name, plan_id, 
+      batch_no, emergency_level, problem_desc, 
+      tech_consult_status, handle_time, technician_id, 
+      handle_user_id, handle_desc, handle_type, 
+      enable, create_time, create_user_id, 
+      modify_time, modify_user_id)
     values (#{customerId,jdbcType=INTEGER}, #{customerName,jdbcType=VARCHAR}, #{customerPhoneNumber,jdbcType=VARCHAR}, 
-      #{coopId,jdbcType=INTEGER}, #{coopName,jdbcType=VARCHAR}, #{plantId,jdbcType=INTEGER}, 
-      #{plantName,jdbcType=VARCHAR}, #{planId,jdbcType=INTEGER}, #{batchNo,jdbcType=VARCHAR}, 
-      #{emergencyLevel,jdbcType=INTEGER}, #{problemDesc,jdbcType=VARCHAR}, #{techConsultStatus,jdbcType=INTEGER}, 
-      #{handleTime,jdbcType=TIMESTAMP}, #{handleUserId,jdbcType=INTEGER}, #{handleDesc,jdbcType=VARCHAR}, 
-      #{handleType,jdbcType=INTEGER}, #{enable,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{createUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER}
-      )
+      #{dayAge,jdbcType=INTEGER}, #{coopId,jdbcType=INTEGER}, #{coopName,jdbcType=VARCHAR}, 
+      #{plantId,jdbcType=INTEGER}, #{plantName,jdbcType=VARCHAR}, #{planId,jdbcType=INTEGER}, 
+      #{batchNo,jdbcType=VARCHAR}, #{emergencyLevel,jdbcType=INTEGER}, #{problemDesc,jdbcType=VARCHAR}, 
+      #{techConsultStatus,jdbcType=INTEGER}, #{handleTime,jdbcType=TIMESTAMP}, #{technicianId,jdbcType=INTEGER}, 
+      #{handleUserId,jdbcType=INTEGER}, #{handleDesc,jdbcType=VARCHAR}, #{handleType,jdbcType=INTEGER}, 
+      #{enable,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, #{createUserId,jdbcType=INTEGER}, 
+      #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.jaagro.cbs.api.model.TechConsultRecord" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -128,6 +130,9 @@
       </if>
       <if test="customerPhoneNumber != null" >
         customer_phone_number,
+      </if>
+      <if test="dayAge != null" >
+        day_age,
       </if>
       <if test="coopId != null" >
         coop_id,
@@ -158,6 +163,9 @@
       </if>
       <if test="handleTime != null" >
         handle_time,
+      </if>
+      <if test="technicianId != null" >
+        technician_id,
       </if>
       <if test="handleUserId != null" >
         handle_user_id,
@@ -194,6 +202,9 @@
       <if test="customerPhoneNumber != null" >
         #{customerPhoneNumber,jdbcType=VARCHAR},
       </if>
+      <if test="dayAge != null" >
+        #{dayAge,jdbcType=INTEGER},
+      </if>
       <if test="coopId != null" >
         #{coopId,jdbcType=INTEGER},
       </if>
@@ -223,6 +234,9 @@
       </if>
       <if test="handleTime != null" >
         #{handleTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="technicianId != null" >
+        #{technicianId,jdbcType=INTEGER},
       </if>
       <if test="handleUserId != null" >
         #{handleUserId,jdbcType=INTEGER},
@@ -268,6 +282,9 @@
       <if test="customerPhoneNumber != null" >
         customer_phone_number = #{customerPhoneNumber,jdbcType=VARCHAR},
       </if>
+      <if test="dayAge != null" >
+        day_age = #{dayAge,jdbcType=INTEGER},
+      </if>
       <if test="coopId != null" >
         coop_id = #{coopId,jdbcType=INTEGER},
       </if>
@@ -297,6 +314,9 @@
       </if>
       <if test="handleTime != null" >
         handle_time = #{handleTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="technicianId != null" >
+        technician_id = #{technicianId,jdbcType=INTEGER},
       </if>
       <if test="handleUserId != null" >
         handle_user_id = #{handleUserId,jdbcType=INTEGER},
@@ -330,6 +350,7 @@
     set customer_id = #{customerId,jdbcType=INTEGER},
       customer_name = #{customerName,jdbcType=VARCHAR},
       customer_phone_number = #{customerPhoneNumber,jdbcType=VARCHAR},
+      day_age = #{dayAge,jdbcType=INTEGER},
       coop_id = #{coopId,jdbcType=INTEGER},
       coop_name = #{coopName,jdbcType=VARCHAR},
       plant_id = #{plantId,jdbcType=INTEGER},
@@ -340,6 +361,7 @@
       problem_desc = #{problemDesc,jdbcType=VARCHAR},
       tech_consult_status = #{techConsultStatus,jdbcType=INTEGER},
       handle_time = #{handleTime,jdbcType=TIMESTAMP},
+      technician_id = #{technicianId,jdbcType=INTEGER},
       handle_user_id = #{handleUserId,jdbcType=INTEGER},
       handle_desc = #{handleDesc,jdbcType=VARCHAR},
       handle_type = #{handleType,jdbcType=INTEGER},

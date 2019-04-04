@@ -1,5 +1,6 @@
 package com.jaagro.cbs.api.dto.order;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jaagro.cbs.api.dto.farmer.ReturnProductDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,6 +33,11 @@ public class ReturnFarmerPurchaseOrderDetailsDto implements Serializable {
     private Integer planId;
 
     /**
+     * 订单货物类型（1: 种苗 2: 饲料 3: 药品）
+     */
+    private Integer productType;
+
+    /**
      * 商品采购单编号
      */
     private String purchaseNo;
@@ -49,6 +55,7 @@ public class ReturnFarmerPurchaseOrderDetailsDto implements Serializable {
     /**
      * 计划送达时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planDeliveryTime;
 
     /**

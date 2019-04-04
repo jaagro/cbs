@@ -1,5 +1,6 @@
 package com.jaagro.cbs.web.config;
 
+import com.jaagro.cbs.api.exception.BusinessException;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import org.slf4j.Logger;
@@ -23,14 +24,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public BaseResponse javaExceptionHandler(Exception e) {
         log.error(e.getMessage(), e);
-        return BaseResponse.errorInstance(e.getMessage());
+        return BaseResponse.errorInstance("服务异常了,请稍后重试");
     }
 
     @ResponseBody
-    @ExceptionHandler(value = NullPointerException.class)
-    public BaseResponse authorizationExceptionHandler(Exception e) {
+    @ExceptionHandler(value = BusinessException.class)
+    public BaseResponse javaExceptionHandler(BusinessException e) {
         log.error(e.getMessage(), e);
-        return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), e.getMessage());
+        return BaseResponse.errorInstance(e.getMessage());
     }
 
     @ExceptionHandler(value=MethodArgumentNotValidException.class)

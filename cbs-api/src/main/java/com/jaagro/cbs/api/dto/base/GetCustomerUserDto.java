@@ -24,6 +24,15 @@ public class GetCustomerUserDto implements Serializable {
      */
     private Integer relevanceId;
 
+    /**
+     * 显示名称
+     */
+    private String name;
+
+    /**
+     * 手机号码
+     */
+    private String phoneNumber;
 
 
 }

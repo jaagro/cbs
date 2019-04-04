@@ -1,5 +1,6 @@
 package com.jaagro.cbs.api.dto.plan;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,11 +26,6 @@ public class ReturnPurchaseOrderDto implements Serializable {
     private Integer id;
 
     /**
-     * 批次号
-     */
-    private String batchNo;
-
-    /**
      * 商品采购单编号
      */
     private String purchaseNo;
@@ -38,6 +34,17 @@ public class ReturnPurchaseOrderDto implements Serializable {
      * 订单货物类型（1: 种苗 2: 饲料 3: 药品）
      */
     private String productType;
+
+    /**
+     * 采购名称
+     */
+    private String purchaseName;
+
+    /**
+     * 计划送达时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date planDeliveryTime;
 
     /**
      * 签收人姓名
@@ -49,6 +56,10 @@ public class ReturnPurchaseOrderDto implements Serializable {
      */
     private String signerPhone;
 
+    /**
+     * 签收时间
+     */
+    private Date signerTime;
 
     /**
      * 采购数量 采购重量
@@ -60,35 +71,9 @@ public class ReturnPurchaseOrderDto implements Serializable {
      */
     private String unit;
 
-    /**
-     * 单价
-     */
-    private BigDecimal price;
-
-    /**
-     * 金额
-     */
-    private BigDecimal amount;
 
     /**
      * 状态(0-待审核,1-审核通过,2－已完成送货 ,3-审核拒绝)
      */
     private String purchaseOrderStatus;
-
-    /**
-     * 到货时间
-     */
-    private Date deliveryTime;
-
-    /**
-     * 采购商品备注
-     */
-    private String notes;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-
 }

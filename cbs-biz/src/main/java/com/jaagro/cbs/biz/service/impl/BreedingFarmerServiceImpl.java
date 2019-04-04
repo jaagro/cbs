@@ -18,15 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * @description: 农户端app 相关api
@@ -58,8 +56,6 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
     @Autowired
     private ProductMapperExt productMapper;
     @Autowired
-    private BatchPlantCoopMapperExt batchPlantCoopMapper;
-    @Autowired
     private PurchaseOrderItemsMapperExt purchaseOrderItemsMapper;
 
 
@@ -78,7 +74,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         if (currentUser != null && currentUser.getId() != null) {
             GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
             if (customerUser != null && customerUser.getRelevanceId() != null) {
-                List<ReturnBreedingBatchDetailsDto> returnBreedingBatchDetailsDtos = breedingPlanMapper.listBreedingPlanByCustomerId(customerUser.getRelevanceId());
+                List<ReturnBreedingBatchDetailsDto> returnBreedingBatchDetailsDtos = breedingPlanMapper.listAllBreedingPlanByCustomerId(customerUser.getRelevanceId());
                 if (!CollectionUtils.isEmpty(returnBreedingBatchDetailsDtos)) {
                     for (ReturnBreedingBatchDetailsDto returnBreedingBatchDetailsDto : returnBreedingBatchDetailsDtos) {
                         planIds.add(returnBreedingBatchDetailsDto.getId());
@@ -107,15 +103,19 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         //环控异常指数
                         BigDecimal accumulativeTotalAbnormalWarn = deviceAlarmLogMapper.accumulativeTotalAbnormalWarn(planIds);
                         //饲料库存
-                        PurchaseOrderParamDto purchaseOrderParamDto = new PurchaseOrderParamDto();
-                        purchaseOrderParamDto
+                        PurchaseOrderItemsParamDto purchaseOrderItemsParamDto = new PurchaseOrderItemsParamDto();
+                        purchaseOrderItemsParamDto
                                 .setPlanIds(planIds)
                                 .setProductType(ProductTypeEnum.FEED.getCode());
-                        BigDecimal planFeedWeight = purchaseOrderMapper.calculateTotalPlanFeedWeight(purchaseOrderParamDto);
+                        BigDecimal planFeedWeight = purchaseOrderItemsMapper.calculateTotalPlanFeedWeight(purchaseOrderItemsParamDto);
                         if (planFeedWeight != null && accumulativeTotalFeed != null) {
                             BigDecimal totalFeedStock = planFeedWeight.subtract(accumulativeTotalFeed);
-                            returnBreedingFarmerIndexDto
-                                    .setTotalFeedStock(totalFeedStock);
+                            if (totalFeedStock != null && BigDecimal.ZERO.compareTo(totalFeedStock) != -1) {
+                                returnBreedingFarmerIndexDto.setTotalFeedStock(BigDecimal.ZERO);
+                            } else {
+                                returnBreedingFarmerIndexDto
+                                        .setTotalFeedStock(totalFeedStock);
+                            }
                         }
                         returnBreedingFarmerIndexDto
                                 .setTotalBreedingStock(totalBreedingStock)
@@ -145,7 +145,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                 if (!CollectionUtils.isEmpty(returnBreedingBatchDetailsDtos)) {
                     for (ReturnBreedingBatchDetailsDto returnBreedingBatchDetailsDto : returnBreedingBatchDetailsDtos) {
                         Integer planId = returnBreedingBatchDetailsDto.getId();
-                        Integer dayAge = null;
+                        int dayAge = 0;
                         try {
                             //获取当前日龄
                             if (returnBreedingBatchDetailsDto.getPlanTime() != null) {
@@ -154,9 +154,11 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         } catch (Exception e) {
                             log.info("R breedingFarmerIndex getDayAge error", e);
                         }
-                        returnBreedingBatchDetailsDto.setDayAge(dayAge);
+                        dayAge = dayAge < 0 ? 0 : dayAge;
+                        returnBreedingBatchDetailsDto
+                                .setDayAge(dayAge);
                         BatchInfoExample batchInfoExample = new BatchInfoExample();
-                        if (dayAge != null) {
+                        if (dayAge > 0) {
                             //今日耗料量
                             batchInfoExample
                                     .createCriteria()
@@ -177,17 +179,18 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         BigDecimal deadAmount = batchInfoMapper.accumulativeDeadAmount(planId);
                         //计算存栏量
                         if (returnBreedingBatchDetailsDto.getPlanChickenQuantity() != null) {
-                            BigDecimal breedingStock = null;
-                            BigDecimal totalBreedingStock = null;
+                            BigDecimal breedingStock;
                             Integer planChickenQuantity = returnBreedingBatchDetailsDto.getPlanChickenQuantity();
                             if (saleAmount != null) {
                                 breedingStock = new BigDecimal(planChickenQuantity).subtract(saleAmount);
+                            } else {
+                                breedingStock = new BigDecimal(planChickenQuantity);
                             }
                             if (breedingStock != null && deadAmount != null) {
-                                totalBreedingStock = breedingStock.subtract(deadAmount);
+                                breedingStock = breedingStock.subtract(deadAmount);
                             }
                             returnBreedingBatchDetailsDto
-                                    .setBreedingStock(totalBreedingStock);
+                                    .setBreedingStock(breedingStock);
                             if (returnBreedingBatchDetailsDto.getPlanStatus() != null) {
                                 returnBreedingBatchDetailsDto
                                         .setStrPlanStatus(PlanStatusEnum.getDescByCode(returnBreedingBatchDetailsDto.getPlanStatus()));
@@ -214,6 +217,15 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         }
         //插入技术询问
         TechConsultRecord techConsultRecord = new TechConsultRecord();
+        try {
+            //获取当前日龄
+            if (breedingPlan.getPlanTime() != null) {
+                Integer dayAge = getDayAge(breedingPlan.getPlanTime());
+                techConsultRecord.setDayAge(dayAge);
+            }
+        } catch (Exception e) {
+            log.info("R breedingFarmerIndex getDayAge error", e);
+        }
         UserInfo currentUser = currentUserService.getCurrentUser();
         BeanUtils.copyProperties(dto, techConsultRecord);
         techConsultRecord
@@ -229,6 +241,10 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                             .setCustomerName(showCustomer.getCustomerName())
                             .setCreateUserId(currentUser.getId())
                             .setCustomerId(customerUser.getRelevanceId());
+                    if (breedingPlan.getTechnicianId() != null) {
+                        techConsultRecord
+                                .setTechnicianId(breedingPlan.getTechnicianId());
+                    }
                 }
             }
         }
@@ -265,7 +281,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         if (currentUser != null && currentUser.getId() != null && currentUser.getLoginName() != null) {
             farmerPersonalCenterDto
                     .setPhoneNumber(currentUser.getPhoneNumber())
-                    .setLoginName(currentUser.getLoginName());
+                    .setLoginName(currentUser.getName());
             GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
             if (customerUser != null && customerUser.getRelevanceId() != null) {
                 farmerPersonalCenterDto
@@ -288,52 +304,50 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
      */
     @Override
     public PageInfo listPurchaseOrder(PurchaseOrderListParamDto dto) {
+        List<PurchaseOrderDto> purchaseOrderDtos = new ArrayList<>();
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         List<Integer> purchaseOrderStatus = new ArrayList<>();
         if (dto.getPurchaseOrderStatus() == null) {
             for (PurchaseOrderStatusEnum type : PurchaseOrderStatusEnum.values()) {
+                if (PurchaseOrderStatusEnum.ORDER_PLACED.getCode() == type.getCode()) {
+                    continue;
+                }
                 purchaseOrderStatus.add(type.getCode());
             }
         } else {
             purchaseOrderStatus.add(dto.getPurchaseOrderStatus());
         }
-        List<PurchaseOrderDto> purchaseOrderDtos = new ArrayList<>();
         UserInfo currentUser = currentUserService.getCurrentUser();
         if (currentUser != null && currentUser.getId() != null) {
             GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
             if (customerUser != null && customerUser.getRelevanceId() != null) {
-                PurchaseOrderExample purchaseOrderExample = new PurchaseOrderExample();
-                purchaseOrderExample
-                        .createCriteria()
-                        .andPurchaseOrderStatusIn(purchaseOrderStatus)
-                        .andEnableEqualTo(true)
-                        .andCustomerIdEqualTo(customerUser.getRelevanceId());
-                purchaseOrderExample.setOrderByClause("create_time DESC");
-                List<PurchaseOrder> purchaseOrderList = purchaseOrderMapper.selectByExample(purchaseOrderExample);
-                for (PurchaseOrder purchaseOrder : purchaseOrderList) {
+                PurchaseOrderCriteriaDto purchaseOrderCriteriaDto = new PurchaseOrderCriteriaDto();
+                purchaseOrderCriteriaDto
+                        .setCustomerId(customerUser.getRelevanceId())
+                        .setPurchaseOrderStatus(purchaseOrderStatus);
+                purchaseOrderDtos = purchaseOrderMapper.listFarmerPurchaseOrder(purchaseOrderCriteriaDto);
+                for (PurchaseOrderDto purchaseOrderDto : purchaseOrderDtos) {
                     BigDecimal totalPurchaseStatistics = new BigDecimal(0);
-                    PurchaseOrderDto purchaseOrderDto = new PurchaseOrderDto();
-                    BeanUtils.copyProperties(purchaseOrder, purchaseOrderDto);
-                    if (ProductTypeEnum.SPROUT.getCode() == purchaseOrder.getProductType()) {
+                    if (ProductTypeEnum.SPROUT.getCode() == purchaseOrderDto.getProductType()) {
                         purchaseOrderDto.setStrOrderPhase("全部鸡苗配送");
                     }
-                    if (ProductTypeEnum.FEED.getCode() == purchaseOrder.getProductType()) {
-                        purchaseOrderDto.setStrOrderPhase("第" + PurchaseOrderPhaseEnum.getDescByCode(purchaseOrder.getOrderPhase()) + "批饲料配送");
+                    if (ProductTypeEnum.FEED.getCode() == purchaseOrderDto.getProductType()) {
+                        purchaseOrderDto.setStrOrderPhase("第" + PurchaseOrderPhaseEnum.getDescByCode(purchaseOrderDto.getOrderPhase()) + "批饲料配送");
                     }
 
-                    if (ProductTypeEnum.DRUG.getCode() == purchaseOrder.getProductType()) {
-                        purchaseOrderDto.setStrOrderPhase("第" + PurchaseOrderPhaseEnum.getDescByCode(purchaseOrder.getOrderPhase()) + "次药品配送");
+                    if (ProductTypeEnum.DRUG.getCode() == purchaseOrderDto.getProductType()) {
+                        purchaseOrderDto.setStrOrderPhase("第" + PurchaseOrderPhaseEnum.getDescByCode(purchaseOrderDto.getOrderPhase()) + "次药品配送");
                     }
-                    if (purchaseOrder.getPurchaseOrderStatus() != null) {
+                    if (purchaseOrderDto.getPurchaseOrderStatus() != null) {
                         purchaseOrderDto
-                                .setStrPurchaseOrderStatus(PurchaseOrderStatusEnum.getDescByCode(purchaseOrder.getPurchaseOrderStatus()));
+                                .setStrPurchaseOrderStatus(PurchaseOrderStatusEnum.getDescByCode(purchaseOrderDto.getPurchaseOrderStatus()));
                     }
-                    if (purchaseOrder.getId() != null) {
+                    if (purchaseOrderDto.getId() != null) {
                         PurchaseOrderItemsExample purchaseOrderItemsExample = new PurchaseOrderItemsExample();
                         purchaseOrderItemsExample
                                 .createCriteria()
                                 .andEnableEqualTo(true)
-                                .andPurchaseOrderIdEqualTo(purchaseOrder.getId());
+                                .andPurchaseOrderIdEqualTo(purchaseOrderDto.getId());
                         List<PurchaseOrderItems> purchaseOrderItems = purchaseOrderItemsMapper.selectByExample(purchaseOrderItemsExample);
                         if (!CollectionUtils.isEmpty(purchaseOrderItems)) {
                             PurchaseOrderItems purchase = purchaseOrderItems.get(0);
@@ -348,8 +362,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                         }
                         purchaseOrderDto.setQuantity(totalPurchaseStatistics);
                     }
-                    purchaseOrderDto.setStrProductType(ProductTypeEnum.getDescByCode(purchaseOrder.getProductType()) + "任务");
-                    purchaseOrderDtos.add(purchaseOrderDto);
+                    purchaseOrderDto.setStrProductType(ProductTypeEnum.getDescByCode(purchaseOrderDto.getProductType()) + "任务");
                 }
             }
         }
@@ -406,10 +419,26 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                                     .andEnableEqualTo(true);
                             List<Product> products = productMapper.selectByExample(productExample);
                             if (!CollectionUtils.isEmpty(products)) {
+                                StringBuilder sb = new StringBuilder();
                                 Product product = products.get(0);
                                 if (product.getProductName() != null) {
                                     returnProductDto
                                             .setProductName(product.getProductName());
+                                }
+                                if (ProductTypeEnum.DRUG.getCode() == product.getProductType()
+                                        || ProductTypeEnum.SPROUT.getCode() == product.getProductType()) {
+                                    if (product.getProductCapacity() != null) {
+                                        sb.append(product.getProductCapacity());
+                                    }
+                                    if (product.getCapacityUnit() != null) {
+                                        sb.append(CapacityUnitEnum.getDescByCode(product.getCapacityUnit()));
+                                    }
+                                    if (product.getPackageUnit() != null) {
+                                        sb.append("/").append(PackageUnitEnum.getDescByCode(product.getPackageUnit()));
+                                    }
+                                    returnProductDto.setSpecification(sb.toString());
+                                } else {
+                                    returnProductDto.setSpecification("");
                                 }
                             }
                         }
@@ -431,59 +460,6 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
     }
 
     /**
-     * 更新采购订单状态
-     *
-     * @param dto
-     * @author @Gao.
-     */
-    @Override
-    public void updatePurchaseOrder(UpdatePurchaseOrderParamDto dto) {
-        PurchaseOrderExample purchaseOrderExample = new PurchaseOrderExample();
-        purchaseOrderExample
-                .createCriteria()
-                .andEnableEqualTo(true)
-                .andIdEqualTo(dto.getPurchaseOrderId());
-        List<PurchaseOrder> purchaseOrderList = purchaseOrderMapper.selectByExample(purchaseOrderExample);
-        if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
-            if (!CollectionUtils.isEmpty(purchaseOrderList)) {
-                PurchaseOrder purchaseOrder = purchaseOrderList.get(0);
-                //种苗已签收 更改养殖计划状态为养殖中
-                if (purchaseOrder.getProductType() != null) {
-                    if (ProductTypeEnum.SPROUT.getCode() == purchaseOrder.getProductType()) {
-                        if (purchaseOrder.getPlanId() != null) {
-                            BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(purchaseOrder.getPlanId());
-                            if (breedingPlan != null && PlanStatusEnum.SIGN_CHICKEN.getCode() == breedingPlan.getPlanStatus()) {
-                                breedingPlan
-                                        .setPlanStatus(PlanStatusEnum.BREEDING.getCode())
-                                        .setId(purchaseOrder.getPlanId());
-                                breedingPlanMapper.updateByPrimaryKeySelective(breedingPlan);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        //更新采购单状态
-        PurchaseOrder purchaseOrder = new PurchaseOrder();
-        if (dto.getPurchaseOrderId() != null) {
-            purchaseOrder
-                    .setId(dto.getPurchaseOrderId());
-            if (dto.getPurchaseOrderStatus() != null) {
-                if (PurchaseOrderStatusEnum.PENDING_ARRIVED.getCode() == dto.getPurchaseOrderStatus()) {
-                    purchaseOrder
-                            .setDeliveryTime(new Date());
-                }
-                if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
-                    purchaseOrder.setSignerTime(new Date());
-                }
-                purchaseOrder
-                        .setPurchaseOrderStatus(dto.getPurchaseOrderStatus());
-                purchaseOrderMapper.updateByPrimaryKeySelective(purchaseOrder);
-            }
-        }
-    }
-
-    /**
      * 农户端上鸡计划列表
      *
      * @param dto
@@ -497,16 +473,82 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
         UserInfo currentUser = currentUserService.getCurrentUser();
         BreedingPlanExample breedingPlanExample = new BreedingPlanExample();
         if (currentUser != null && currentUser.getId() != null) {
-            GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
-            if (customerUser != null && customerUser.getRelevanceId() != null) {
-                breedingPlanExample
-                        .createCriteria()
-                        .andCustomerIdEqualTo(customerUser.getRelevanceId())
-                        .andEnableEqualTo(true);
-                breedingPlans = breedingPlanMapper.selectByExample(breedingPlanExample);
-            }
+            breedingPlanExample
+                    .createCriteria()
+                    .andCreateUserIdEqualTo(currentUser.getId())
+                    .andEnableEqualTo(true);
+            breedingPlanExample.setOrderByClause("plan_time desc");
+            breedingPlans = breedingPlanMapper.selectByExample(breedingPlanExample);
         }
         return new PageInfo(breedingPlans);
+    }
+
+    /**
+     * 更新采购订单状态
+     *
+     * @param dto
+     * @author @Gao.
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePurchaseOrder(UpdatePurchaseOrderParamDto dto) {
+        final int countVal = 3;
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        PurchaseOrderExample purchaseOrderExample = new PurchaseOrderExample();
+        PurchaseOrderExample.Criteria criteria = purchaseOrderExample.createCriteria();
+        criteria.andEnableEqualTo(true)
+                .andIdEqualTo(dto.getPurchaseOrderId());
+        List<PurchaseOrder> purchaseOrderList = purchaseOrderMapper.selectByExample(purchaseOrderExample);
+        if (CollectionUtils.isEmpty(purchaseOrderList)) {
+            throw new RuntimeException("当前采购订单不存在");
+        }
+        //更新采购单状态
+        PurchaseOrder purchaseOrder = new PurchaseOrder();
+        purchaseOrder
+                .setId(dto.getPurchaseOrderId());
+        if (dto.getPurchaseOrderStatus() != null) {
+            if (PurchaseOrderStatusEnum.PENDING_ARRIVED.getCode() == dto.getPurchaseOrderStatus()) {
+                purchaseOrder
+                        .setDeliveryTime(new Date());
+            }
+            if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
+                purchaseOrder.setSignerTime(new Date());
+                if (currentUser != null && currentUser.getId() != null) {
+                    purchaseOrder.setSignerId(currentUser.getId());
+                }
+            }
+            purchaseOrder
+                    .setPurchaseOrderStatus(dto.getPurchaseOrderStatus());
+            purchaseOrderMapper.updateByPrimaryKeySelective(purchaseOrder);
+        }
+        if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == dto.getPurchaseOrderStatus()) {
+            purchaseOrder = purchaseOrderList.get(0);
+            //当前第一批采购订单全部签收 更改养殖计划状态为养殖中
+            if (purchaseOrder.getPlanId() != null) {
+                BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(purchaseOrder.getPlanId());
+                if (breedingPlan != null && PlanStatusEnum.SIGN_CHICKEN.getCode() == breedingPlan.getPlanStatus()) {
+                    PurchaseOrderExample example = new PurchaseOrderExample();
+                    int count = 0;
+                    example
+                            .createCriteria()
+                            .andEnableEqualTo(true)
+                            .andOrderPhaseEqualTo(PurchaseOrderPhaseEnum.PHASE_ONE.getCode())
+                            .andPlanIdEqualTo(purchaseOrder.getPlanId());
+                    purchaseOrderList = purchaseOrderMapper.selectByExample(example);
+                    for (PurchaseOrder order : purchaseOrderList) {
+                        if (PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode() == order.getPurchaseOrderStatus()) {
+                            count++;
+                        }
+                    }
+                    if (count == purchaseOrderList.size() && count == countVal) {
+                        breedingPlan
+                                .setPlanStatus(PlanStatusEnum.BREEDING.getCode())
+                                .setId(purchaseOrder.getPlanId());
+                        breedingPlanMapper.updateByPrimaryKeySelective(breedingPlan);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -517,20 +559,19 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
      */
     @Override
     public PageInfo listTechnicalInquiries(BreedingBatchParamDto dto) {
-        List<TechConsultRecord> techConsultRecords = null;
+        List<TechConsultRecord> techConsultRecords = new ArrayList<>();
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         UserInfo currentUser = currentUserService.getCurrentUser();
         TechConsultRecordExample techConsultRecordExample = new TechConsultRecordExample();
         if (currentUser != null && currentUser.getId() != null) {
-            GetCustomerUserDto customerUser = userClientService.getCustomerUserById(currentUser.getId());
-            if (customerUser != null && customerUser.getRelevanceId() != null) {
-                techConsultRecordExample
-                        .createCriteria()
-                        .andCustomerIdEqualTo(customerUser.getRelevanceId());
-                techConsultRecords = techConsultRecordMapper.selectByExample(techConsultRecordExample);
-            }
+            techConsultRecordExample
+                    .createCriteria()
+                    .andEnableEqualTo(true)
+                    .andCreateUserIdEqualTo(currentUser.getId());
+            techConsultRecordExample
+                    .setOrderByClause("create_time desc");
+            techConsultRecords = techConsultRecordMapper.selectByExample(techConsultRecordExample);
         }
-
         return new PageInfo(techConsultRecords);
     }
 
@@ -567,16 +608,21 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
      * @return
      * @author: @Gao.
      */
-    private Integer getDayAge(Date beginDate) throws Exception {
-        Integer day = 0;
+    @Override
+    public int getDayAge(Date beginDate) throws Exception {
+        int day = 0;
         Date endDate = new Date();
         if (beginDate == null) {
             return day;
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         beginDate = sdf.parse(sdf.format(beginDate));
         endDate = sdf.parse(sdf.format(endDate));
-        day = (int) (endDate.getTime() - beginDate.getTime()) / (24 * 60 * 60 * 1000);
-        return day + 1;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(beginDate);
+        long time1 = cal.getTimeInMillis();
+        cal.setTime(endDate);
+        long time2 = cal.getTimeInMillis();
+        return Integer.parseInt(String.valueOf((time2 - time1) / (1000 * 3600 * 24))) + 1;
     }
 }

@@ -596,6 +596,7 @@ public class BreedingBrainServiceImpl implements BreedingBrainService {
                     BigDecimal purchasePrice = product.getPurchasePrice() == null ? BigDecimal.ZERO : product.getPurchasePrice();
                     BigDecimal productCapacity = product.getProductCapacity() == null ? new BigDecimal("1") : product.getProductCapacity();
                     BigDecimal packageQuantity = orderItem.getQuantity().divide(productCapacity, 0, BigDecimal.ROUND_UP);
+                    orderItem.setQuantity(packageQuantity);
                     BigDecimal price = packageQuantity.multiply(purchasePrice);
                     orderItem.setTotalPrice(price);
                     orderItem.setUnitPrice(purchasePrice);

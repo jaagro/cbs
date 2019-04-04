@@ -21,10 +21,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -101,8 +98,7 @@ public class BreedingStandardController {
     @PostMapping("/breedingStandardParameter")
     public BaseResponse breedingStandardParameter(@RequestBody @Validated BreedingParameterListDto dto) {
         log.info("O breedingStandardParameter param={}", dto);
-        breedingStandardService.saveOrUpdateParameter(dto);
-        return BaseResponse.successInstance("保存成功");
+        return BaseResponse.successInstance(breedingStandardService.saveOrUpdateParameter(dto));
     }
 
     @ApiOperation("排序变更")
@@ -147,6 +143,12 @@ public class BreedingStandardController {
         return BaseResponse.successInstance(breedingStandardService.listAllBreedingStandard());
     }
 
+    @ApiOperation("养殖计划参数配置可选择养殖模板列表")
+    @GetMapping("/listBreedingStandardForParamConfiguration")
+    public BaseResponse listBreedingStandardForParamConfiguration(){
+        log.info("O listBreedingStandardForParamConfiguration");
+        return BaseResponse.successInstance(breedingStandardService.listBreedingStandardForParamConfiguration());
+    }
     @ApiOperation("查询单个养殖模板详情按日龄分组")
     @GetMapping("/getBreedingStandardDetail/{id}")
     public BaseResponse getBreedingStandardDetail(@PathVariable("id") Integer id) {
@@ -199,6 +201,7 @@ public class BreedingStandardController {
                 }
             }
         }
+        listVoList.sort(Comparator.comparingInt(BreedingStandardDrugListVo::getDayAgeStart));
         return listVoList;
     }
 

@@ -1,7 +1,5 @@
 package com.jaagro.cbs.biz.mapper;
 
-import javax.annotation.Resource;
-
 import com.jaagro.cbs.api.dto.farmer.BreedingPlanDetailDto;
 import com.jaagro.cbs.api.dto.farmer.ReturnBreedingBatchDetailsDto;
 import com.jaagro.cbs.api.dto.order.PurchaseOrderPresetCriteriaDto;
@@ -15,6 +13,7 @@ import com.jaagro.cbs.api.model.BreedingPlanExample;
 import com.jaagro.cbs.biz.mapper.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 
@@ -36,12 +35,20 @@ public interface BreedingPlanMapperExt extends BaseMapper<BreedingPlan, Breeding
     List<ReturnBreedingPlanDto> listBreedingPlan(BreedingPlanParamDto dto);
 
     /**
-     * 根据客户id 查询当前客户所有养殖批次详情
+     * 根据客户id 查询当前客户养殖批次详情
      *
      * @param customerId
      * @return
      */
     List<ReturnBreedingBatchDetailsDto> listBreedingPlanByCustomerId(@Param("customerId") Integer customerId);
+
+    /**
+     * 根据客户id 查询当前客户所有养殖批次详情
+     *
+     * @param customerId
+     * @return
+     */
+    List<ReturnBreedingBatchDetailsDto> listAllBreedingPlanByCustomerId(@Param("customerId") Integer customerId);
 
     /**
      * 根据当前客户id 查询所有养殖计划id 集合
@@ -57,7 +64,7 @@ public interface BreedingPlanMapperExt extends BaseMapper<BreedingPlan, Breeding
      * @param customerId
      * @return
      */
-    List<BreedingPlanDetailDto> listByCustomerId(@Param("customerId") Integer customerId);
+    List<BreedingPlanDetailDto> listBreedingBatchForFarmer(@Param("customerId") Integer customerId);
 
     /**
      * @param dto
@@ -76,7 +83,15 @@ public interface BreedingPlanMapperExt extends BaseMapper<BreedingPlan, Breeding
 
     /**
      * 查看可能需要从养殖中到待出栏确认的养殖计划
+     *
      * @return
      */
     List<BreedingPlan> listToSlaughterConfirm();
+
+    /**
+     * 查询今日创建的、未提交喂料记录的批次
+     *
+     * @return
+     */
+    List<Integer> listTodayPlanInteger();
 }

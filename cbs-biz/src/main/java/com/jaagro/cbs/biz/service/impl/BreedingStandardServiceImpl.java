@@ -5,14 +5,9 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.ValidList;
 import com.jaagro.cbs.api.dto.plan.CustomerInfoParamDto;
 import com.jaagro.cbs.api.dto.standard.*;
-import com.jaagro.cbs.api.enums.BreedingStandardParamEnum;
-import com.jaagro.cbs.api.enums.BreedingStandardValueTypeEnum;
-import com.jaagro.cbs.api.enums.PlanStatusEnum;
-import com.jaagro.cbs.api.enums.SortTypeEnum;
-import com.jaagro.cbs.api.model.BreedingStandard;
-import com.jaagro.cbs.api.model.BreedingStandardDrug;
-import com.jaagro.cbs.api.model.BreedingStandardParameter;
-import com.jaagro.cbs.api.model.BreedingStandardParameterExample;
+import com.jaagro.cbs.api.enums.*;
+import com.jaagro.cbs.api.exception.BusinessException;
+import com.jaagro.cbs.api.model.*;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.BreedingStandardService;
 import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
@@ -51,7 +46,14 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
     private BreedingPlanMapperExt breedingPlanMapper;
     @Autowired
     private BreedingPlanService breedingPlanService;
-
+    /**
+     * 一个养殖周期需要停药的次数
+     */
+    private static final Integer breedingStopDrugCount = 2;
+    /**
+     * 必要参数类型个数
+     */
+    private static final Integer necessaryParamTypeNum = 4;
     /**
      * 创建养殖模版与参数
      *
@@ -80,7 +82,19 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
     public Integer updateBreedingTemplate(CreateBreedingStandardDto dto) {
         log.info("O BreedingStandardServiceImpl.updateBreedingTemplate input BreedingStandardDto:{}", dto);
         Integer currentUserId = getCurrentUserId();
-        BreedingStandard breedingStandard = new BreedingStandard();
+        BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(dto.getId());
+        // 如果养殖天数减少则删除大于修改后养殖天数日龄的养殖参数
+        if (breedingStandard.getBreedingDays() != null && dto.getBreedingDays() != null ) {
+            if (breedingStandard.getBreedingDays() < dto.getBreedingDays()){
+                throw new BusinessException("亲,不允许增加养殖天数");
+            }
+            if (breedingStandard.getBreedingDays() > dto.getBreedingDays()){
+                BreedingStandardParameterExample example = new BreedingStandardParameterExample();
+                example.createCriteria().andEnableEqualTo(Boolean.TRUE).andStandardIdEqualTo(dto.getId())
+                        .andDayAgeGreaterThan(dto.getBreedingDays());
+                standardParameterMapper.deleteByExample(example);
+            }
+        }
         BeanUtils.copyProperties(dto, breedingStandard);
         breedingStandard.setModifyTime(new Date())
                 .setModifyUserId(currentUserId);
@@ -129,7 +143,8 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
      * @param dto
      */
     @Override
-    public void saveOrUpdateParameter(BreedingParameterListDto dto) {
+    public Map<String,Object> saveOrUpdateParameter(BreedingParameterListDto dto) {
+        Map<String,Object> result = new HashMap<>(2);
         List<BreedingStandardParameterItemDto> breedingStandardParameterList = dto.getBreedingStandardParameterList();
         if (!CollectionUtils.isEmpty(breedingStandardParameterList)) {
             List<BreedingStandardParameterItemDto> newParameterList = new ArrayList<>();
@@ -171,6 +186,47 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
                 }
                 standardParameterMapper.batchUpdateByPrimaryKeySelective(parameterList);
             }
+            // 如果必要参数都已配置则模板状态改为已参数配置状态
+            BreedingStandardParameterExample example = new BreedingStandardParameterExample();
+            List<String> necessaryParamList = new ArrayList<>();
+            necessaryParamList.add("死淘");
+            necessaryParamList.add("体重标准");
+            necessaryParamList.add("饲喂重量");
+            necessaryParamList.add("饲喂次数");
+            example.createCriteria().andEnableEqualTo(Boolean.TRUE)
+                    .andStandardIdEqualTo(dto.getStandardId())
+                    .andParamNameIn(necessaryParamList);
+            List<BreedingStandardParameter> parameterList = standardParameterMapper.selectByExample(example);
+            Set<String> necessaryParamSet = new HashSet<>();
+            BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(dto.getStandardId());
+            if (!CollectionUtils.isEmpty(parameterList) && parameterList.size() == breedingStandard.getBreedingDays()*necessaryParamTypeNum){
+                if (breedingStandard.getStandardStatus() != null &&  StandardStatusEnum.NORMAL.getCode() != breedingStandard.getStandardStatus()){
+                    breedingStandard.setStandardStatus(StandardStatusEnum.WAIT_DRUG_CONFIGURATION.getCode())
+                            .setModifyUserId(currentUserId);
+                    breedingStandardMapper.updateByPrimaryKeySelective(breedingStandard);
+                }
+            }
+            putConfigureMessage(necessaryParamList,parameterList,necessaryParamSet,result);
+        }else {
+            throw new BusinessException("参数列表为空");
+        }
+        return result;
+    }
+
+    private void putConfigureMessage(List<String> necessaryParamList,List<BreedingStandardParameter> parameterList, Set<String> necessaryParamSet, Map<String,Object> result) {
+        if (!CollectionUtils.isEmpty(parameterList)){
+            parameterList.forEach(parameter->necessaryParamSet.add(parameter.getParamName()));
+        }
+        necessaryParamList.removeAll(necessaryParamSet);
+        if (CollectionUtils.isEmpty(necessaryParamList)){
+            result.put("necessaryAllConfigured",true);
+        }else {
+            result.put("necessaryAllConfigured",false);
+            StringBuffer sb = new StringBuffer();
+            necessaryParamList.forEach(paramName->sb.append(paramName).append(","));
+            sb.deleteCharAt(sb.lastIndexOf(","));
+            sb.append("未配置");
+            result.put("unConfiguredMessage",sb.toString());
         }
     }
 
@@ -261,9 +317,9 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
 
     private Set<ParameterTypeDto> getInitParameterTypeDtoSet(Integer standardId) {
         Set<ParameterTypeDto> result = new HashSet<>();
-        ParameterTypeDto parameterTypeDtoWeight = new ParameterTypeDto(standardId, "体重标准", BreedingStandardParamEnum.WEIGHT.getCode(), "克", 1);
+        ParameterTypeDto parameterTypeDtoWeight = new ParameterTypeDto(standardId, "体重标准", BreedingStandardParamEnum.WEIGHT.getCode(), "克/只", 1);
         result.add(parameterTypeDtoWeight);
-        ParameterTypeDto parameterTypeDtoFeedingWeight = new ParameterTypeDto(standardId, "饲喂重量", BreedingStandardParamEnum.FEEDING_WEIGHT.getCode(), "克", 2);
+        ParameterTypeDto parameterTypeDtoFeedingWeight = new ParameterTypeDto(standardId, "饲喂重量", BreedingStandardParamEnum.FEEDING_WEIGHT.getCode(), "克/只/日", 2);
         result.add(parameterTypeDtoFeedingWeight);
         ParameterTypeDto parameterTypeDtoFeedingFodderNum = new ParameterTypeDto(standardId, "饲喂次数", BreedingStandardParamEnum.FEEDING_FODDER_NUM.getCode(), "次", 3);
         result.add(parameterTypeDtoFeedingFodderNum);
@@ -326,20 +382,20 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         if (isInitParam) {
             BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(standardId);
             if (breedingStandard == null) {
-                throw new RuntimeException("模板id=" + standardId + "不存在");
+                throw new BusinessException("模板id=" + standardId + "不存在");
             }
             Integer breedingDays = breedingStandard.getBreedingDays();
             if (breedingDays == null) {
-                throw new RuntimeException("喂养天数为空");
+                throw new BusinessException("喂养天数为空");
             }
             switch (paramName) {
                 case "体重标准":
                     dto.setDisplayOrder(1);
-                    dto.setUnit("克");
+                    dto.setUnit("克/只");
                     break;
                 case "饲喂重量":
                     dto.setDisplayOrder(2);
-                    dto.setUnit("克");
+                    dto.setUnit("克/只/日");
                     break;
                 case "饲喂次数":
                     dto.setDisplayOrder(3);
@@ -391,11 +447,11 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         List<ParameterTypeDto> result = new ArrayList<>();
         Integer sortType = dto.getSortType();
         if (!SortTypeEnum.UP.equals(sortType) && !SortTypeEnum.DOWN.equals(sortType)) {
-            throw new RuntimeException("排序类型不正确");
+            throw new BusinessException("排序类型不正确");
         }
         List<ParameterTypeDto> parameterTypeDtoList = listParameterNameByStandardId(dto.getStandardId());
         if (CollectionUtils.isEmpty(parameterTypeDtoList)) {
-            throw new RuntimeException("养殖模板参数为空");
+            throw new BusinessException("养殖模板参数为空");
         }
         List<BreedingStandardParameter> needUpdateDisplayOrderList = new ArrayList<>();
         for (ParameterTypeDto parameterTypeDto : parameterTypeDtoList) {
@@ -460,12 +516,17 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
     @Override
     public void configurationDrugs(ValidList<BreedingStandardDrugListDto> drugList) {
         if (!CollectionUtils.isEmpty(drugList)) {
+            judgeCanConfiguration(drugList);
             Integer standardId = drugList.get(0).getStandardId();
             Integer currentUserId = getCurrentUserId();
             breedingStandardDrugMapper.delByStandardId(standardId);
             List<BreedingStandardDrug> standardDrugList = new ArrayList<>();
             for (BreedingStandardDrugListDto dto : drugList) {
                 List<BreedingStandardDrugItemDto> drugItemVoList = dto.getBreedingStandardDrugItemVoList();
+               boolean flag =  (dto.getStopDrugFlag() == null || !dto.getStopDrugFlag()) && CollectionUtils.isEmpty(drugItemVoList);
+                if (flag){
+                    throw new BusinessException("非停药日必须要配置药品");
+                }
                 if (CollectionUtils.isEmpty(drugItemVoList)) {
                     BreedingStandardDrug drug = generateStandardDrug(dto, currentUserId);
                     standardDrugList.add(drug);
@@ -480,8 +541,39 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
                 }
             }
             breedingStandardDrugMapper.batchInsert(standardDrugList);
+            BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(standardId);
+            breedingStandard.setStandardStatus(StandardStatusEnum.NORMAL.getCode())
+                    .setModifyUserId(currentUserId);
+            breedingStandardMapper.updateByPrimaryKeySelective(breedingStandard);
         } else {
-            throw new RuntimeException("药品配置信息列表为空");
+            throw new BusinessException("药品配置信息列表为空");
+        }
+    }
+
+    /**
+     * 判断是否能进行药品配置
+     * @param drugList
+     */
+    private void judgeCanConfiguration(ValidList<BreedingStandardDrugListDto> drugList) {
+        Integer standardId = drugList.get(0).getStandardId();
+        BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(standardId);
+        if(StandardStatusEnum.WAIT_DRUG_CONFIGURATION.getCode() != breedingStandard.getStandardStatus() && StandardStatusEnum.NORMAL.getCode() != breedingStandard.getStandardStatus()){
+            throw new BusinessException("必要参数需要都已配置才能进行药品配置");
+        }
+        // 一个养殖周期必须有两个以上停药日
+        Integer stopDrugCount = 0;
+        for (BreedingStandardDrugListDto drugListDto : drugList){
+            if (drugListDto.getStopDrugFlag() != null && drugListDto.getStopDrugFlag()){
+                stopDrugCount++;
+            }
+        }
+        if (stopDrugCount < breedingStopDrugCount){
+            throw new BusinessException("一个养殖周期必须有两个以上停药日");
+        }
+        BreedingStandardDrugListDto drugListDto = drugList.get(drugList.size() - 1);
+        Integer dayAgeEnd = drugListDto.getDayAgeEnd();
+        if(dayAgeEnd == null || !dayAgeEnd.equals(breedingStandard.getBreedingDays())){
+            throw new BusinessException("药品配置需要配置整个养殖周期才能提交");
         }
     }
 
@@ -494,10 +586,23 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
     public void delBreedingStandard(Integer standardId) {
         BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(standardId);
         if (breedingStandard == null) {
-            throw new RuntimeException("养殖模板id=" + standardId + "不存在");
+            throw new BusinessException("养殖模板id=" + standardId + "不存在");
         }
         breedingStandardMapper.deleteByPrimaryKey(standardId);
         standardParameterMapper.deleteByStandardId(standardId);
+    }
+
+    /**
+     * 养殖计划参数配置可选择养殖模板列表
+     *
+     * @return
+     */
+    @Override
+    public List<BreedingStandard> listBreedingStandardForParamConfiguration() {
+        BreedingStandardExample example = new BreedingStandardExample();
+        example.createCriteria().andEnableEqualTo(Boolean.TRUE).andStandardStatusEqualTo(StandardStatusEnum.NORMAL.getCode());
+        example.setOrderByClause("create_time desc");
+        return breedingStandardMapper.selectByExample(example);
     }
 
     private BreedingStandardDrug generateStandardDrug(BreedingStandardDrugListDto dto, Integer currentUserId) {

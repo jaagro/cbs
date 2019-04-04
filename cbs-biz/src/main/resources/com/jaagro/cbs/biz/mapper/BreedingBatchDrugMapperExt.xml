@@ -3,6 +3,22 @@
 <mapper namespace="com.jaagro.cbs.biz.mapper.BreedingBatchDrugMapperExt">
 
     <!--          自动生成扩展XML author: generator on 2019/3/8                 -->
-
+    <insert id="batchInsert" parameterType="list">
+        insert into breeding_batch_drug (plan_id, batch_no, standard_drug_id, 
+      product_id, sku_no, day_age_start, 
+      day_age_end, stop_drug_flag, days, 
+      feed_volume, enable, create_time, 
+      create_user_id, modify_time, modify_user_id
+      )
+    values 
+    <foreach collection="breedingBatchDrugList" separator="," item="item">
+        (#{item.planId,jdbcType=INTEGER}, #{item.batchNo,jdbcType=VARCHAR}, #{item.standardDrugId,jdbcType=INTEGER},
+        #{item.productId,jdbcType=INTEGER}, #{item.skuNo,jdbcType=VARCHAR}, #{item.dayAgeStart,jdbcType=INTEGER},
+        #{item.dayAgeEnd,jdbcType=INTEGER}, #{item.stopDrugFlag,jdbcType=BIT}, #{item.days,jdbcType=INTEGER},
+        #{item.feedVolume,jdbcType=DECIMAL}, #{item.enable,jdbcType=BIT}, #{item.createTime,jdbcType=TIMESTAMP},
+        #{item.createUserId,jdbcType=INTEGER}, #{item.modifyTime,jdbcType=TIMESTAMP}, #{item.modifyUserId,jdbcType=INTEGER}
+        )
+    </foreach>
+    </insert>
 
 </mapper>

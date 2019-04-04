@@ -22,10 +22,10 @@ public interface BreedingRecordMapperExt extends BaseMapper<BreedingRecord, Bree
     /**
      * 查询每个批次的日汇总
      *
-     * @param todayDate
+     * @param criteriaDto
      * @return
      */
-    List<BreedingRecord> listSumByParams(@Param("todayDate") String todayDate);
+    List<BreedingRecordDaily> listBreedingDailyByParams(BatchInfoCriteriaDto criteriaDto);
 
     /**
      * 鸡舍养殖每日汇总
@@ -38,18 +38,10 @@ public interface BreedingRecordMapperExt extends BaseMapper<BreedingRecord, Bree
     /**
      * 批次养殖情况汇总
      *
-     * @param todayDate
-     * @return
-     */
-    List<BatchInfo> listBatchInfoByParams(@Param("todayDate") String todayDate);
-
-    /**
-     * 死淘数量 -- 根据批次
-     *
      * @param criteriaDto
      * @return
      */
-    int sumDeadAmountByPlanId(BatchInfoCriteriaDto criteriaDto);
+    List<BatchInfo> listBatchInfoByParams(BatchInfoCriteriaDto criteriaDto);
 
     /**
      * 根据条件查询养殖记录列表
