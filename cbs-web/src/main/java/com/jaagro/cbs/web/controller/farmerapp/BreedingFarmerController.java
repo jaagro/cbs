@@ -189,7 +189,7 @@ public class BreedingFarmerController {
                 StringBuilder sb = new StringBuilder();
                 TechnicalInquiriesVo technicalInquiriesVo = new TechnicalInquiriesVo();
                 BeanUtils.copyProperties(techConsultRecord, technicalInquiriesVo);
-                if (techConsultRecord.getHandleUserId() != null) {
+                if (techConsultRecord.getTechnicianId() != null) {
                     BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(techConsultRecord.getTechnicianId());
                     if (globalUser != null && globalUser.getData() != null) {
                         UserInfo userInfo = globalUser.getData();
