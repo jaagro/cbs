@@ -7,6 +7,7 @@ import com.jaagro.cbs.api.dto.techconsult.UpdateTechConsultDto;
 import com.jaagro.cbs.api.enums.EmergencyLevelEnum;
 import com.jaagro.cbs.api.enums.TechConsultStatusEnum;
 import com.jaagro.cbs.api.model.TechConsultRecord;
+import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.TechConsultService;
 import com.jaagro.cbs.web.vo.techconsult.TechConsultVo;
 import com.jaagro.utils.BaseResponse;
@@ -35,6 +36,8 @@ public class TechConsultController {
 
     @Autowired
     private TechConsultService techConsultService;
+    @Autowired
+    private BreedingPlanService breedingPlanService;
 
     /**
      * 获取技术询问列表
@@ -101,5 +104,38 @@ public class TechConsultController {
             return BaseResponse.errorInstance("处理技术申请失败");
         }
     }
+    /**
+     * 获取技术询问列表
+     * @author gavin
+     * @date 2019/04/03
+     */
+    @ApiOperation("获取技术询问列表-技术员APP")
+    @PostMapping("/listTechConsultRecordsApp")
+    public BaseResponse<PageInfo> listTechConsultRecordsApp(@RequestBody TechConsultParamDto criteriaDto) {
 
+        if (StringUtils.isEmpty(criteriaDto.getPageNum())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为空");
+        }
+        if (StringUtils.isEmpty(criteriaDto.getPageSize())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
+        }
+        breedingPlanService.listBreedingPlanByTechnicianId()
+        PageInfo pageInfo == techConsultService.listTechConsultRecordsApp(criteriaDto);
+        if (pageInfo != null) {
+            List<TechConsultVo> voList = new ArrayList<>();
+            List<TechConsultRecord> doList = pageInfo.getList();
+            if (!CollectionUtils.isEmpty(doList)) {
+                for (TechConsultRecord techConsultRecord : doList) {
+                    TechConsultVo techConsultVo = new TechConsultVo();
+                    BeanUtils.copyProperties(techConsultRecord, techConsultVo);
+
+                    techConsultVo.setStrEmergencyLevel(EmergencyLevelEnum.getDescByCode(techConsultRecord.getEmergencyLevel()));
+                    techConsultVo.setStrTechConsultStatus(TechConsultStatusEnum.getDescByCode(techConsultRecord.getTechConsultStatus()));
+                    voList.add(techConsultVo);
+                }
+            }
+            pageInfo.setList(voList);
+        }
+        return BaseResponse.successInstance(pageInfo);
+    }
 }

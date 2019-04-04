@@ -35,4 +35,11 @@ public interface TechConsultService {
      */
     boolean handleTechConsultRecord(UpdateTechConsultDto updateTechConsultDto);
 
+    /**
+     *技术询问列表-技术员APP
+     *  @param queryParam
+     * @return
+     */
+
+    PageInfo listTechConsultRecordsApp(TechConsultParamDto queryParam);
 }
