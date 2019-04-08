@@ -1088,6 +1088,66 @@ public class TechConsultRecordExample implements Serializable {
             return (Criteria) this;
         }
 
+        public Criteria andTechnicianIdIsNull() {
+            addCriterion("technician_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdIsNotNull() {
+            addCriterion("technician_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdEqualTo(Integer value) {
+            addCriterion("technician_id =", value, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdNotEqualTo(Integer value) {
+            addCriterion("technician_id <>", value, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdGreaterThan(Integer value) {
+            addCriterion("technician_id >", value, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdGreaterThanOrEqualTo(Integer value) {
+            addCriterion("technician_id >=", value, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdLessThan(Integer value) {
+            addCriterion("technician_id <", value, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdLessThanOrEqualTo(Integer value) {
+            addCriterion("technician_id <=", value, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdIn(List<Integer> values) {
+            addCriterion("technician_id in", values, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdNotIn(List<Integer> values) {
+            addCriterion("technician_id not in", values, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdBetween(Integer value1, Integer value2) {
+            addCriterion("technician_id between", value1, value2, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdNotBetween(Integer value1, Integer value2) {
+            addCriterion("technician_id not between", value1, value2, "technicianId");
+            return (Criteria) this;
+        }
+
         public Criteria andHandleUserIdIsNull() {
             addCriterion("handle_user_id is null");
             return (Criteria) this;

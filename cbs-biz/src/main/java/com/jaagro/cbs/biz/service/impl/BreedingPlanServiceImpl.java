@@ -524,9 +524,9 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                                 recordItemsDto.setCapacityUnit(CapacityUnitEnum.getTypeByCode(product.getCapacityUnit()));
                             }
                             if (coopBreedingValue != null && batchQuantity != null && breedingBatchDrug.getFeedVolume() != null) {
-                                BigDecimal scale = batchQuantity.divide(new BigDecimal("1000"),4,BigDecimal.ROUND_HALF_UP);
+                                BigDecimal scale = batchQuantity.divide(new BigDecimal("1000"), 4, BigDecimal.ROUND_HALF_UP);
                                 BigDecimal rate = new BigDecimal(coopBreedingValue).divide(batchQuantity, 6, BigDecimal.ROUND_HALF_UP);
-                                BigDecimal feedVal = breedingBatchDrug.getFeedVolume().multiply(scale).multiply(rate).setScale(0,BigDecimal.ROUND_HALF_UP);
+                                BigDecimal feedVal = breedingBatchDrug.getFeedVolume().multiply(scale).multiply(rate).setScale(0, BigDecimal.ROUND_HALF_UP);
                                 recordItemsDto.setBreedingValue(feedVal);
                             }
                             recordItemsDtoList.add(recordItemsDto);
@@ -730,7 +730,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             List<ContractPriceSection> contractPriceSectionList = new ArrayList<>();
             for (ContractPriceSectionDto dto : contractPriceSectionDtoList) {
                 boolean flag = dto.getRecyclingPrice() == null && (dto.getMarketPriceFlag() == null || !dto.getMarketPriceFlag());
-                if (flag){
+                if (flag) {
                     throw new BusinessException("回收价格不能为空");
                 }
                 if (dto.getWeightLower() != null && dto.getWeightLower().compareTo(new BigDecimal("100")) == 1) {
@@ -959,8 +959,8 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void breedingPlanParamConfiguration(BreedingPlanParamConfigurationDto dto) {
-        String key = "paramConfiguration_"+dto.getPlanId();
-        redisLock.lock(key,System.currentTimeMillis()+"",5, TimeUnit.SECONDS);
+        String key = "paramConfiguration_" + dto.getPlanId();
+        redisLock.lock(key, System.currentTimeMillis() + "", 5, TimeUnit.SECONDS);
         List<BreedingPlanCoopDto> breedingPlanCoopDtoList = dto.getBreedingPlanCoopDtoList();
         UserInfo currentUser = currentUserService.getCurrentUser();
         Integer currentUserId = currentUser == null ? null : currentUser.getId();
@@ -1198,7 +1198,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             }
             calculatePurchaseOrderDtos.add(calculatePurchaseOrderDto);
         }
-        HashMap<Integer, BigDecimal> calculatePlanFeedWeightMap = calculatePurchaseOrder(planId, ProductTypeEnum.FEED.getCode(), null);
+        HashMap<Integer, BigDecimal> calculatePlanFeedWeightMap = calculatePurchaseOrder(planId, ProductTypeEnum.FEED.getCode(), PurchaseOrderStatusEnum.ALREADY_SIGNED.getCode());
         //计算计划饲料 剩余饲料
         if (calculatePlanFeedWeightMap != null && calculatePlanFeedWeightMap.get(ProductTypeEnum.FEED.getCode()) != null) {
             BigDecimal totalPlanFeedWeight = calculatePlanFeedWeightMap.get(ProductTypeEnum.FEED.getCode());
