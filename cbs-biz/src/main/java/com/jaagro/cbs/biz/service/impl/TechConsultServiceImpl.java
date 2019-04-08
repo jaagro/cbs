@@ -163,5 +163,22 @@ public class TechConsultServiceImpl implements TechConsultService {
         return true;
     }
 
+    /**
+     * 技术询问列表-技术员APP
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public PageInfo listTechConsultRecordsApp(TechConsultParamDto dto) {
+        PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+        TechConsultRecordExample example = new TechConsultRecordExample();
+        TechConsultRecordExample.Criteria criteria = example.createCriteria();
+        criteria.andEnableEqualTo(true).andTechnicianIdEqualTo(dto.getTechnicianId());
+        List<TechConsultRecord> techConsultRecordDos = techConsultRecordMapper.selectByExample(example);
+
+        return new PageInfo(techConsultRecordDos);
+    }
+
 
 }
