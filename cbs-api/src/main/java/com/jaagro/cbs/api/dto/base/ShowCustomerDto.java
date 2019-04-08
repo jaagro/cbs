@@ -25,6 +25,11 @@ public class ShowCustomerDto implements Serializable {
     private String customerName;
 
     /**
+     * 客户状态
+     */
+    private Integer customerStatus;
+
+    /**
      * 客户是否直接下单
      */
     private String enableDirectOrder;

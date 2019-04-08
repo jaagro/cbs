@@ -26,4 +26,5 @@ public class ReturnCustomerInfoDto implements Serializable {
      * 客户名称
      */
     private String customerName;
+
 }
