@@ -1,4 +1,4 @@
-package com.jaagro.cbs.api.dto.techSiteApp;
+package com.jaagro.cbs.api.dto.technicianapp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

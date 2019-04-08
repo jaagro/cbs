@@ -2,7 +2,7 @@ package com.jaagro.cbs.biz.mapper;
 
 import javax.annotation.Resource;
 
-import com.jaagro.cbs.api.dto.techSiteApp.DeviceAlarmLogDto;
+import com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto;
 import com.jaagro.cbs.api.model.DeviceAlarmLog;
 import com.jaagro.cbs.api.model.DeviceAlarmLogExample;
 import com.jaagro.cbs.biz.mapper.base.BaseMapper;

@@ -1,7 +1,7 @@
 package com.jaagro.cbs.web.vo.techApp;
 
 
-import com.jaagro.cbs.api.dto.techSiteApp.DeviceAlarmLogDto;
+import com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

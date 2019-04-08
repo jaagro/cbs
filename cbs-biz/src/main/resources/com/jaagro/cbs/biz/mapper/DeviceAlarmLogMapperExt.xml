@@ -16,7 +16,7 @@
         </where>
     </select>
 
-    <select id="listDeviceAlarmLogApp" resultType="com.jaagro.cbs.api.dto.techSiteApp.DeviceAlarmLogDto">
+    <select id="listDeviceAlarmLogApp" resultType="com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto">
         select a.plan_id,a.plant_id,a.coop_id,a.device_id,a.day_age,a.param_standard_value,a.times,
                 b.device_name,b.device_type,
                 c.coop_name,c.coop_no,

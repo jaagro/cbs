@@ -1,4 +1,4 @@
-package com.jaagro.cbs.api.dto.techSiteApp;
+package com.jaagro.cbs.api.dto.technicianapp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+
 /**
  * @Author gavin
  *

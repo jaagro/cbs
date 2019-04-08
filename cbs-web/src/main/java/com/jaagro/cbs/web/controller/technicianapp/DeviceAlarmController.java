@@ -1,22 +1,15 @@
-package com.jaagro.cbs.web.controller;
+package com.jaagro.cbs.web.controller.technicianapp;
 
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
-import com.jaagro.cbs.api.dto.techSiteApp.DeviceAlarmLogDto;
-import com.jaagro.cbs.api.dto.techSiteApp.ToDoAlarmParam;
-import com.jaagro.cbs.api.dto.techSiteApp.UpdateDeviceAlarmLogDto;
-import com.jaagro.cbs.api.dto.techconsult.TechConsultParamDto;
-import com.jaagro.cbs.api.enums.EmergencyLevelEnum;
-import com.jaagro.cbs.api.enums.TechConsultStatusEnum;
-import com.jaagro.cbs.api.model.BreedingPlan;
+import com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto;
+import com.jaagro.cbs.api.dto.technicianapp.ToDoAlarmParam;
+import com.jaagro.cbs.api.dto.technicianapp.UpdateDeviceAlarmLogDto;
 import com.jaagro.cbs.api.model.DeviceAlarmLog;
-import com.jaagro.cbs.api.model.TechConsultRecord;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.DeviceAlarmLogService;
-import com.jaagro.cbs.api.service.TechConsultService;
 import com.jaagro.cbs.biz.service.CustomerClientService;
 import com.jaagro.cbs.web.vo.techApp.DeviceAlarmLogVo;
-import com.jaagro.cbs.web.vo.techconsult.TechConsultVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -33,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 技术APP-待办：报警信息
