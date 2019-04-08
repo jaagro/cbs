@@ -2,12 +2,15 @@ package com.jaagro.cbs.biz.mapper;
 
 import javax.annotation.Resource;
 
+import com.jaagro.cbs.api.dto.techSiteApp.DeviceAlarmLogDto;
 import com.jaagro.cbs.api.model.DeviceAlarmLog;
 import com.jaagro.cbs.api.model.DeviceAlarmLogExample;
 import com.jaagro.cbs.biz.mapper.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -27,4 +30,11 @@ public interface DeviceAlarmLogMapperExt extends BaseMapper<DeviceAlarmLog, Devi
      * @return
      */
     BigDecimal accumulativeTotalAbnormalWarn(@Param("planIds") Set planIds);
+
+    /**
+     *
+     * @param queryMap
+     * @return
+     */
+    List<DeviceAlarmLogDto> listDeviceAlarmLogApp(Map<String,Integer> queryMap);
 }

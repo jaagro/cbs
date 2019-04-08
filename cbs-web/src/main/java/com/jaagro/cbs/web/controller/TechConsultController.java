@@ -6,6 +6,7 @@ import com.jaagro.cbs.api.dto.techconsult.TechConsultParamDto;
 import com.jaagro.cbs.api.dto.techconsult.UpdateTechConsultDto;
 import com.jaagro.cbs.api.enums.EmergencyLevelEnum;
 import com.jaagro.cbs.api.enums.TechConsultStatusEnum;
+import com.jaagro.cbs.api.model.BreedingPlan;
 import com.jaagro.cbs.api.model.TechConsultRecord;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.TechConsultService;
@@ -24,9 +25,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 技术询问管理
+ *
  * @author gavin
  */
 @RestController
@@ -41,6 +44,7 @@ public class TechConsultController {
 
     /**
      * 获取技术询问列表
+     *
      * @author gavin
      * @date 2019/2/28
      */
@@ -74,6 +78,7 @@ public class TechConsultController {
 
     /**
      * 获取技术询问详情
+     *
      * @author gavin
      * @date 2019/03/01
      */
@@ -84,12 +89,14 @@ public class TechConsultController {
         ReturnTechConsultRecordDto returnDto = techConsultService.getDetailTechConsultDtoById(id);
         if (returnDto != null) {
             return BaseResponse.successInstance(returnDto);
-        }else {
+        } else {
             return BaseResponse.errorInstance("获取技术询问详情失败");
         }
     }
+
     /**
      * 处理技术申请
+     *
      * @author gavin
      * @date 2019/03/01
      */
@@ -100,27 +107,32 @@ public class TechConsultController {
         boolean flag = techConsultService.handleTechConsultRecord(updateDto);
         if (flag) {
             return BaseResponse.successInstance("处理技术申请成功!");
-        }else {
+        } else {
             return BaseResponse.errorInstance("处理技术申请失败");
         }
     }
+
     /**
      * 获取技术询问列表
+     *
      * @author gavin
      * @date 2019/04/03
      */
     @ApiOperation("获取技术询问列表-技术员APP")
     @PostMapping("/listTechConsultRecordsApp")
     public BaseResponse<PageInfo> listTechConsultRecordsApp(@RequestBody TechConsultParamDto criteriaDto) {
-
+        if (StringUtils.isEmpty(criteriaDto.getTechnicianId())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "技术员ID不能为空");
+        }
         if (StringUtils.isEmpty(criteriaDto.getPageNum())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为空");
         }
         if (StringUtils.isEmpty(criteriaDto.getPageSize())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
-        breedingPlanService.listBreedingPlanByTechnicianId()
-        PageInfo pageInfo == techConsultService.listTechConsultRecordsApp(criteriaDto);
+
+        List<BreedingPlan> plans = breedingPlanService.listBreedingPlanByTechnicianId(criteriaDto.getTechnicianId());
+        PageInfo pageInfo = techConsultService.listTechConsultRecordsApp(criteriaDto);
         if (pageInfo != null) {
             List<TechConsultVo> voList = new ArrayList<>();
             List<TechConsultRecord> doList = pageInfo.getList();
@@ -128,9 +140,13 @@ public class TechConsultController {
                 for (TechConsultRecord techConsultRecord : doList) {
                     TechConsultVo techConsultVo = new TechConsultVo();
                     BeanUtils.copyProperties(techConsultRecord, techConsultVo);
-
                     techConsultVo.setStrEmergencyLevel(EmergencyLevelEnum.getDescByCode(techConsultRecord.getEmergencyLevel()));
                     techConsultVo.setStrTechConsultStatus(TechConsultStatusEnum.getDescByCode(techConsultRecord.getTechConsultStatus()));
+                    List<BreedingPlan> getPlans = plans.stream().filter(c -> techConsultRecord.getPlanId().equals(c.getId())).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(getPlans)) {
+                        BreedingPlan breedingPlan = getPlans.get(0);
+                        techConsultVo.setBreedingDays(breedingPlan.getBreedingDays());
+                    }
                     voList.add(techConsultVo);
                 }
             }
