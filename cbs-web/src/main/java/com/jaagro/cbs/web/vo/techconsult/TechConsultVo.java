@@ -32,5 +32,8 @@ public class TechConsultVo extends TechConsultRecord implements Serializable {
     private String strTechConsultStatus;
 
 
-
+    /**
+     * 养殖天数
+     */
+    private Integer breedingDays;
 }

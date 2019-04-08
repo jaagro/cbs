@@ -1323,4 +1323,16 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         calculatePurchaseOrderMap.put(productType, totalPurchaseOrderItemsStatistics);
         return calculatePurchaseOrderMap;
     }
+    /**
+     * 根据技术员ID查找该技术员负责的所有养殖计划
+     *
+     * @param technicianId
+     * @return
+     */
+    @Override
+    public List<BreedingPlan> listBreedingPlanByTechnicianId(Integer technicianId) {
+        BreedingPlanExample example = new BreedingPlanExample();
+        example.createCriteria().andEnableEqualTo(true).andTechnicianIdEqualTo(technicianId);
+        return breedingPlanMapper.selectByExample(example);
+    }
 }

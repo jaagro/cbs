@@ -505,7 +505,26 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
      */
     @Override
     public void delBreedingStandardParam(DelBreedingStandardParamDto dto) {
+        BreedingStandardParameterExample example = new BreedingStandardParameterExample();
+        example.createCriteria().andEnableEqualTo(Boolean.TRUE).andParamNameEqualTo(dto.getParamName())
+                .andParamTypeEqualTo(dto.getParamType()).andStandardIdEqualTo(dto.getStandardId());
+        List<BreedingStandardParameter> parameterList = standardParameterMapper.selectByExample(example);
+        if (CollectionUtils.isEmpty(parameterList)){
+            throw new BusinessException("参数不存在");
+        }
+        Integer displayOrder = parameterList.get(0).getDisplayOrder();
         standardParameterMapper.delByCondition(dto);
+        // 删除后更新排序
+        BreedingStandardParameterExample upDateExample = new BreedingStandardParameterExample();
+        example.createCriteria().andStandardIdEqualTo(dto.getStandardId()).andEnableEqualTo(Boolean.TRUE)
+                .andDisplayOrderGreaterThan(displayOrder);
+        List<BreedingStandardParameter> needUpdateParameterList = standardParameterMapper.selectByExample(upDateExample);
+        if (!CollectionUtils.isEmpty(needUpdateParameterList)){
+            for (BreedingStandardParameter parameter : needUpdateParameterList){
+                parameter.setDisplayOrder(parameter.getDisplayOrder()-1);
+            }
+        }
+        standardParameterMapper.batchUpdateByPrimaryKeySelective(needUpdateParameterList);
     }
 
     /**

@@ -85,4 +85,16 @@ public class ProductServiceImpl implements ProductService {
     public TenantDrugStock getDrugStock(Integer drugStockId) {
         return tenantDrugStockMapper.selectByPrimaryKey(drugStockId);
     }
+
+    /**
+     * @param productId
+     */
+    @Override
+    public void deleteDrugStock(Integer productId) {
+        Product product = new Product();
+        product
+                .setEnable(false)
+                .setId(productId);
+        productMapper.updateByPrimaryKeySelective(product);
+    }
 }

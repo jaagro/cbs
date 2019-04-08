@@ -46,4 +46,11 @@ public interface ProductService {
      * @return
      */
     TenantDrugStock getDrugStock(Integer drugStockId);
+
+    /**
+     *
+     * @param productId
+     */
+    void deleteDrugStock(Integer productId);
+
 }
