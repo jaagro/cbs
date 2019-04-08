@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * @author :gaoxin
- * @date :2019/04/03
+ * @author :gavinwang
+ * @date :2019/04/08
  */
 @Data
 @NoArgsConstructor
@@ -56,6 +56,31 @@ public class DeviceAlarmLog implements Serializable {
      * 标准值
      */
     private String paramStandardValue;
+
+    /**
+     * 处理状态(0-待处理,1-已处理)
+     */
+    private Integer handleStatus;
+
+    /**
+     * 处理时间
+     */
+    private Date handleTime;
+
+    /**
+     * 处理人id
+     */
+    private Integer handleUserId;
+
+    /**
+     * 处理描述
+     */
+    private String handleDesc;
+
+    /**
+     * 处理类型(1-电话询问,2-远程协助,3-上门处理,4-故障误报)
+     */
+    private Integer handleType;
 
     /**
      * 创建时间
