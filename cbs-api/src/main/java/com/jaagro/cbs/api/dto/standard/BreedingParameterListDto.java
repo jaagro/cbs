@@ -49,7 +49,6 @@ public class BreedingParameterListDto implements Serializable{
     /**
      * 养殖参数状态（1-启用 0 -未启用）
      */
-    @Min(value = 1,message = "{status.Min}")
     @NotNull(message = "{status.NotNull}")
     private Integer status;
 
@@ -69,7 +68,6 @@ public class BreedingParameterListDto implements Serializable{
      */
     private Integer displayOrder;
 
-    /**
      /**
      * 养殖参数列表
      */

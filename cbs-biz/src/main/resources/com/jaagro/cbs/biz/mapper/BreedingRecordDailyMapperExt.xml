@@ -5,7 +5,7 @@
     <!--          自动生成扩展XML author: generator on 2019/2/21                 -->
     <delete id="deleteByDate" parameterType="java.lang.String">
         delete from breeding_record_daily
-        where DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{todayDate}
+        where DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{todayDate}, '%Y-%m-%d' )
     </delete>
     <insert id="insertBatch" parameterType="com.jaagro.cbs.api.model.BreedingRecordDaily">
         <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">

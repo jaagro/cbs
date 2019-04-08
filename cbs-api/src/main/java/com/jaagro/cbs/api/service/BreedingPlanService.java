@@ -6,6 +6,7 @@ import com.jaagro.cbs.api.dto.base.ShowCustomerDto;
 import com.jaagro.cbs.api.dto.farmer.*;
 import com.jaagro.cbs.api.dto.order.AccumulationPurchaseOrderParamDto;
 import com.jaagro.cbs.api.dto.plan.*;
+import com.jaagro.cbs.api.model.BreedingPlan;
 
 import java.util.List;
 
@@ -158,5 +159,12 @@ public interface BreedingPlanService {
      * @returnr
      */
     AccumulationPurchaseOrderParamDto accumulationPurchaseOrderItems(Integer purchaseOrderId);
+
+    /**
+     *根据技术员ID查找该技术员负责的所有养殖计划
+     * @param technicianId
+     * @return
+     */
+    List<BreedingPlan> listBreedingPlanByTechnicianId(Integer technicianId);
 
 }

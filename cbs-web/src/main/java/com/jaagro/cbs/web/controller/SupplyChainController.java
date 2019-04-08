@@ -90,7 +90,7 @@ public class SupplyChainController {
                 if (product.getId() != null) {
                     TenantDrugStock drugStock = productService.getDrugStock(product.getId());
                     if (drugStock != null && drugStock.getStockQuantity() != null) {
-                      drugStockVo.setStockQuantity(drugStock.getStockQuantity());
+                        drugStockVo.setStockQuantity(drugStock.getStockQuantity());
                     }
                 }
                 drugStockVos.add(drugStockVo);
@@ -103,6 +103,16 @@ public class SupplyChainController {
     @PostMapping("/listPurchasingManagement")
     @ApiOperation("采购管理商品添加")
     public BaseResponse listPurchasingManagement(@RequestBody PurchaseOrderManageCriteria criteria) {
+        return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
+    }
+
+    @GetMapping("/deleteDrugStock/{productId}")
+    @ApiOperation("药品库存删除")
+    public BaseResponse deleteDrugStock(@PathVariable("productId") Integer productId) {
+        if (productId == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "药品id不能为空");
+        }
+        productService.deleteDrugStock(productId);
         return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
     }
 }

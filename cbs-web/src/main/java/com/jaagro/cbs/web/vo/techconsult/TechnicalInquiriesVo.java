@@ -25,6 +25,11 @@ public class TechnicalInquiriesVo implements Serializable {
     private String plantName;
 
     /**
+     * 批次号
+     */
+    private String batchNo;
+
+    /**
      * 地址
      */
     private String address;

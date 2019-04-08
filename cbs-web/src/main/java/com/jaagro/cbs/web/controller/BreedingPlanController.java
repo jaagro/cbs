@@ -1,5 +1,6 @@
 package com.jaagro.cbs.web.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.plan.*;
 import com.jaagro.cbs.api.dto.plant.ReturnCoopDto;
@@ -8,6 +9,7 @@ import com.jaagro.cbs.api.enums.CoopStatusEnum;
 import com.jaagro.cbs.api.enums.PlanStatusEnum;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.BreedingPlantService;
+import com.jaagro.cbs.biz.utils.DateUtil;
 import com.jaagro.cbs.web.vo.plan.BreedingPlanVo;
 import com.jaagro.cbs.web.vo.plan.coop.CheckCoopVo;
 import com.jaagro.utils.BaseResponse;
@@ -38,9 +40,11 @@ public class BreedingPlanController {
     @Autowired
     private BreedingPlantService breedingPlantService;
 
+
     @PostMapping("/createBreedingPlan")
     @ApiOperation("创建养殖计划")
     public BaseResponse createBreedingPlan(@RequestBody CreateBreedingPlanDto dto) {
+        log.info("O createBreedingPlan param={}", JSON.toJSONString(dto));
         if (CollectionUtils.isEmpty(dto.getPlantIds())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "养殖场不能为空");
         }
@@ -161,7 +165,7 @@ public class BreedingPlanController {
                         checkCoopVo
                                 .setPlantName(returnPlantDto.getPlantName())
                                 .setCapacity(returnCoopDto.getCapacity())
-                                .setCoopNo(returnCoopDto.getCoopName())
+                                .setCoopName(returnCoopDto.getCoopName())
                                 .setLastEndDate(returnCoopDto.getLastEndDate())
                                 .setLastStartDate(returnCoopDto.getLastStartDate())
                                 .setCoopStatus(CoopStatusEnum.getDescByCode(returnCoopDto.getCoopStatus()));

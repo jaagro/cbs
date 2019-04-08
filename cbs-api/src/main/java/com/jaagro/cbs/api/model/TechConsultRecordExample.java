@@ -388,6 +388,66 @@ public class TechConsultRecordExample implements Serializable {
             return (Criteria) this;
         }
 
+        public Criteria andDayAgeIsNull() {
+            addCriterion("day_age is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeIsNotNull() {
+            addCriterion("day_age is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeEqualTo(Integer value) {
+            addCriterion("day_age =", value, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeNotEqualTo(Integer value) {
+            addCriterion("day_age <>", value, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeGreaterThan(Integer value) {
+            addCriterion("day_age >", value, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("day_age >=", value, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeLessThan(Integer value) {
+            addCriterion("day_age <", value, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeLessThanOrEqualTo(Integer value) {
+            addCriterion("day_age <=", value, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeIn(List<Integer> values) {
+            addCriterion("day_age in", values, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeNotIn(List<Integer> values) {
+            addCriterion("day_age not in", values, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeBetween(Integer value1, Integer value2) {
+            addCriterion("day_age between", value1, value2, "dayAge");
+            return (Criteria) this;
+        }
+
+        public Criteria andDayAgeNotBetween(Integer value1, Integer value2) {
+            addCriterion("day_age not between", value1, value2, "dayAge");
+            return (Criteria) this;
+        }
+
         public Criteria andCoopIdIsNull() {
             addCriterion("coop_id is null");
             return (Criteria) this;
@@ -1025,6 +1085,66 @@ public class TechConsultRecordExample implements Serializable {
 
         public Criteria andHandleTimeNotBetween(Date value1, Date value2) {
             addCriterion("handle_time not between", value1, value2, "handleTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdIsNull() {
+            addCriterion("technician_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdIsNotNull() {
+            addCriterion("technician_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdEqualTo(Integer value) {
+            addCriterion("technician_id =", value, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdNotEqualTo(Integer value) {
+            addCriterion("technician_id <>", value, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdGreaterThan(Integer value) {
+            addCriterion("technician_id >", value, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdGreaterThanOrEqualTo(Integer value) {
+            addCriterion("technician_id >=", value, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdLessThan(Integer value) {
+            addCriterion("technician_id <", value, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdLessThanOrEqualTo(Integer value) {
+            addCriterion("technician_id <=", value, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdIn(List<Integer> values) {
+            addCriterion("technician_id in", values, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdNotIn(List<Integer> values) {
+            addCriterion("technician_id not in", values, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdBetween(Integer value1, Integer value2) {
+            addCriterion("technician_id between", value1, value2, "technicianId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTechnicianIdNotBetween(Integer value1, Integer value2) {
+            addCriterion("technician_id not between", value1, value2, "technicianId");
             return (Criteria) this;
         }
 

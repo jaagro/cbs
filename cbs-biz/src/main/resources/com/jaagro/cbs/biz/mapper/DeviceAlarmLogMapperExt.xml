@@ -15,4 +15,31 @@
             </if>
         </where>
     </select>
+
+    <select id="listDeviceAlarmLogApp" resultType="com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto">
+        select a.plan_id,a.plant_id,a.coop_id,a.device_id,a.day_age,a.param_standard_value,a.times,
+                b.device_name,b.device_type,
+                c.coop_name,c.coop_no,
+                d.plant_name,
+                e.batch_no,e.customer_id,e.breeding_days
+        FROM(
+                SELECT plan_id,plant_id,coop_id,device_id,day_age,param_standard_value,count(id) AS times
+                FROM device_alarm_log
+                WHERE
+                plan_id IN (SELECT id FROM breeding_plan WHERE technician_id =${technicianId})
+                GROUP BY plan_id,plant_id,coop_id,device_id,day_age,param_standard_value
+        ) a,coop_device b,coop c,plant d,breeding_plan e where a.device_id=b.id and a.coop_id=c.id and c.plant_id=d.id and a.plan_id=e.id and a.plant_id=d.id
+        <if test="planId != null and planId !=''">
+            and  a.plan_id=${planId}
+        </if>
+        <if test="plantId != null and plantId !=''">
+            and a.plant_id=${plantId}
+        </if>
+        <if test="coopId != null and coopId !=''">
+            and a.coop_id= ${coopId}
+        </if>
+        <if test="dayAge != null and dayAge !=''">
+            and a.day_age= ${dayAge}
+        </if>
+    </select>
 </mapper>

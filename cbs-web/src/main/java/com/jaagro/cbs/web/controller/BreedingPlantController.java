@@ -139,12 +139,12 @@ public class BreedingPlantController {
     }
 
     @ApiOperation("鸡舍-删除")
-        @GetMapping("/deleteCoop/{plantId}")
-        public BaseResponse deleteCoop(@PathVariable("plantId") Integer coopId) {
-            if (coopId == null) {
-                return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "鸡舍id不能为空");
-            }
-            return null;
+    @GetMapping("/deleteCoop/{plantId}")
+    public BaseResponse deleteCoop(@PathVariable("plantId") Integer coopId) {
+        if (coopId == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "鸡舍id不能为空");
+        }
+        return null;
     }
 
     /**
@@ -215,4 +215,9 @@ public class BreedingPlantController {
         return BaseResponse.successInstance(breedingCoopDeviceService.listCoopDeviceByCoopId(coopId));
     }
 
+    @ApiOperation("查询当前客户有鸡舍的养殖场")
+    @GetMapping("/listFreePlantByCustomerId/{customerId}")
+    public BaseResponse<List<ReturnBasicPlantDto>> listFreePlantByCustomerId(@PathVariable("customerId") Integer customerId) {
+        return BaseResponse.successInstance(breedingPlantService.listFreePlantByCustomerId(customerId));
+    }
 }

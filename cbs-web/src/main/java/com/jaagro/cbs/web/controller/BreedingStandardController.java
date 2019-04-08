@@ -21,10 +21,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -49,7 +46,7 @@ public class BreedingStandardController {
     @ApiOperation("新增、修改养殖标准模板")
     @PostMapping("/breedingStandard")
     public BaseResponse breedingStandard(@RequestBody @Validated CreateBreedingStandardDto dto) {
-        log.info("O saveOrUpdate breedingStandard param={}",dto);
+        log.info("O saveOrUpdate breedingStandard param={}", dto);
         Integer id;
         try {
             if (null == dto.getId() || dto.getId() == 0) {
@@ -65,56 +62,56 @@ public class BreedingStandardController {
 
     @ApiOperation("删除养殖标准模板")
     @DeleteMapping("/breedingStandard/{standardId}")
-    public BaseResponse breedingStandard(@PathVariable("standardId") Integer standardId){
-        log.info("O delete breedingStandard standardId={}",standardId);
+    public BaseResponse breedingStandard(@PathVariable("standardId") Integer standardId) {
+        log.info("O delete breedingStandard standardId={}", standardId);
         breedingStandardService.delBreedingStandard(standardId);
         return BaseResponse.successInstance("删除养殖标准模板成功");
     }
+
     @ApiOperation("查看养殖模板基本信息")
     @GetMapping("/breedingStandard/{id}")
-    public BaseResponse getBreedingStandard(@PathVariable Integer id){
-        log.info("O getBreedingStandard id={}",id);
+    public BaseResponse getBreedingStandard(@PathVariable Integer id) {
+        log.info("O getBreedingStandard id={}", id);
         BreedingStandard standard = breedingStandardService.getStandardBaseInfoById(id);
         BreedingStandardBaseVo vo = new BreedingStandardBaseVo();
-        if (standard != null){
-            BeanUtils.copyProperties(standard,vo);
+        if (standard != null) {
+            BeanUtils.copyProperties(standard, vo);
         }
         return BaseResponse.successInstance(vo);
     }
 
     @ApiOperation("根据养殖模板id获取养殖参数模块列表")
     @GetMapping("/listParameterNameByStandardId/{standardId}")
-    public BaseResponse listParameterNameByStandardId(@PathVariable("standardId") Integer standardId){
-        log.info("O listParameterNameByStandardId standardId={}",standardId );
+    public BaseResponse listParameterNameByStandardId(@PathVariable("standardId") Integer standardId) {
+        log.info("O listParameterNameByStandardId standardId={}", standardId);
         return BaseResponse.successInstance(breedingStandardService.listParameterNameByStandardId(standardId));
     }
 
     @ApiOperation("根据养殖模板id参数名称获取参数列表")
     @GetMapping("/listParameterListByName")
-    public BaseResponse listParameterListByName(@RequestParam Integer standardId,@RequestParam String paramName,@RequestParam Integer paramType){
-        log.info("O listParameterListByName standardId={},paramName={},paramType",standardId,paramName,paramType);
-        return BaseResponse.successInstance(breedingStandardService.listParameterListByName(standardId,paramName,paramType));
+    public BaseResponse listParameterListByName(@RequestParam Integer standardId, @RequestParam String paramName, @RequestParam Integer paramType) {
+        log.info("O listParameterListByName standardId={},paramName={},paramType", standardId, paramName, paramType);
+        return BaseResponse.successInstance(breedingStandardService.listParameterListByName(standardId, paramName, paramType));
     }
 
     @ApiOperation("新增或者修改养殖参数")
     @PostMapping("/breedingStandardParameter")
-    public BaseResponse breedingStandardParameter(@RequestBody @Validated BreedingParameterListDto dto){
-        log.info("O breedingStandardParameter param={}",dto);
-        breedingStandardService.saveOrUpdateParameter(dto);
-        return BaseResponse.successInstance("保存成功");
+    public BaseResponse breedingStandardParameter(@RequestBody @Validated BreedingParameterListDto dto) {
+        log.info("O breedingStandardParameter param={}", dto);
+        return BaseResponse.successInstance(breedingStandardService.saveOrUpdateParameter(dto));
     }
 
     @ApiOperation("排序变更")
     @PostMapping("/changeParameterDisplayOrder")
-    public BaseResponse changeParameterDisplayOrder(@RequestBody @Validated ChangeParameterDisplayOrderDto dto){
-        log.info("O changeParameterDisplayOrder param={}",dto);
+    public BaseResponse changeParameterDisplayOrder(@RequestBody @Validated ChangeParameterDisplayOrderDto dto) {
+        log.info("O changeParameterDisplayOrder param={}", dto);
         return BaseResponse.successInstance(breedingStandardService.changeParameterDisplayOrder(dto));
     }
 
     @ApiOperation("删除养殖参数配置信息")
     @DeleteMapping("/delBreedingStandardParam")
-    public BaseResponse delBreedingStandardParam(@RequestBody @Validated DelBreedingStandardParamDto dto){
-        log.info("O delBreedingStandardParam dto={}",dto);
+    public BaseResponse delBreedingStandardParam(@RequestBody @Validated DelBreedingStandardParamDto dto) {
+        log.info("O delBreedingStandardParam dto={}", dto);
         breedingStandardService.delBreedingStandardParam(dto);
         return BaseResponse.successInstance("删除成功");
     }
@@ -122,17 +119,17 @@ public class BreedingStandardController {
 
     @ApiOperation("查询养殖模板药品配置信息")
     @GetMapping("/listBreedingStandardDrugs/{standardId}")
-    public BaseResponse listBreedingStandardDrugs(@PathVariable("standardId") Integer standardId){
-        log.info("O listBreedingStandardDrugs standardId={}",standardId);
+    public BaseResponse listBreedingStandardDrugs(@PathVariable("standardId") Integer standardId) {
+        log.info("O listBreedingStandardDrugs standardId={}", standardId);
         List<BreedingStandardDrugListVo> breedingStandardDrugListVoList = generateStandardDrugs(breedingStandardService.listBreedingStandardDrugs(standardId));
         return BaseResponse.successInstance(breedingStandardDrugListVoList);
     }
 
     @ApiOperation("养殖参数模板药品配置")
     @PostMapping("/breedingStandardDrugs")
-    public BaseResponse breedingStandardDrugs(@RequestBody @Validated ValidList<BreedingStandardDrugListDto> drugList){
-        log.info("O breedingStandardDrugs drugList={}",drugList);
-        if (CollectionUtils.isEmpty(drugList)){
+    public BaseResponse breedingStandardDrugs(@RequestBody @Validated ValidList<BreedingStandardDrugListDto> drugList) {
+        log.info("O breedingStandardDrugs drugList={}", drugList);
+        if (CollectionUtils.isEmpty(drugList)) {
             return BaseResponse.errorInstance("参数为空");
         }
         breedingStandardService.configurationDrugs(drugList);
@@ -146,6 +143,12 @@ public class BreedingStandardController {
         return BaseResponse.successInstance(breedingStandardService.listAllBreedingStandard());
     }
 
+    @ApiOperation("养殖计划参数配置可选择养殖模板列表")
+    @GetMapping("/listBreedingStandardForParamConfiguration")
+    public BaseResponse listBreedingStandardForParamConfiguration(){
+        log.info("O listBreedingStandardForParamConfiguration");
+        return BaseResponse.successInstance(breedingStandardService.listBreedingStandardForParamConfiguration());
+    }
     @ApiOperation("查询单个养殖模板详情按日龄分组")
     @GetMapping("/getBreedingStandardDetail/{id}")
     public BaseResponse getBreedingStandardDetail(@PathVariable("id") Integer id) {
@@ -157,28 +160,33 @@ public class BreedingStandardController {
 
     /**
      * 将养殖模板配置信息按日龄分组
+     *
      * @param breedingStandardDrugListDtoList
      * @return
      */
     private List<BreedingStandardDrugListVo> generateStandardDrugs(List<BreedingStandardDrugDto> breedingStandardDrugListDtoList) {
         List<BreedingStandardDrugListVo> listVoList = new ArrayList<>();
         Set<Integer> dayAgeStart = new HashSet<>();
-        if (!CollectionUtils.isEmpty(breedingStandardDrugListDtoList)){
-            breedingStandardDrugListDtoList.forEach(dto-> {if (dto.getDayAgeStart() != null){dayAgeStart.add(dto.getDayAgeStart());}});
-            for (Integer startDayAge : dayAgeStart){
+        if (!CollectionUtils.isEmpty(breedingStandardDrugListDtoList)) {
+            breedingStandardDrugListDtoList.forEach(dto -> {
+                if (dto.getDayAgeStart() != null) {
+                    dayAgeStart.add(dto.getDayAgeStart());
+                }
+            });
+            for (Integer startDayAge : dayAgeStart) {
                 BreedingStandardDrugListVo drugListVo = new BreedingStandardDrugListVo();
                 drugListVo.setDayAgeStart(startDayAge);
                 List<BreedingStandardDrugItemVo> breedingStandardDrugItemVoList = new ArrayList<>();
                 drugListVo.setBreedingStandardDrugItemVoList(breedingStandardDrugItemVoList);
                 listVoList.add(drugListVo);
             }
-            for (BreedingStandardDrugDto drugDto : breedingStandardDrugListDtoList){
-                for (BreedingStandardDrugListVo drugListVo : listVoList){
-                    if (drugDto.getDayAgeStart() != null && drugDto.getDayAgeStart().equals(drugListVo.getDayAgeStart())){
+            for (BreedingStandardDrugDto drugDto : breedingStandardDrugListDtoList) {
+                for (BreedingStandardDrugListVo drugListVo : listVoList) {
+                    if (drugDto.getDayAgeStart() != null && drugDto.getDayAgeStart().equals(drugListVo.getDayAgeStart())) {
                         drugListVo.setDayAgeEnd(drugDto.getDayAgeEnd())
                                 .setStandardId(drugDto.getBreedingStandardId())
                                 .setStopDrugFlag(drugDto.getStopDrugFlag());
-                        if (!drugDto.getStopDrugFlag()){
+                        if (!drugDto.getStopDrugFlag()) {
                             List<BreedingStandardDrugItemVo> drugItemVoList = drugListVo.getBreedingStandardDrugItemVoList();
                             BreedingStandardDrugItemVo drugItemVo = new BreedingStandardDrugItemVo();
                             drugItemVo.setCapacityUnit(CapacityUnitEnum.getTypeByCode(drugDto.getCapacityUnit()))
@@ -193,6 +201,7 @@ public class BreedingStandardController {
                 }
             }
         }
+        listVoList.sort(Comparator.comparingInt(BreedingStandardDrugListVo::getDayAgeStart));
         return listVoList;
     }
 
@@ -223,6 +232,7 @@ public class BreedingStandardController {
         }
         return detailDto;
     }
+
     @PostMapping("/listBreedingParamTemplate")
     @ApiOperation("养殖参数模板列表")
     public BaseResponse listBreedingParamTemplate(@RequestBody BreedingParamTemplateCriteria dto) {

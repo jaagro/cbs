@@ -71,20 +71,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public PageInfo listDrugStock(ListDrugCriteria criteria) {
         PageHelper.startPage(criteria.getPageNum(), criteria.getPageSize());
-        ProductExample productExample = new ProductExample();
-        ProductExample.Criteria condition = productExample.createCriteria();
-        if (criteria.getProductName() != null) {
-            condition.andProductNameEqualTo(criteria.getProductName());
-        }
-        if (criteria.getProductType() != null) {
-            condition.andProductTypeEqualTo(criteria.getProductType());
-        }
-        if (criteria.getSkuNo() != null) {
-            condition.andSkuNoEqualTo(criteria.getSkuNo());
-        }
-        List<Integer> drugType = Arrays.asList(ProductTypeEnum.DRUG.getCode());
-        condition.andProductTypeIn(drugType);
-        List<Product> products = productMapper.selectByExample(productExample);
+        List<Product> products = productMapper.listDrugStockByCriteria(criteria);
         return new PageInfo(products);
     }
 
@@ -97,5 +84,17 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public TenantDrugStock getDrugStock(Integer drugStockId) {
         return tenantDrugStockMapper.selectByPrimaryKey(drugStockId);
+    }
+
+    /**
+     * @param productId
+     */
+    @Override
+    public void deleteDrugStock(Integer productId) {
+        Product product = new Product();
+        product
+                .setEnable(false)
+                .setId(productId);
+        productMapper.updateByPrimaryKeySelective(product);
     }
 }

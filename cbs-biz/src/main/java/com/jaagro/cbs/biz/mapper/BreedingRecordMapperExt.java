@@ -2,10 +2,7 @@ package com.jaagro.cbs.biz.mapper;
 
 import com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto;
 import com.jaagro.cbs.api.dto.farmer.BreedingRecordDto;
-import com.jaagro.cbs.api.model.BatchInfo;
-import com.jaagro.cbs.api.model.BreedingRecord;
-import com.jaagro.cbs.api.model.BreedingRecordExample;
-import com.jaagro.cbs.api.model.BreedingRecordItems;
+import com.jaagro.cbs.api.model.*;
 import com.jaagro.cbs.biz.mapper.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -25,10 +22,10 @@ public interface BreedingRecordMapperExt extends BaseMapper<BreedingRecord, Bree
     /**
      * 查询每个批次的日汇总
      *
-     * @param todayDate
+     * @param criteriaDto
      * @return
      */
-    List<BreedingRecord> listSumByParams(@Param("todayDate") String todayDate);
+    List<BreedingRecordDaily> listBreedingDailyByParams(BatchInfoCriteriaDto criteriaDto);
 
     /**
      * 鸡舍养殖每日汇总
@@ -36,42 +33,19 @@ public interface BreedingRecordMapperExt extends BaseMapper<BreedingRecord, Bree
      * @param todayDate
      * @return
      */
-    List<BreedingRecord> listCoopDailySumByParams(@Param("todayDate") String todayDate);
-
-    /**
-     * 鸡舍当日累积喂料次数
-     *
-     * @param record
-     * @return
-     */
-    Integer countFodderTimesByCoopId(BreedingRecord record);
-
-    /**
-     * 死淘数量 -- 根据鸡舍
-     *
-     * @param record
-     * @return
-     */
-    Integer sumDeadAmountByCoopId(BreedingRecord record);
+    List<BatchCoopDaily> listCoopDailyByParams(@Param("todayDate") String todayDate);
 
     /**
      * 批次养殖情况汇总
      *
-     * @param todayDate
-     * @return
-     */
-    List<BatchInfo> listBatchInfoByParams(@Param("todayDate") String todayDate);
-
-    /**
-     * 死淘数量 -- 根据批次
-     *
      * @param criteriaDto
      * @return
      */
-    int sumDeadAmountByPlanId(BatchInfoCriteriaDto criteriaDto);
+    List<BatchInfo> listBatchInfoByParams(BatchInfoCriteriaDto criteriaDto);
 
     /**
      * 根据条件查询养殖记录列表
+     *
      * @param params
      * @return
      */

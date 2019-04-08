@@ -22,98 +22,70 @@
         <collection property="breedingRecordItemsList" column="id"
                     select="com.jaagro.cbs.biz.mapper.BreedingRecordItemsMapperExt.listByBreedingRecordId"/>
     </resultMap>
-    <select id="listSumByParams" parameterType="java.lang.String" resultMap="BaseResultMap">
+    <select id="listBreedingDailyByParams" parameterType="com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto"
+            resultType="com.jaagro.cbs.api.model.BreedingRecordDaily">
         SELECT
-            id,
-            plan_id,
-            batch_no,
-            day_age,
-            record_type,
-            SUM( breeding_value ) AS breeding_value,
-            unit,
+        id,
+        plan_id,
+        batch_no,
+        day_age,
+        record_type,
+        SUM( breeding_value ) AS breeding_value,
+        unit,
         ENABLE
         FROM
-            breeding_record
+        breeding_record
         WHERE
-            ENABLE = 1
-            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{todayDate}
+        ENABLE = 1
+        AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{todayDate}, '%Y-%m-%d' )
+        <if test="planId != null">
+            AND plan_id = #{planId}
+        </if>
         GROUP BY
-            plan_id,
-            record_type
+        plan_id,
+        record_type
     </select>
-    <select id="listCoopDailySumByParams" parameterType="java.lang.String" resultMap="BaseResultMap">
+    <select id="listCoopDailyByParams" parameterType="java.lang.String"
+            resultType="com.jaagro.cbs.api.model.BatchCoopDaily">
         SELECT
             plan_id ,
             batch_no,
             coop_id,
             day_age,
-            SUM(breeding_value) as breeding_value
+            SUM( CASE WHEN record_type = 1 THEN breeding_value  END ) AS fodder_amount,
+            SUM( CASE WHEN record_type = 4 THEN breeding_value  END ) AS dead_amount,
+            COUNT(CASE WHEN record_type = 1 THEN breeding_value  END) as fodder_times,
+            create_time
         FROM
             breeding_record
         WHERE
             enable = 1
-            AND DATE_FORMAT(create_time, '%Y-%m-%d') = #{todayDate}
-            GROUP BY plan_id,coop_id
+            AND DATE_FORMAT(create_time, '%Y-%m-%d') = DATE_FORMAT(#{todayDate}, '%Y-%m-%d')
+            GROUP BY plan_id,coop_id,day_age
     </select>
-    <select id="countFodderTimesByCoopId" parameterType="com.jaagro.cbs.api.model.BreedingRecord"
-            resultType="java.lang.Integer">
+    <select id="listBatchInfoByParams" resultType="com.jaagro.cbs.api.model.BatchInfo"
+            parameterType="com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto">
         SELECT
-            count(breeding_value) as breeding_value
+        r.plan_id,
+        r.batch_no,
+        r.day_age,
+        SUM( CASE WHEN r.record_type = 4 THEN r.breeding_value END ) AS dead_amount,
+        SUM( CASE WHEN r.record_type = 1 THEN r.breeding_value END ) AS fodder_amount,
+        p.technician_id AS technician_id,
+        p.technician AS technician,
+        r.create_time as create_time
         FROM
-            breeding_record
+        breeding_record r
+        INNER JOIN breeding_plan p ON r.plan_id = p.id
         WHERE
-            enable = 1
-            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{createTime}
-            AND coop_id = #{coopId}
-            AND plan_id = #{planId}
-            AND record_type = 1
-    </select>
-    <select id="sumDeadAmountByCoopId" parameterType="com.jaagro.cbs.api.model.BreedingRecord"
-            resultType="java.lang.Integer">
-        SELECT
-            sum(breeding_value) as breeding_value
-        FROM
-            breeding_record
-        WHERE
-            enable = 1
-            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{createTime}
-            AND coop_id = #{coopId}
-            AND plan_id = #{planId}
-            AND record_type = 4
-    </select>
-    <select id="listBatchInfoByParams" resultType="com.jaagro.cbs.api.model.BatchInfo" parameterType="java.lang.String">
-        SELECT
-            r.plan_id,
-            r.batch_no,
-            r.day_age,
-            CASE WHEN r.record_type = 1 THEN SUM( r.breeding_value ) END AS fodder_amount,
-            CASE WHEN r.record_type = 4 THEN SUM( r.breeding_value ) END AS dead_amount,
-            r.unit,
-            r.ENABLE,
-            p.technician_id AS technician_id,
-            p.technician AS technician ,
-            p.plan_chicken_quantity as plan_chicken_quantity
-            FROM
-            breeding_record r
-            INNER JOIN breeding_plan p ON r.plan_id = p.id
-        WHERE
-            r.enable = 1
-            AND p.enable = 1
-            AND DATE_FORMAT( r.create_time, '%Y-%m-%d' ) = #{todayDate}
+        r.ENABLE = 1
+        AND p.ENABLE = 1
+        AND DATE_FORMAT( r.create_time, '%Y-%m-%d' ) = DATE_FORMAT( #{todayDate}, '%Y-%m-%d' )
+        <if test="planId != null">
+            AND r.plan_id = #{planId}
+        </if>
         GROUP BY
-            r.plan_id
-    </select>
-    <select id="sumDeadAmountByPlanId" parameterType="com.jaagro.cbs.api.dto.base.BatchInfoCriteriaDto"
-            resultType="int">
-        SELECT
-            sum(breeding_value) as breeding_value
-        FROM
-            breeding_record
-        WHERE
-            enable = 1
-            AND DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{todayDate}
-            AND plan_id = #{planId}
-            AND record_type = 4
+        r.plan_id
     </select>
     <select id="listByParams" resultMap="DetailResultMap" parameterType="com.jaagro.cbs.api.model.BreedingRecord">
         SELECT

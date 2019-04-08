@@ -1,13 +1,14 @@
 package com.jaagro.cbs.web.controller.farmerapp;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
+import com.jaagro.cbs.api.dto.base.ShowCustomerDto;
 import com.jaagro.cbs.api.dto.farmer.*;
 import com.jaagro.cbs.api.dto.message.MessageCriteriaDto;
 import com.jaagro.cbs.api.dto.order.PurchaseOrderListParamDto;
 import com.jaagro.cbs.api.dto.order.UpdatePurchaseOrderParamDto;
 import com.jaagro.cbs.api.dto.plan.CreateBreedingPlanDto;
-import com.jaagro.cbs.api.dto.plant.ReturnPlantDto;
 import com.jaagro.cbs.api.dto.progress.BreedingRecordDto;
 import com.jaagro.cbs.api.enums.EmergencyLevelEnum;
 import com.jaagro.cbs.api.enums.UserTypeEnum;
@@ -18,6 +19,7 @@ import com.jaagro.cbs.api.service.BreedingFarmerService;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.BreedingPlantService;
 import com.jaagro.cbs.api.service.BreedingProgressService;
+import com.jaagro.cbs.biz.service.CustomerClientService;
 import com.jaagro.cbs.biz.service.UserClientService;
 import com.jaagro.cbs.biz.service.impl.CurrentUserService;
 import com.jaagro.cbs.biz.service.impl.MessageServiceImpl;
@@ -63,6 +65,8 @@ public class BreedingFarmerController {
     private MessageServiceImpl messageService;
     @Autowired
     private BreedingProgressService breedingProgressService;
+    @Autowired
+    private CustomerClientService customerClientService;
 
 
     @GetMapping("/breedingFarmerIndexStatistical")
@@ -86,6 +90,7 @@ public class BreedingFarmerController {
     @PostMapping("/publishedChickenPlan")
     @ApiOperation("发布上鸡计划")
     public BaseResponse publishedChickenPlan(@RequestBody CreateBreedingPlanDto dto) {
+        log.info("O publishedChickenPlan param={}", JSON.toJSONString(dto));
         if (CollectionUtils.isEmpty(dto.getPlantIds())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "养殖场不能为空");
         }
@@ -121,7 +126,6 @@ public class BreedingFarmerController {
     @PostMapping("/listPurchaseOrder")
     @ApiOperation("商品采购列表")
     public BaseResponse listPurchaseOrder(@RequestBody PurchaseOrderListParamDto dto) {
-
         return BaseResponse.successInstance(breedingFarmerService.listPurchaseOrder(dto));
     }
 
@@ -187,26 +191,35 @@ public class BreedingFarmerController {
                 StringBuilder sb = new StringBuilder();
                 TechnicalInquiriesVo technicalInquiriesVo = new TechnicalInquiriesVo();
                 BeanUtils.copyProperties(techConsultRecord, technicalInquiriesVo);
-                if (techConsultRecord.getHandleUserId() != null) {
-                    BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(techConsultRecord.getHandleUserId());
+                if (techConsultRecord.getTechnicianId() != null) {
+                    BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(techConsultRecord.getTechnicianId());
                     if (globalUser != null && globalUser.getData() != null) {
                         UserInfo userInfo = globalUser.getData();
-                        technicalInquiriesVo
-                                .setHandlePhone(userInfo.getPhoneNumber())
-                                .setHandleUser(userInfo.getName());
+                        if (userInfo.getPhoneNumber() != null) {
+                            technicalInquiriesVo
+                                    .setHandlePhone(userInfo.getPhoneNumber());
+                        }
+                        if (userInfo.getName() != null) {
+                            technicalInquiriesVo
+                                    .setHandleUser(userInfo.getName());
+                        }
                     }
                 }
-                if (techConsultRecord.getPlantId() != null) {
-                    ReturnPlantDto plant = breedingPlantService.getPlantDetailsById(techConsultRecord.getPlantId());
-                    if (plant != null && plant.getProvince() != null) {
-                        sb.append(plant.getProvince());
+                if (techConsultRecord.getCustomerId() != null) {
+                    ShowCustomerDto showCustomer = customerClientService.getShowCustomerById(techConsultRecord.getCustomerId());
+                    if (showCustomer != null && showCustomer.getProvince() != null) {
+                        sb.append(showCustomer.getProvince());
                     }
-                    if (plant != null && plant.getCity() != null) {
-                        sb.append(plant.getCity());
+                    if (showCustomer != null && showCustomer.getCity() != null) {
+                        sb.append(showCustomer.getCity());
                     }
-                    if (plant != null && plant.getCounty() != null) {
-                        sb.append(plant.getCounty());
+                    if (showCustomer != null && showCustomer.getCounty() != null) {
+                        sb.append(showCustomer.getCounty());
                     }
+                }
+                if (techConsultRecord.getBatchNo() != null) {
+                    technicalInquiriesVo
+                            .setBatchNo(techConsultRecord.getBatchNo());
                 }
                 technicalInquiriesVo
                         .setAddress(sb.toString());
@@ -319,9 +332,9 @@ public class BreedingFarmerController {
 
     @ApiOperation("获取农户应喂药列表")
     @GetMapping("/listBreedingRecordDrug")
-    public BaseResponse listBreedingRecordDrug(@RequestParam Integer planId,@RequestParam Integer coopId){
-        log.info("O listBreedingRecordDrug planId={},coopId={}",planId,coopId);
-        return BaseResponse.successInstance(breedingPlanService.listBreedingRecordDrug(planId,coopId));
+    public BaseResponse listBreedingRecordDrug(@RequestParam Integer planId, @RequestParam Integer coopId) {
+        log.info("O listBreedingRecordDrug planId={},coopId={}", planId, coopId);
+        return BaseResponse.successInstance(breedingPlanService.listBreedingRecordDrug(planId, coopId));
     }
 
     /**

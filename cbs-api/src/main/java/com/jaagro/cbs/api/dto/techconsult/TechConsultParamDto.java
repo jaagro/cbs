@@ -45,4 +45,9 @@ public class TechConsultParamDto implements Serializable {
      */
     private Integer status;
 
+    /**
+     * 技术员id
+     */
+    private Integer technicianId;
+
 }

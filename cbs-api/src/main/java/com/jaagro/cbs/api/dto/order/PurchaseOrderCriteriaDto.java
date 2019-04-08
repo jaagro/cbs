@@ -6,26 +6,27 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Set;
+import java.util.List;
+
 
 /**
- * @description: 采购订单查询参数
+ * @description: 采购订单查询条件
  * @author: @Gao.
- * @create: 2019-03-04 16:48
+ * @create: 2019-03-30 15:51
  **/
 @Data
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class PurchaseOrderParamDto implements Serializable {
+public class PurchaseOrderCriteriaDto implements Serializable {
+
     /**
-     * 商品类型
+     * 客户id
      */
-    private Integer productType;
+    private Integer customerId;
+
     /**
-     * 养殖计划集合id
+     * 状态(1-已下单 ,2－待送达 ,3-已签收)
      */
-    private Set<Integer> planIds;
+    private List<Integer> purchaseOrderStatus;
 }

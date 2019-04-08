@@ -30,15 +30,30 @@
             </if>
             <if test="flag==1">
                 and plan_status in (0,7)
-                order by create_time desc
+                order by plan_status asc ,create_time desc
             </if>
             <if test="flag==2">
                 and plan_status in (1,2,3,4,5,6)
-                order by create_time desc
+                order by plan_status asc , create_time desc
+            </if>
+            <if test="flag==3">
+                and plan_status in (3,4,5)
+                order by plan_status asc, create_time desc
             </if>
         </where>
     </select>
     <select id="listBreedingPlanByCustomerId" resultType="com.jaagro.cbs.api.dto.farmer.ReturnBreedingBatchDetailsDto"
+            parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from breeding_plan
+        where customer_id = #{customerId,jdbcType=INTEGER}
+        and enable = 1
+        and plan_status in (2,3,4,5)
+        order by create_time desc
+    </select>
+    <select id="listAllBreedingPlanByCustomerId"
+            resultType="com.jaagro.cbs.api.dto.farmer.ReturnBreedingBatchDetailsDto"
             parameterType="java.lang.Integer">
         select
         <include refid="Base_Column_List"/>
@@ -55,12 +70,14 @@
         where customer_id = #{customerId,jdbcType=INTEGER}
         and enable = 1
     </select>
-    <select id="listByCustomerId" resultType="com.jaagro.cbs.api.dto.farmer.BreedingPlanDetailDto">
+    <select id="listBreedingBatchForFarmer" resultType="com.jaagro.cbs.api.dto.farmer.BreedingPlanDetailDto">
         SELECT
         <include refid="Base_Column_List"/>
         FROM breeding_plan
         WHERE customer_id = #{customerId,jdbcType=INTEGER}
         and enable = 1
+        and plan_status in (2,3,4,5,6)
+        order by plan_time desc
     </select>
     <select id="listPurchaseOrderPreset" resultType="com.jaagro.cbs.api.dto.order.ReturnPurchaseOrderPresetDto"
             parameterType="com.jaagro.cbs.api.dto.order.PurchaseOrderPresetCriteriaDto">
@@ -84,17 +101,22 @@
             <if test="createUserName!=null">
                 and bp.create_user_name like concat('%', #{createUserName},'%')
             </if>
+            <if test="batchNo!=null">
+                and bp.batch_no like concat('%', #{batchNo},'%')
+            </if>
+            order by po.purchase_order_status asc , po.plan_execute_time desc
         </where>
     </select>
     <select id="listBreedingParamTemplate" resultType="com.jaagro.cbs.api.dto.standard.ReturnBreedingParamTemplateDto"
             parameterType="com.jaagro.cbs.api.dto.standard.BreedingParamTemplateCriteria">
         select distinct bp.id, bp.batch_no ,bp.customer_id,
-        bp.plan_chicken_quantity,bp.plan_time ,bp.plan_status,bp.create_user_name,bs.standard_name,bs.id breedingStandardId
-        from breeding_plan bp inner join breeding_batch_parameter bbp on (bp.id=bbp.param_id)
+        bp.plan_chicken_quantity,bp.plan_time ,bp.plan_status,bp.create_user_name,bs.standard_name,bs.id
+        breedingStandardId
+        from breeding_plan bp inner join breeding_batch_parameter bbp on (bp.id=bbp.plan_id)
         inner join breeding_standard_parameter bsp on (bbp.param_id=bsp.id)
         inner join breeding_standard bs on (bsp.standard_id=bs.id )
         <where>
-            bp.enable=1
+            bs.enable=1
             <if test="customerIds!=null">
                 and bp.customer_id IN
                 <foreach collection="customerIds" open="(" separator="," close=")" item="customerId">
@@ -107,17 +129,24 @@
             <if test="batchNo!=null">
                 and bp.batch_no like concat('%', #{batchNo},'%')
             </if>
-            and plan_status in (2,3,4,5,6)
+            order by bp.plan_status asc , bs.create_time desc
         </where>
     </select>
     <select id="listToSlaughterConfirm" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List"/>
+        SELECT
+        <include refid="Base_Column_List"/>
         FROM breeding_plan
         WHERE
         enable = 1
         AND plan_status = 3
-        AND plan_time &lt;= CURRENT_DATE() - (
-        plan_time - (breeding_days - 7)
-        )
+        AND plan_time &lt;= DATE_SUB(CURRENT_DATE (), INTERVAL breeding_days-7 DAY )
+    </select>
+    <select id="listTodayPlanInteger" resultType="java.lang.Integer">
+    SELECT
+        temp_a.id
+    FROM
+        ( SELECT id FROM breeding_plan WHERE DATE_FORMAT( create_time, "%Y-%m-%d" ) = DATE_FORMAT( now(), "%Y-%m-%d" ) AND ENABLE = 1 ) temp_a
+    WHERE
+        temp_a.id NOT IN ( SELECT plan_id FROM breeding_record WHERE ENABLE = 1 AND DATE_FORMAT( create_time, "%Y-%m-%d" ) = DATE_FORMAT(now(), "%Y-%m-%d" ) GROUP BY plan_id )
     </select>
 </mapper>

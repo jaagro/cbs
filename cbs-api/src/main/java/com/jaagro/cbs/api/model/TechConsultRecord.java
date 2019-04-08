@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 
 /**
  * @author :gaoxin
- * @date :2019/03/19
+ * @date :2019/04/04
  */
 @Data
 @NoArgsConstructor
@@ -35,6 +35,11 @@ public class TechConsultRecord implements Serializable {
      * 客户手机号
      */
     private String customerPhoneNumber;
+
+    /**
+     * 喂养日龄
+     */
+    private Integer dayAge;
 
     /**
      * 鸡舍id
@@ -85,6 +90,11 @@ public class TechConsultRecord implements Serializable {
      * 处理时间
      */
     private Date handleTime;
+
+    /**
+     * 技术员id
+     */
+    private Integer technicianId;
 
     /**
      * 处理人

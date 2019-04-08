@@ -10,6 +10,7 @@
             breeding_standard_drug bsd
         LEFT JOIN product p ON bsd.product_id = p.id
         WHERE bsd.breeding_standard_id = #{standardId}
+        order by day_age_start asc
     </select>
     <delete id="delByStandardId">
         DELETE FROM breeding_standard_drug

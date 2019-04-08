@@ -1,5 +1,6 @@
 package com.jaagro.cbs.api.dto.plan;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jaagro.cbs.api.dto.base.ListEmployeeDto;
 import com.jaagro.cbs.api.model.Plant;
 import lombok.AllArgsConstructor;
@@ -58,6 +59,7 @@ public class ReturnBreedingPlanDetailsDto implements Serializable {
     /**
      * 上鸡时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planTime;
 
     /**
@@ -85,6 +87,10 @@ public class ReturnBreedingPlanDetailsDto implements Serializable {
      */
     private String createUserName;
 
+    /**
+     * 最大可养数量
+     */
+    private Integer breedingAble;
 
     /**
      * 养殖场

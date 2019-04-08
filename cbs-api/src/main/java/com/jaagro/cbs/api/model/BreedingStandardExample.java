@@ -378,6 +378,66 @@ public class BreedingStandardExample implements Serializable {
             return (Criteria) this;
         }
 
+        public Criteria andStandardStatusIsNull() {
+            addCriterion("standard_status is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandardStatusIsNotNull() {
+            addCriterion("standard_status is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandardStatusEqualTo(Integer value) {
+            addCriterion("standard_status =", value, "standardStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandardStatusNotEqualTo(Integer value) {
+            addCriterion("standard_status <>", value, "standardStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandardStatusGreaterThan(Integer value) {
+            addCriterion("standard_status >", value, "standardStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandardStatusGreaterThanOrEqualTo(Integer value) {
+            addCriterion("standard_status >=", value, "standardStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandardStatusLessThan(Integer value) {
+            addCriterion("standard_status <", value, "standardStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandardStatusLessThanOrEqualTo(Integer value) {
+            addCriterion("standard_status <=", value, "standardStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandardStatusIn(List<Integer> values) {
+            addCriterion("standard_status in", values, "standardStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandardStatusNotIn(List<Integer> values) {
+            addCriterion("standard_status not in", values, "standardStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandardStatusBetween(Integer value1, Integer value2) {
+            addCriterion("standard_status between", value1, value2, "standardStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandardStatusNotBetween(Integer value1, Integer value2) {
+            addCriterion("standard_status not between", value1, value2, "standardStatus");
+            return (Criteria) this;
+        }
+
         public Criteria andEnableIsNull() {
             addCriterion("enable is null");
             return (Criteria) this;

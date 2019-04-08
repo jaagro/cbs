@@ -1,5 +1,6 @@
 package com.jaagro.cbs.api.dto.standard;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -66,6 +67,7 @@ public class ReturnBreedingParamTemplateDto implements Serializable {
     /**
      * 上鸡时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planTime;
 
     /**
