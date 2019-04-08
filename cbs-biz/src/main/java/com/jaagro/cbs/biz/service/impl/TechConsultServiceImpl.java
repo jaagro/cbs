@@ -77,6 +77,7 @@ public class TechConsultServiceImpl implements TechConsultService {
             criteriaTwo.andCustomerPhoneNumberLike("%" + dto.getKeyWord() + "%");
         }
         example.or(criteriaTwo);
+        example.setOrderByClause("tech_consult_status,create_time desc");
         List<TechConsultRecord> techConsultRecordDos = techConsultRecordMapper.selectByExample(example);
 
         return new PageInfo(techConsultRecordDos);
@@ -107,22 +108,16 @@ public class TechConsultServiceImpl implements TechConsultService {
         BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
         if (null != breedingPlan) {
             returnDto.setBreedingDays(breedingPlan.getBreedingDays());
-            int planChickenQuantity = breedingPlan.getPlanChickenQuantity();
             int coopId = techConsultRecordDo.getCoopId();
 
             BatchCoopDailyExample example = new BatchCoopDailyExample();
-            example.createCriteria().andPlanIdEqualTo(planId).andCoopIdEqualTo(coopId).andEnableEqualTo(true);
+            example.createCriteria().andPlanIdEqualTo(planId).andCoopIdEqualTo(coopId).andDayAgeEqualTo(techConsultRecordDo.getDayAge()).andEnableEqualTo(true);
             List<BatchCoopDaily> batchCoopDailyList = batchCoopDailyMapper.selectByExample(example);
-            int deadAmount = 0;
             if (!CollectionUtils.isEmpty(batchCoopDailyList)) {
-                for (BatchCoopDaily batchCoopDaily : batchCoopDailyList) {
-                    if (!StringUtils.isEmpty(batchCoopDaily.getDeadAmount())) {
-                        deadAmount = deadAmount + batchCoopDaily.getDeadAmount();
-                    }
-                }
+                livingAmount = batchCoopDailyList.get(0).getCurrentAmount();
             }
-            livingAmount = planChickenQuantity - deadAmount;
         }
+        //鸡舍的存栏数
         returnDto.setLivingAmount(livingAmount);
 
         TechConsultImagesExample imagesExample = new TechConsultImagesExample();

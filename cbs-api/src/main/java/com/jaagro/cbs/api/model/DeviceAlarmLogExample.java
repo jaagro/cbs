@@ -619,6 +619,316 @@ public class DeviceAlarmLogExample implements Serializable {
             return (Criteria) this;
         }
 
+        public Criteria andHandleStatusIsNull() {
+            addCriterion("handle_status is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleStatusIsNotNull() {
+            addCriterion("handle_status is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleStatusEqualTo(Integer value) {
+            addCriterion("handle_status =", value, "handleStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleStatusNotEqualTo(Integer value) {
+            addCriterion("handle_status <>", value, "handleStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleStatusGreaterThan(Integer value) {
+            addCriterion("handle_status >", value, "handleStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleStatusGreaterThanOrEqualTo(Integer value) {
+            addCriterion("handle_status >=", value, "handleStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleStatusLessThan(Integer value) {
+            addCriterion("handle_status <", value, "handleStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleStatusLessThanOrEqualTo(Integer value) {
+            addCriterion("handle_status <=", value, "handleStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleStatusIn(List<Integer> values) {
+            addCriterion("handle_status in", values, "handleStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleStatusNotIn(List<Integer> values) {
+            addCriterion("handle_status not in", values, "handleStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleStatusBetween(Integer value1, Integer value2) {
+            addCriterion("handle_status between", value1, value2, "handleStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleStatusNotBetween(Integer value1, Integer value2) {
+            addCriterion("handle_status not between", value1, value2, "handleStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTimeIsNull() {
+            addCriterion("handle_time is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTimeIsNotNull() {
+            addCriterion("handle_time is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTimeEqualTo(Date value) {
+            addCriterion("handle_time =", value, "handleTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTimeNotEqualTo(Date value) {
+            addCriterion("handle_time <>", value, "handleTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTimeGreaterThan(Date value) {
+            addCriterion("handle_time >", value, "handleTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("handle_time >=", value, "handleTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTimeLessThan(Date value) {
+            addCriterion("handle_time <", value, "handleTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTimeLessThanOrEqualTo(Date value) {
+            addCriterion("handle_time <=", value, "handleTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTimeIn(List<Date> values) {
+            addCriterion("handle_time in", values, "handleTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTimeNotIn(List<Date> values) {
+            addCriterion("handle_time not in", values, "handleTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTimeBetween(Date value1, Date value2) {
+            addCriterion("handle_time between", value1, value2, "handleTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTimeNotBetween(Date value1, Date value2) {
+            addCriterion("handle_time not between", value1, value2, "handleTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleUserIdIsNull() {
+            addCriterion("handle_user_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleUserIdIsNotNull() {
+            addCriterion("handle_user_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleUserIdEqualTo(Integer value) {
+            addCriterion("handle_user_id =", value, "handleUserId");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleUserIdNotEqualTo(Integer value) {
+            addCriterion("handle_user_id <>", value, "handleUserId");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleUserIdGreaterThan(Integer value) {
+            addCriterion("handle_user_id >", value, "handleUserId");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleUserIdGreaterThanOrEqualTo(Integer value) {
+            addCriterion("handle_user_id >=", value, "handleUserId");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleUserIdLessThan(Integer value) {
+            addCriterion("handle_user_id <", value, "handleUserId");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleUserIdLessThanOrEqualTo(Integer value) {
+            addCriterion("handle_user_id <=", value, "handleUserId");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleUserIdIn(List<Integer> values) {
+            addCriterion("handle_user_id in", values, "handleUserId");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleUserIdNotIn(List<Integer> values) {
+            addCriterion("handle_user_id not in", values, "handleUserId");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleUserIdBetween(Integer value1, Integer value2) {
+            addCriterion("handle_user_id between", value1, value2, "handleUserId");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleUserIdNotBetween(Integer value1, Integer value2) {
+            addCriterion("handle_user_id not between", value1, value2, "handleUserId");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescIsNull() {
+            addCriterion("handle_desc is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescIsNotNull() {
+            addCriterion("handle_desc is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescEqualTo(String value) {
+            addCriterion("handle_desc =", value, "handleDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescNotEqualTo(String value) {
+            addCriterion("handle_desc <>", value, "handleDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescGreaterThan(String value) {
+            addCriterion("handle_desc >", value, "handleDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescGreaterThanOrEqualTo(String value) {
+            addCriterion("handle_desc >=", value, "handleDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescLessThan(String value) {
+            addCriterion("handle_desc <", value, "handleDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescLessThanOrEqualTo(String value) {
+            addCriterion("handle_desc <=", value, "handleDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescLike(String value) {
+            addCriterion("handle_desc like", value, "handleDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescNotLike(String value) {
+            addCriterion("handle_desc not like", value, "handleDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescIn(List<String> values) {
+            addCriterion("handle_desc in", values, "handleDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescNotIn(List<String> values) {
+            addCriterion("handle_desc not in", values, "handleDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescBetween(String value1, String value2) {
+            addCriterion("handle_desc between", value1, value2, "handleDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleDescNotBetween(String value1, String value2) {
+            addCriterion("handle_desc not between", value1, value2, "handleDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTypeIsNull() {
+            addCriterion("handle_type is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTypeIsNotNull() {
+            addCriterion("handle_type is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTypeEqualTo(Integer value) {
+            addCriterion("handle_type =", value, "handleType");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTypeNotEqualTo(Integer value) {
+            addCriterion("handle_type <>", value, "handleType");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTypeGreaterThan(Integer value) {
+            addCriterion("handle_type >", value, "handleType");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTypeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("handle_type >=", value, "handleType");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTypeLessThan(Integer value) {
+            addCriterion("handle_type <", value, "handleType");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTypeLessThanOrEqualTo(Integer value) {
+            addCriterion("handle_type <=", value, "handleType");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTypeIn(List<Integer> values) {
+            addCriterion("handle_type in", values, "handleType");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTypeNotIn(List<Integer> values) {
+            addCriterion("handle_type not in", values, "handleType");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTypeBetween(Integer value1, Integer value2) {
+            addCriterion("handle_type between", value1, value2, "handleType");
+            return (Criteria) this;
+        }
+
+        public Criteria andHandleTypeNotBetween(Integer value1, Integer value2) {
+            addCriterion("handle_type not between", value1, value2, "handleType");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;

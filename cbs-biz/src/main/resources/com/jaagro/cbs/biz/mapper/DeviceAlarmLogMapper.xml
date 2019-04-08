@@ -10,6 +10,11 @@
     <result column="day_age" property="dayAge" jdbcType="INTEGER" />
     <result column="current_value" property="currentValue" jdbcType="DECIMAL" />
     <result column="param_standard_value" property="paramStandardValue" jdbcType="VARCHAR" />
+    <result column="handle_status" property="handleStatus" jdbcType="INTEGER" />
+    <result column="handle_time" property="handleTime" jdbcType="TIMESTAMP" />
+    <result column="handle_user_id" property="handleUserId" jdbcType="INTEGER" />
+    <result column="handle_desc" property="handleDesc" jdbcType="VARCHAR" />
+    <result column="handle_type" property="handleType" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Example_Where_Clause" >
@@ -43,7 +48,7 @@
   </sql>
   <sql id="Base_Column_List" >
     id, plan_id, plant_id, coop_id, device_id, day_age, current_value, param_standard_value, 
-    create_time
+    handle_status, handle_time, handle_user_id, handle_desc, handle_type, create_time
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.jaagro.cbs.api.model.DeviceAlarmLogExample" >
     select
@@ -84,10 +89,14 @@
     </selectKey>
     insert into device_alarm_log (plan_id, plant_id, coop_id, 
       device_id, day_age, current_value, 
-      param_standard_value, create_time)
+      param_standard_value, handle_status, handle_time, 
+      handle_user_id, handle_desc, handle_type, 
+      create_time)
     values (#{planId,jdbcType=INTEGER}, #{plantId,jdbcType=INTEGER}, #{coopId,jdbcType=INTEGER}, 
       #{deviceId,jdbcType=INTEGER}, #{dayAge,jdbcType=INTEGER}, #{currentValue,jdbcType=DECIMAL}, 
-      #{paramStandardValue,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+      #{paramStandardValue,jdbcType=VARCHAR}, #{handleStatus,jdbcType=INTEGER}, #{handleTime,jdbcType=TIMESTAMP}, 
+      #{handleUserId,jdbcType=INTEGER}, #{handleDesc,jdbcType=VARCHAR}, #{handleType,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.jaagro.cbs.api.model.DeviceAlarmLog" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -116,6 +125,21 @@
       <if test="paramStandardValue != null" >
         param_standard_value,
       </if>
+      <if test="handleStatus != null" >
+        handle_status,
+      </if>
+      <if test="handleTime != null" >
+        handle_time,
+      </if>
+      <if test="handleUserId != null" >
+        handle_user_id,
+      </if>
+      <if test="handleDesc != null" >
+        handle_desc,
+      </if>
+      <if test="handleType != null" >
+        handle_type,
+      </if>
       <if test="createTime != null" >
         create_time,
       </if>
@@ -141,6 +165,21 @@
       </if>
       <if test="paramStandardValue != null" >
         #{paramStandardValue,jdbcType=VARCHAR},
+      </if>
+      <if test="handleStatus != null" >
+        #{handleStatus,jdbcType=INTEGER},
+      </if>
+      <if test="handleTime != null" >
+        #{handleTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="handleUserId != null" >
+        #{handleUserId,jdbcType=INTEGER},
+      </if>
+      <if test="handleDesc != null" >
+        #{handleDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="handleType != null" >
+        #{handleType,jdbcType=INTEGER},
       </if>
       <if test="createTime != null" >
         #{createTime,jdbcType=TIMESTAMP},
@@ -177,6 +216,21 @@
       <if test="paramStandardValue != null" >
         param_standard_value = #{paramStandardValue,jdbcType=VARCHAR},
       </if>
+      <if test="handleStatus != null" >
+        handle_status = #{handleStatus,jdbcType=INTEGER},
+      </if>
+      <if test="handleTime != null" >
+        handle_time = #{handleTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="handleUserId != null" >
+        handle_user_id = #{handleUserId,jdbcType=INTEGER},
+      </if>
+      <if test="handleDesc != null" >
+        handle_desc = #{handleDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="handleType != null" >
+        handle_type = #{handleType,jdbcType=INTEGER},
+      </if>
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -192,6 +246,11 @@
       day_age = #{dayAge,jdbcType=INTEGER},
       current_value = #{currentValue,jdbcType=DECIMAL},
       param_standard_value = #{paramStandardValue,jdbcType=VARCHAR},
+      handle_status = #{handleStatus,jdbcType=INTEGER},
+      handle_time = #{handleTime,jdbcType=TIMESTAMP},
+      handle_user_id = #{handleUserId,jdbcType=INTEGER},
+      handle_desc = #{handleDesc,jdbcType=VARCHAR},
+      handle_type = #{handleType,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>

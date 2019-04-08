@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -17,9 +18,9 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class DeviceAlarmLogDto implements Serializable {
+public class AlarmLogDetailDto implements Serializable {
 
-    private static final long serialVersionUID = 1854706316957719948L;
+    private static final long serialVersionUID = 3538281775105066673L;
     /**
      * 计划id
      */
@@ -82,9 +83,42 @@ public class DeviceAlarmLogDto implements Serializable {
      * 鸡舍名称
      */
     private String coopName;
+    /**
+     * 设备的最近一次报警值
+     */
+    private BigDecimal latestValue;
+    /**
+     * 设备的最近一次报警值时间
+     */
+    private Date latestAlarmDate;
 
+    /**
+     * 客户联系人名称
+     */
+    private String customerContactName;
+
+    /**
+     * 联系人电话
+     */
+    private String customerContactPhone;
+
+    /**
+     * 鸡舍存栏量
+     */
+    private int livingAmount;
     /**
      * 计划创建时间
      */
     private Date planCreateTime;
+
+    /**
+     * 处理的方式、途径
+     */
+    private String handleTypeStr;
+
+    /**
+     * 处理备注说明
+     */
+    private String handleDesc;
+
 }

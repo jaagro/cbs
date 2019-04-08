@@ -21,7 +21,7 @@
                 b.device_name,b.device_type,
                 c.coop_name,c.coop_no,
                 d.plant_name,
-                e.batch_no,e.customer_id,e.breeding_days
+                e.batch_no,e.customer_id,e.breeding_days,e.create_time as plan_create_time
         FROM(
                 SELECT plan_id,plant_id,coop_id,device_id,day_age,param_standard_value,count(id) AS times
                 FROM device_alarm_log
@@ -40,6 +40,9 @@
         </if>
         <if test="dayAge != null and dayAge !=''">
             and a.day_age= ${dayAge}
+        </if>
+        <if test="deviceId != null and deviceId !=''">
+            and a.device_id= ${deviceId}
         </if>
     </select>
 </mapper>

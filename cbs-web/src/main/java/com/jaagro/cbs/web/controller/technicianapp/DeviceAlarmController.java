@@ -2,6 +2,7 @@ package com.jaagro.cbs.web.controller.technicianapp;
 
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
+import com.jaagro.cbs.api.dto.technicianapp.AlarmLogDetailDto;
 import com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto;
 import com.jaagro.cbs.api.dto.technicianapp.ToDoAlarmParam;
 import com.jaagro.cbs.api.dto.technicianapp.UpdateDeviceAlarmLogDto;
@@ -9,7 +10,7 @@ import com.jaagro.cbs.api.model.DeviceAlarmLog;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.DeviceAlarmLogService;
 import com.jaagro.cbs.biz.service.CustomerClientService;
-import com.jaagro.cbs.web.vo.techApp.DeviceAlarmLogVo;
+import com.jaagro.cbs.web.vo.technicianapp.DeviceAlarmLogVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -96,5 +97,28 @@ public class DeviceAlarmController {
             pageInfo.setList(voList);
         }
         return BaseResponse.successInstance(pageInfo);
+    }
+
+    @ApiOperation("待办报警信息详情-技术员APP")
+    @PostMapping("/getDeviceAlarmLogDetailApp")
+    public BaseResponse getDeviceAlarmLogDetail(@RequestBody UpdateDeviceAlarmLogDto queryDto){
+        if (StringUtils.isEmpty(queryDto.getPlanId())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "养殖计划id不能为空");
+        }
+        if (StringUtils.isEmpty(queryDto.getPlantId())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "养殖厂id不能为空");
+        }
+        if (StringUtils.isEmpty(queryDto.getCoopId())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "鸡舍ID不能为空");
+        }
+
+        if (StringUtils.isEmpty(queryDto.getDeviceId())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "报警设备ID不能为空");
+        }
+        if (StringUtils.isEmpty(queryDto.getDayAge())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "日龄不能为空");
+        }
+        AlarmLogDetailDto detailDto = deviceAlarmLogService.getDeviceAlarmLogDetail(queryDto);
+        return BaseResponse.successInstance(detailDto);
     }
 }

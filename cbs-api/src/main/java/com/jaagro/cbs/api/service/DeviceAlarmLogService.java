@@ -2,6 +2,7 @@ package com.jaagro.cbs.api.service;
 
 
 import com.github.pagehelper.PageInfo;
+import com.jaagro.cbs.api.dto.technicianapp.AlarmLogDetailDto;
 import com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto;
 import com.jaagro.cbs.api.dto.technicianapp.ToDoAlarmParam;
 import com.jaagro.cbs.api.dto.technicianapp.UpdateDeviceAlarmLogDto;
@@ -25,9 +26,16 @@ public interface DeviceAlarmLogService {
      */
     PageInfo listDeviceAlarmLogApp(ToDoAlarmParam dto);
 
+
+
     boolean handleDeviceAlarmLogRecord(UpdateDeviceAlarmLogDto updateDto);
 
-    DeviceAlarmLogDto getDeviceAlarmLogDetail();
+    /**
+     * 获取某个计划某个养殖场某个鸡舍某个日龄某个设备的报警详细信息
+     * @param queryDto
+     * @return
+     */
+    AlarmLogDetailDto getDeviceAlarmLogDetail(UpdateDeviceAlarmLogDto queryDto);
 
     /**
      * 获取某个计划某个养殖场某个鸡舍某个日龄某个设备的报警
