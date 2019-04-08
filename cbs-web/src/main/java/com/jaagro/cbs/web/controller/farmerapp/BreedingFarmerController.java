@@ -1,5 +1,6 @@
 package com.jaagro.cbs.web.controller.farmerapp;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
 import com.jaagro.cbs.api.dto.base.ShowCustomerDto;
@@ -89,6 +90,7 @@ public class BreedingFarmerController {
     @PostMapping("/publishedChickenPlan")
     @ApiOperation("发布上鸡计划")
     public BaseResponse publishedChickenPlan(@RequestBody CreateBreedingPlanDto dto) {
+        log.info("O publishedChickenPlan param={}", JSON.toJSONString(dto));
         if (CollectionUtils.isEmpty(dto.getPlantIds())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "养殖场不能为空");
         }
