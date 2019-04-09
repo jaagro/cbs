@@ -54,6 +54,8 @@ public class BreedingFarmerController {
     @Autowired
     private BreedingFarmerService breedingFarmerService;
     @Autowired
+
+
     private BreedingPlanService breedingPlanService;
     @Autowired
     private UserClientService userClientService;
