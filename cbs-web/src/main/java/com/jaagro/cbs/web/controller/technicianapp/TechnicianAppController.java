@@ -1,8 +1,10 @@
 package com.jaagro.cbs.web.controller.technicianapp;
 
 import com.github.pagehelper.PageInfo;
+import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
 import com.jaagro.cbs.api.dto.farmer.BreedingBatchParamDto;
+import com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto;
 import com.jaagro.cbs.api.dto.product.ListProductCriteria;
 import com.jaagro.cbs.api.dto.technicianapp.AppPurchaseOrderDto;
 import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
@@ -12,6 +14,7 @@ import com.jaagro.cbs.api.enums.PurchaseOrderStatusEnum;
 import com.jaagro.cbs.api.model.Product;
 import com.jaagro.cbs.api.model.PurchaseOrderItems;
 import com.jaagro.cbs.api.service.BreedingPlanService;
+import com.jaagro.cbs.web.vo.technicianapp.UnConfirmChickenPlanVo;
 import com.jaagro.cbs.api.service.BreedingPurchaseOrderService;
 import com.jaagro.cbs.api.service.ProductService;
 import com.jaagro.cbs.biz.service.CustomerClientService;
@@ -33,6 +36,9 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 技术管理app端
@@ -132,4 +138,33 @@ public class TechnicianAppController {
         return BaseResponse.successInstance(pageInfo);
     }
 
+
+    /**
+     * 确认出栏列表
+     *
+     * @param dto
+     * @return
+     */
+    @PostMapping("/listUnConfirmChickenPlan")
+    @ApiOperation("确认出栏列表")
+    public BaseResponse listPublishedChickenPlan(@RequestBody BreedingBatchParamDto dto) {
+        if (dto.getPageNum() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "起始页不能为空");
+        }
+        if (dto.getPageSize() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "每页条数不能为空");
+        }
+        PageInfo pageInfo = breedingPlanService.listBreedingPlanForTechnician(dto);
+        List<UnConfirmChickenPlanVo> unConfirmChickenPlanVos = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(pageInfo.getList())) {
+            List<ReturnBreedingPlanDto> breedingPlans = pageInfo.getList();
+            for (ReturnBreedingPlanDto plan : breedingPlans) {
+                UnConfirmChickenPlanVo planVo = new UnConfirmChickenPlanVo();
+                BeanUtils.copyProperties(plan, planVo);
+                unConfirmChickenPlanVos.add(planVo);
+            }
+        }
+        pageInfo.setList(unConfirmChickenPlanVos);
+        return BaseResponse.successInstance(pageInfo);
+    }
 }
