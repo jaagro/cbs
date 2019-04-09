@@ -6,6 +6,7 @@ import com.jaagro.cbs.api.dto.farmer.BreedingBatchParamDto;
 import com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto;
 import com.jaagro.cbs.api.dto.product.ListProductCriteria;
 import com.jaagro.cbs.api.dto.technicianapp.AppPurchaseOrderDto;
+import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
 import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
 import com.jaagro.cbs.api.enums.PackageUnitEnum;
 import com.jaagro.cbs.api.enums.ProductTypeEnum;
@@ -30,9 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +56,7 @@ public class TechnicianAppController {
 
     @Autowired
     private ProductService productService;
+
     /**
      * 养殖
      *
@@ -70,16 +70,7 @@ public class TechnicianAppController {
         log.info("O listBreedingBatchForFarmer params={}", dto);
         return BaseResponse.successInstance(breedingPlanService.listBreedingBatchForTechnician(dto));
     }
-/*
-    @GetMapping("/purchaseOrderPresetDetails/{purchaseOrderId}")
-    @ApiOperation("采购订单详情")
-    public BaseResponse purchaseOrderPresetDetails(@PathVariable("purchaseOrderId") Integer purchaseOrderId) {
-        if (purchaseOrderId == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "采购订单id不能为空");
-        }
-        return BaseResponse.successInstance(breedingPurchaseOrderService.purchaseOrderPresetDetails(purchaseOrderId));
-    }
-*/
+
     @PostMapping("/listPurchaseOrdersApp")
     @ApiOperation("技术员App待办-采购订单列表")
     public BaseResponse<PageInfo> listPurchaseOrdersApp(@RequestBody ToDoQueryParam criteriaDto) {
@@ -114,11 +105,11 @@ public class TechnicianAppController {
 
                     List<AppPurchaseOrderItemsVo> itemsVos = new ArrayList<>();
                     List<PurchaseOrderItems> items = purchaseOrderDto.getOrderItems();
-                    if(!CollectionUtils.isEmpty(items)){
+                    if (!CollectionUtils.isEmpty(items)) {
                         for (PurchaseOrderItems item : items) {
                             AppPurchaseOrderItemsVo itemsVo = new AppPurchaseOrderItemsVo();
-                            List<Product> productDos=products.stream().filter(c->c.getId().equals(item.getProductId())).collect(Collectors.toList());
-                            if(!CollectionUtils.isEmpty(productDos)) {
+                            List<Product> productDos = products.stream().filter(c -> c.getId().equals(item.getProductId())).collect(Collectors.toList());
+                            if (!CollectionUtils.isEmpty(productDos)) {
                                 itemsVo.setProductName(productDos.get(0).getProductName());
                                 itemsVo.setQuantity(item.getQuantity());
                                 itemsVo.setStrUnit(PackageUnitEnum.getDescByCode(item.getUnit()));
@@ -137,6 +128,16 @@ public class TechnicianAppController {
     }
 
 
+    @GetMapping("/purchaseOrderDetailsApp/{purchaseOrderId}")
+    @ApiOperation("采购订单详情")
+    public BaseResponse purchaseOrderDetailsApp(@PathVariable("purchaseOrderId") Integer purchaseOrderId) {
+        if (purchaseOrderId == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "采购订单id不能为空");
+        }
+        return BaseResponse.successInstance(breedingPurchaseOrderService.purchaseOrderPresetDetails(purchaseOrderId));
+    }
+
+
     /**
      * 确认出栏列表
      *
@@ -145,12 +146,15 @@ public class TechnicianAppController {
      */
     @PostMapping("/listUnConfirmChickenPlan")
     @ApiOperation("确认出栏列表")
-    public BaseResponse listPublishedChickenPlan(@RequestBody BreedingBatchParamDto dto) {
+    public BaseResponse listPublishedChickenPlan(@RequestBody BreedingPlanCriteriaDto dto) {
         if (dto.getPageNum() == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "起始页不能为空");
         }
         if (dto.getPageSize() == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "每页条数不能为空");
+        }
+        if (dto.getPlanStatus() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "计划状态不能为空");
         }
         PageInfo pageInfo = breedingPlanService.listBreedingPlanForTechnician(dto);
         List<UnConfirmChickenPlanVo> unConfirmChickenPlanVos = new ArrayList<>();
@@ -165,4 +169,5 @@ public class TechnicianAppController {
         pageInfo.setList(unConfirmChickenPlanVos);
         return BaseResponse.successInstance(pageInfo);
     }
+
 }

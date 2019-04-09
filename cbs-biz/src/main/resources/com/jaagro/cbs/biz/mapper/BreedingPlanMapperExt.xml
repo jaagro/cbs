@@ -176,12 +176,12 @@
         order by plan_time desc
     </select>
     <select id="listBreedingPlanForTechnician" resultType="com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto"
-            parameterType="java.lang.Integer">
+            parameterType="com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto">
         select
         <include refid="Base_Column_List"/>
         from breeding_plan
-        where enable=1
-        and technician_id = #{currentUserId}
-        and plan_status = 4
+        where enable = 1
+        and technician_id = #{technicianId}
+        and plan_status = #{planStatus}
     </select>
 </mapper>
