@@ -53,4 +53,13 @@ public interface CustomerClientService {
     @Ignore
     @GetMapping("/getCustomerContactByCustomerId/{customerId}")
     CustomerContactsReturnDto getCustomerContactByCustomerId(@PathVariable("customerId") Integer customerId);
+
+    /**
+     * 查询客户有效合同
+     *
+     * @param customerId
+     * @return
+     */
+    @GetMapping("/listContractByCustomerId/{customerId}")
+    BaseResponse listByCustomerId(@PathVariable("customerId") Integer customerId);
 }
