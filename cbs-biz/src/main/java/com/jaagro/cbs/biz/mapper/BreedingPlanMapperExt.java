@@ -96,6 +96,21 @@ public interface BreedingPlanMapperExt extends BaseMapper<BreedingPlan, Breeding
     List<Integer> listTodayPlanInteger();
 
     /**
+     * 过期的养殖计划单
+     *
+     * @return
+     */
+    List<BreedingPlan> listBreedingPlanOverdue();
+
+    /**
+     *
+     * 批量更新养殖计划超时状态了
+     * @param planIds
+     */
+    void batchUpdateBreedingPlanStatus(@Param("planIds") List<Integer> planIds);
+
+
+    /**
      * 根据技术员id查询
      *
      * @param technicianId
