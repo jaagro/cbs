@@ -7,6 +7,8 @@ import com.jaagro.cbs.api.dto.technicianapp.AlarmLogDetailDto;
 import com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto;
 import com.jaagro.cbs.api.dto.technicianapp.ToDoAlarmParam;
 import com.jaagro.cbs.api.dto.technicianapp.UpdateDeviceAlarmLogDto;
+import com.jaagro.cbs.api.enums.AlarmLogHandleTypeEnum;
+import com.jaagro.cbs.api.enums.TechConsultStatusEnum;
 import com.jaagro.cbs.api.model.*;
 import com.jaagro.cbs.api.service.DeviceAlarmLogService;
 import com.jaagro.cbs.biz.mapper.BatchCoopDailyMapperExt;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +46,10 @@ public class DeviceAlarmLogServiceImpl implements DeviceAlarmLogService {
     @Autowired
     private CustomerClientService customerClientService;
 
+
+
     /**
-     * 技术询问列表-技术员APP
+     * 获取技术员app报警列表
      *
      * @param dto
      * @return
@@ -52,16 +57,48 @@ public class DeviceAlarmLogServiceImpl implements DeviceAlarmLogService {
     @Override
     public PageInfo listDeviceAlarmLogApp(ToDoAlarmParam dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-        Map<String, Integer> queryParam = new HashMap<>();
+        Map<String, Integer> queryParam = new HashMap<>(10);
         queryParam.put("technicianId", dto.getTechnicianId());
         List<DeviceAlarmLogDto> DeviceAlarmLogDtoList = deviceAlarmLogMapperExt.listDeviceAlarmLogApp(queryParam);
 
         return new PageInfo(DeviceAlarmLogDtoList);
     }
 
+    /**
+     * 处理某个计划某个养殖场某个鸡舍某个日龄某个设备的报警
+     *
+     * @param updateDto
+     * @return
+     */
+    @Override
+    public boolean handleDeviceAlarmLogRecord(UpdateDeviceAlarmLogDto updateDto) {
+        try {
+            log.info("O DeviceAlarmLogServiceImpl.handleDeviceAlarmLogRecord input updateDto:{}", updateDto);
+            UserInfo currentUser = currentUserService.getCurrentUser();
+            DeviceAlarmLog deviceAlarmLog = new DeviceAlarmLog();
+
+            deviceAlarmLog.setHandleType(updateDto.getHandleType());
+            deviceAlarmLog.setHandleDesc(updateDto.getHandleDesc());
+            deviceAlarmLog.setHandleTime(new Date());
+            deviceAlarmLog.setHandleStatus(TechConsultStatusEnum.STATUS_SOLVED.getCode());
+            deviceAlarmLog.setHandleUserId(currentUser != null ? currentUser.getId() : null);
+            deviceAlarmLogMapperExt.updateByPrimaryKeySelective(deviceAlarmLog);
+
+        } catch (Exception e) {
+            log.error("R DeviceAlarmLogServiceImpl.handleDeviceAlarmLogRecord error:" + e);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 获取某个计划某个养殖场某个鸡舍某个日龄某个设备的报警详细信息
+     *
+     * @param queryDto
+     * @return
+     */
     @Override
     public AlarmLogDetailDto getDeviceAlarmLogDetail(UpdateDeviceAlarmLogDto queryDto) {
-
         AlarmLogDetailDto alarmLogDetailDto = new AlarmLogDetailDto();
         Integer technicianId = this.getCurrentUserId();
         Map<String, Integer> queryParam = new HashMap<>(10);
@@ -105,16 +142,15 @@ public class DeviceAlarmLogServiceImpl implements DeviceAlarmLogService {
                 DeviceAlarmLog deviceAlarmLog = alarmLogs.get(0);
                 alarmLogDetailDto.setLatestValue(deviceAlarmLog.getCurrentValue());
                 alarmLogDetailDto.setLatestAlarmDate(deviceAlarmLog.getCreateTime());
-                //alarmLogDetailDto.setHandleTypeStr(deviceAlarmLog.getCreateTime());
-                //alarmLogDetailDto.setHandleDesc(deviceAlarmLog.());
-
+                alarmLogDetailDto.setHandleTypeStr(AlarmLogHandleTypeEnum.getTypeByCode(deviceAlarmLog.getHandleType()));
+                alarmLogDetailDto.setHandleDesc(deviceAlarmLog.getHandleDesc());
             }
         }
         return alarmLogDetailDto;
     }
 
     /**
-     * 获取某个计划某个养殖场某个鸡舍某个日龄某个设备的报警
+     * 获取某个计划某个养殖场某个鸡舍某个日龄某个设备的最细报警记录
      *
      * @param queryDto
      * @return
@@ -132,33 +168,9 @@ public class DeviceAlarmLogServiceImpl implements DeviceAlarmLogService {
         return deviceAlarmLogMapperExt.selectByExample(example);
     }
 
-
-    /**
-     * 处理某个计划某个养殖场某个鸡舍某个日龄某个设备的报警
-     *
-     * @param updateDto
-     * @return
-     */
-    @Override
-    public boolean handleDeviceAlarmLogRecord(UpdateDeviceAlarmLogDto updateDto) {
-        try {
-            log.info("O DeviceAlarmLogServiceImpl.handleDeviceAlarmLogRecord input updateDto:{}", updateDto);
-            UserInfo currentUser = currentUserService.getCurrentUser();
-           /*
-            techConsultRecordDo.setTechConsultStatus(TechConsultStatusEnum.STATUS_SOLVED.getCode());
-            techConsultRecordDo.setModifyUserId(currentUser != null ? currentUser.getId() : null);
-            techConsultRecordDo.setHandleUserId(currentUser != null ? currentUser.getId() : null);
-            techConsultRecordMapper.updateByPrimaryKeySelective(techConsultRecordDo);
-            */
-        } catch (Exception e) {
-            log.error("R DeviceAlarmLogServiceImpl.handleDeviceAlarmLogRecord error:" + e);
-            return false;
-        }
-        return true;
-    }
-
     private Integer getCurrentUserId() {
         UserInfo userInfo = currentUserService.getCurrentUser();
         return userInfo == null ? null : userInfo.getId();
     }
+
 }

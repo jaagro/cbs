@@ -109,4 +109,12 @@ public interface BreedingPlanMapperExt extends BaseMapper<BreedingPlan, Breeding
      */
     void batchUpdateBreedingPlanStatus(@Param("planIds") List<Integer> planIds);
 
+
+    /**
+     * 根据技术员id查询
+     *
+     * @param technicianId
+     * @return
+     */
+    List<BreedingPlanDetailDto> listBreedingBatchForTechnician(@Param("technicianId") Integer technicianId);
 }

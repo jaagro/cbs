@@ -166,4 +166,13 @@
         </foreach>
     </update>
 
+    <select id="listBreedingBatchForTechnician" resultType="com.jaagro.cbs.api.dto.farmer.BreedingPlanDetailDto">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM breeding_plan
+        WHERE technician_id = #{technicianId,jdbcType=INTEGER}
+        and enable = 1
+        and plan_status in (3,4)
+        order by plan_time desc
+    </select>
 </mapper>
