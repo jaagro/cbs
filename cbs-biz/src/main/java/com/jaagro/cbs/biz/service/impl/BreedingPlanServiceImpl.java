@@ -1351,16 +1351,6 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         if (currentUserId == null) {
             throw new BusinessException("获取当前登录用户信息失败");
         }
-        BaseResponse<ListEmployeeDto> technician = userClientService.getTechnicianById(currentUserId);
-        ListEmployeeDto employeeDto;
-        if (technician.getStatusCode() != 200) {
-            throw new BusinessException("当前登录用户对应客户信息为空");
-        } else {
-            employeeDto = technician.getData();
-            if (employeeDto == null) {
-                throw new BusinessException("当前登录用户对应客户信息为空");
-            }
-        }
         List<BreedingPlanDetailDto> breedingPlanDetailDtoList = breedingPlanMapper.listBreedingBatchForTechnician(currentUserId);
         if (!CollectionUtils.isEmpty(breedingPlanDetailDtoList)) {
             breedingPlanDetailDtoList.forEach(breedingPlanDetailDto -> generateBatchDetail(breedingPlanDetailDto));
