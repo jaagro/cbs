@@ -7,14 +7,20 @@ import com.jaagro.cbs.api.dto.order.*;
 import com.jaagro.cbs.api.dto.plan.CustomerInfoParamDto;
 import com.jaagro.cbs.api.dto.supplychain.PurchaseOrderManageCriteria;
 import com.jaagro.cbs.api.dto.supplychain.ReturnPurchaseOrderManageDto;
+import com.jaagro.cbs.api.dto.technicianapp.AppPurchaseOrderDto;
+import com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto;
+import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
 import com.jaagro.cbs.api.enums.PackageUnitEnum;
 import com.jaagro.cbs.api.enums.PurchaseOrderStatusEnum;
 import com.jaagro.cbs.api.model.BreedingPlan;
 import com.jaagro.cbs.api.model.BreedingPlanExample;
+import com.jaagro.cbs.api.model.PurchaseOrderItems;
+import com.jaagro.cbs.api.model.PurchaseOrderItemsExample;
 import com.jaagro.cbs.api.service.BreedingFarmerService;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.BreedingPurchaseOrderService;
 import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
+import com.jaagro.cbs.biz.mapper.PurchaseOrderItemsMapperExt;
 import com.jaagro.cbs.biz.mapper.PurchaseOrderMapperExt;
 import com.jaagro.cbs.biz.service.UserClientService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @description: 采购订单相关api
@@ -44,7 +53,8 @@ public class BreedingPurchaseOrderServiceImpl implements BreedingPurchaseOrderSe
     private BreedingFarmerService breedingFarmerService;
     @Autowired
     private PurchaseOrderMapperExt purchaseOrderMapper;
-
+    @Autowired
+    private PurchaseOrderItemsMapperExt purchaseOrderItemsMapperExt;
 
     /**
      * 采购预置列表
@@ -172,4 +182,31 @@ public class BreedingPurchaseOrderServiceImpl implements BreedingPurchaseOrderSe
         //to do
         return null;
     }
+
+    /**
+     * 获取技术员app待办-采购订单列表
+     *
+     * @param criteriaDto
+     * @return
+     */
+    @Override
+    public PageInfo listPurchaseOrdersApp(ToDoQueryParam criteriaDto) {
+
+        PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
+        Map<String, Integer> queryParam = new HashMap<>();
+        queryParam.put("technicianId", criteriaDto.getTechnicianId());
+        List<AppPurchaseOrderDto> dtoList = purchaseOrderMapper.listPurchaseOrdersApp(queryParam);
+        for (AppPurchaseOrderDto purchaseOrderDto : dtoList) {
+            PurchaseOrderItemsExample example = new PurchaseOrderItemsExample();
+            example.createCriteria()
+                    .andPurchaseOrderIdEqualTo(purchaseOrderDto.getId())
+                    .andEnableEqualTo(true);
+
+            purchaseOrderDto.setOrderItems(purchaseOrderItemsMapperExt.selectByExample(example));
+        }
+
+        return new PageInfo(dtoList);
+    }
+
+
 }

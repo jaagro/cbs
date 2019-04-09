@@ -1,4 +1,4 @@
-package com.jaagro.cbs.web.vo.techApp;
+package com.jaagro.cbs.web.vo.technicianapp;
 
 
 import com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto;

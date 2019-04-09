@@ -93,10 +93,10 @@ public interface UserClientService {
     GetCustomerUserDto getCustomerUserById(@PathVariable("id") Integer id);
 
     /**
-     * 获取技术员列表
+     * 查询单个技术员
      *
+     * @param employeeId
      * @return
-     * @author
      */
     @GetMapping("/listTechnician/{employeeId}")
     BaseResponse<ListEmployeeDto> getTechnicianById(@PathVariable("employeeId") Integer employeeId);

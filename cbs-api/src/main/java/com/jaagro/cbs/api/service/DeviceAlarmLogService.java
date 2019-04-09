@@ -2,8 +2,8 @@ package com.jaagro.cbs.api.service;
 
 
 import com.github.pagehelper.PageInfo;
-import com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto;
-import com.jaagro.cbs.api.dto.technicianapp.ToDoAlarmParam;
+import com.jaagro.cbs.api.dto.technicianapp.AlarmLogDetailDto;
+import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
 import com.jaagro.cbs.api.dto.technicianapp.UpdateDeviceAlarmLogDto;
 import com.jaagro.cbs.api.model.DeviceAlarmLog;
 
@@ -19,18 +19,29 @@ public interface DeviceAlarmLogService {
 
 
     /**
-     * 获取技术端app报警列表
+     * 获取技术员app报警列表
      * @param dto
      * @return
      */
-    PageInfo listDeviceAlarmLogApp(ToDoAlarmParam dto);
+    PageInfo listDeviceAlarmLogApp(ToDoQueryParam dto);
 
-    boolean handleDeviceAlarmLogRecord(UpdateDeviceAlarmLogDto updateDto);
-
-    DeviceAlarmLogDto getDeviceAlarmLogDetail();
 
     /**
-     * 获取某个计划某个养殖场某个鸡舍某个日龄某个设备的报警
+     * 处理某个计划某个养殖场某个鸡舍某个日龄某个设备的报警
+     * @param updateDto
+     * @return
+     */
+    boolean handleDeviceAlarmLogRecord(UpdateDeviceAlarmLogDto updateDto);
+
+    /**
+     * 获取某个计划某个养殖场某个鸡舍某个日龄某个设备的报警详细信息
+     * @param queryDto
+     * @return
+     */
+    AlarmLogDetailDto getDeviceAlarmLogDetail(UpdateDeviceAlarmLogDto queryDto);
+
+    /**
+     * 获取某个计划某个养殖场某个鸡舍某个日龄某个设备的最细报警记录
      * @param updateDto
      * @return
      */

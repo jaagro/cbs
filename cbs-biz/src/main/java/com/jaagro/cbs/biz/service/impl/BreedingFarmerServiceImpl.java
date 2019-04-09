@@ -2,6 +2,7 @@ package com.jaagro.cbs.biz.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
 import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
 import com.jaagro.cbs.api.dto.base.ShowCustomerDto;
 import com.jaagro.cbs.api.dto.farmer.*;
@@ -14,6 +15,8 @@ import com.jaagro.cbs.biz.mapper.*;
 import com.jaagro.cbs.biz.service.CustomerClientService;
 import com.jaagro.cbs.biz.service.UserClientService;
 import com.jaagro.constant.UserInfo;
+import com.jaagro.utils.BaseResponse;
+import com.jaagro.utils.ResponseStatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -591,7 +594,10 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                 customerInfoDto
                         .setCustomerId(customerUser.getRelevanceId());
                 ShowCustomerDto showCustomer = customerClientService.getShowCustomerById(customerUser.getRelevanceId());
-                boolean flag = showCustomer != null && showCustomer.getCustomerName() != null;
+                BaseResponse baseResponse = customerClientService.listByCustomerId(customerUser.getRelevanceId());
+                boolean flag = showCustomer != null && showCustomer.getCustomerName() != null
+                        && CustomerStatusEnum.NORMAL_COOPERATION.getCode() == showCustomer.getCustomerStatus()
+                        && baseResponse.getStatusCode() != ResponseStatusCode.QUERY_DATA_EMPTY.getCode();
                 if (flag) {
                     customerInfoDto
                             .setCustomerName(showCustomer.getCustomerName());

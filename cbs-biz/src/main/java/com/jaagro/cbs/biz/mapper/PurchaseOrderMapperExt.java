@@ -6,6 +6,8 @@ import com.jaagro.cbs.api.dto.order.PurchaseOrderCriteriaDto;
 import com.jaagro.cbs.api.dto.order.PurchaseOrderDto;
 import com.jaagro.cbs.api.dto.supplychain.PurchaseOrderManageCriteria;
 import com.jaagro.cbs.api.dto.supplychain.ReturnPurchaseOrderManageDto;
+import com.jaagro.cbs.api.dto.technicianapp.AppPurchaseOrderDto;
+import com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto;
 import com.jaagro.cbs.api.model.PurchaseOrder;
 import com.jaagro.cbs.api.model.PurchaseOrderExample;
 import com.jaagro.cbs.biz.bo.PurchaseOrderBo;
@@ -13,6 +15,7 @@ import com.jaagro.cbs.biz.mapper.base.BaseMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -60,5 +63,12 @@ public interface PurchaseOrderMapperExt extends BaseMapper<PurchaseOrder, Purcha
      * @return
      */
     List<PurchaseOrderDto> listFarmerPurchaseOrder(PurchaseOrderCriteriaDto criteriaDto);
+
+    /**
+     * 获取技术员app待办-采购订单列表
+     * @Author gavin
+     * @return
+     */
+    List<AppPurchaseOrderDto> listPurchaseOrdersApp(Map<String,Integer> queryMap);
 
 }

@@ -73,4 +73,9 @@
         </if>
         order by delivery_time desc
     </select>
+    <select id="listPurchaseOrdersApp" resultType="com.jaagro.cbs.api.dto.technicianapp.AppPurchaseOrderDto">
+        SELECT o.*,p.plan_time,p.plan_chicken_quantity
+                FROM purchase_order o,breeding_plan p
+                WHERE o.plan_id=p.id and p.technician_id = ${technicianId} order by o.create_time desc
+    </select>
 </mapper>

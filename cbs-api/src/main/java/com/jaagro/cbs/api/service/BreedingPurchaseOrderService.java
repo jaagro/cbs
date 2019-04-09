@@ -3,9 +3,9 @@ package com.jaagro.cbs.api.service;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.order.PurchaseOrderPresetCriteriaDto;
 import com.jaagro.cbs.api.dto.order.ReturnPurchaseOrderPresetDetailsDto;
-import com.jaagro.cbs.api.dto.order.ReturnPurchaseOrderPresetDto;
 import com.jaagro.cbs.api.dto.supplychain.PurchaseOrderManageCriteria;
 import com.jaagro.cbs.api.dto.supplychain.ReturnPurchaseOrderManageDto;
+import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
 
 import java.util.List;
 
@@ -41,4 +41,12 @@ public interface BreedingPurchaseOrderService {
      * @author @Gao.
      */
     List<ReturnPurchaseOrderManageDto> listPurchasingManagement(PurchaseOrderManageCriteria criteria);
+
+    /**
+     *获取技术员app待办采购-订单列表
+     * @Author gavin
+     * @param criteriaDto
+     * @return
+     */
+    PageInfo listPurchaseOrdersApp(ToDoQueryParam criteriaDto);
 }

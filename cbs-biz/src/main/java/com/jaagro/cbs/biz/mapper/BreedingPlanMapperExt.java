@@ -8,6 +8,7 @@ import com.jaagro.cbs.api.dto.plan.BreedingPlanParamDto;
 import com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto;
 import com.jaagro.cbs.api.dto.standard.BreedingParamTemplateCriteria;
 import com.jaagro.cbs.api.dto.standard.ReturnBreedingParamTemplateDto;
+import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
 import com.jaagro.cbs.api.model.BreedingPlan;
 import com.jaagro.cbs.api.model.BreedingPlanExample;
 import com.jaagro.cbs.biz.mapper.base.BaseMapper;
@@ -94,4 +95,34 @@ public interface BreedingPlanMapperExt extends BaseMapper<BreedingPlan, Breeding
      * @return
      */
     List<Integer> listTodayPlanInteger();
+
+    /**
+     * 过期的养殖计划单
+     *
+     * @return
+     */
+    List<BreedingPlan> listBreedingPlanOverdue();
+
+    /**
+     *
+     * 批量更新养殖计划超时状态了
+     * @param planIds
+     */
+    void batchUpdateBreedingPlanStatus(@Param("planIds") List<Integer> planIds);
+
+
+    /**
+     * 根据技术员id查询
+     *
+     * @param technicianId
+     * @return
+     */
+    List<BreedingPlanDetailDto> listBreedingBatchForTechnician(@Param("technicianId") Integer technicianId);
+
+    /**
+     * 分页查询养殖计划 出栏确认
+     * @param currentUserId
+     * @return
+     */
+    List<ReturnBreedingPlanDto> listBreedingPlanForTechnician(BreedingPlanCriteriaDto criteriaDto);
 }

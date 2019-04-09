@@ -149,4 +149,39 @@
     WHERE
         temp_a.id NOT IN ( SELECT plan_id FROM breeding_record WHERE ENABLE = 1 AND DATE_FORMAT( create_time, "%Y-%m-%d" ) = DATE_FORMAT(now(), "%Y-%m-%d" ) GROUP BY plan_id )
     </select>
+    <select id="listBreedingPlanOverdue" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from breeding_plan
+        where
+        <![CDATA[
+        plan_status=0 and plan_time< DATE_FORMAT(now(),"%Y-%m-%d")
+        ]]>
+    </select>
+    <update id="batchUpdateBreedingPlanStatus" parameterType="java.util.List">
+        update breeding_plan
+        set plan_status=7,modify_time=now(),modify_user_id=1 where plan_status = 0 and id in
+        <foreach collection="planIds" item="planId" index="index" separator="," open="(" close=")">
+            #{planId}
+        </foreach>
+    </update>
+
+    <select id="listBreedingBatchForTechnician" resultType="com.jaagro.cbs.api.dto.farmer.BreedingPlanDetailDto">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM breeding_plan
+        WHERE technician_id = #{technicianId,jdbcType=INTEGER}
+        and enable = 1
+        and plan_status in (3,4)
+        order by plan_time desc
+    </select>
+    <select id="listBreedingPlanForTechnician" resultType="com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto"
+            parameterType="com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto">
+        select
+        <include refid="Base_Column_List"/>
+        from breeding_plan
+        where enable = 1
+        and technician_id = #{technicianId}
+        and plan_status = #{planStatus}
+    </select>
 </mapper>
