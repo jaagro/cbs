@@ -3,7 +3,7 @@ package com.jaagro.cbs.api.service;
 
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.technicianapp.AlarmLogDetailDto;
-import com.jaagro.cbs.api.dto.technicianapp.ToDoAlarmParam;
+import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
 import com.jaagro.cbs.api.dto.technicianapp.UpdateDeviceAlarmLogDto;
 import com.jaagro.cbs.api.model.DeviceAlarmLog;
 
@@ -23,7 +23,7 @@ public interface DeviceAlarmLogService {
      * @param dto
      * @return
      */
-    PageInfo listDeviceAlarmLogApp(ToDoAlarmParam dto);
+    PageInfo listDeviceAlarmLogApp(ToDoQueryParam dto);
 
 
     /**

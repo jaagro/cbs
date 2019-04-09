@@ -5,7 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
 import com.jaagro.cbs.api.dto.technicianapp.AlarmLogDetailDto;
 import com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto;
-import com.jaagro.cbs.api.dto.technicianapp.ToDoAlarmParam;
+import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
 import com.jaagro.cbs.api.dto.technicianapp.UpdateDeviceAlarmLogDto;
 import com.jaagro.cbs.api.enums.AlarmLogHandleTypeEnum;
 import com.jaagro.cbs.api.enums.TechConsultStatusEnum;
@@ -55,7 +55,7 @@ public class DeviceAlarmLogServiceImpl implements DeviceAlarmLogService {
      * @return
      */
     @Override
-    public PageInfo listDeviceAlarmLogApp(ToDoAlarmParam dto) {
+    public PageInfo listDeviceAlarmLogApp(ToDoQueryParam dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         Map<String, Integer> queryParam = new HashMap<>(10);
         queryParam.put("technicianId", dto.getTechnicianId());
