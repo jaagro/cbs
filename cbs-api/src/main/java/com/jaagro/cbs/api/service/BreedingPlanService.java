@@ -174,4 +174,12 @@ public interface BreedingPlanService {
      * @return
      */
     PageInfo<BreedingPlanDetailDto> listBreedingBatchForTechnician(BreedingBatchParamDto dto);
+
+    /**
+     * 分页查询养殖计划
+     *
+     * @param dto
+     * @return
+     */
+    PageInfo listBreedingPlanForTechnician(BreedingBatchParamDto dto);
 }
