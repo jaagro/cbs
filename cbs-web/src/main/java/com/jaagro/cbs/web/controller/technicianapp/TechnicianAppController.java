@@ -168,46 +168,4 @@ public class TechnicianAppController {
     @Autowired
     private BreedingPlanService breedingPlanService;
 
-    /**
-     * 养殖
-     *
-     * @param dto
-     * @return
-     * @author byr
-     */
-    @PostMapping("/listBreedingBatchForTechnician")
-    @ApiOperation("养殖")
-    public BaseResponse listBreedingBatchForTechnician(@RequestBody @Validated BreedingBatchParamDto dto) {
-        log.info("O listBreedingBatchForFarmer params={}", dto);
-        return BaseResponse.successInstance(breedingPlanService.listBreedingBatchForTechnician(dto));
-    }
-
-    /**
-     * 确认出栏列表
-     *
-     * @param dto
-     * @return
-     */
-    @PostMapping("/listUnConfirmChickenPlan")
-    @ApiOperation("确认出栏列表")
-    public BaseResponse listPublishedChickenPlan(@RequestBody BreedingBatchParamDto dto) {
-        if (dto.getPageNum() == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "起始页不能为空");
-        }
-        if (dto.getPageSize() == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "每页条数不能为空");
-        }
-        PageInfo pageInfo = breedingPlanService.listBreedingPlanForTechnician(dto);
-        List<UnConfirmChickenPlanVo> unConfirmChickenPlanVos = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(pageInfo.getList())) {
-            List<ReturnBreedingPlanDto> breedingPlans = pageInfo.getList();
-            for (ReturnBreedingPlanDto plan : breedingPlans) {
-                UnConfirmChickenPlanVo planVo = new UnConfirmChickenPlanVo();
-                BeanUtils.copyProperties(plan, planVo);
-                unConfirmChickenPlanVos.add(planVo);
-            }
-        }
-        pageInfo.setList(unConfirmChickenPlanVos);
-        return BaseResponse.successInstance(pageInfo);
-    }
 }
