@@ -2,7 +2,6 @@ package com.jaagro.cbs.api.service;
 
 
 import com.github.pagehelper.PageInfo;
-import com.jaagro.cbs.api.dto.base.ShowCustomerDto;
 import com.jaagro.cbs.api.dto.farmer.*;
 import com.jaagro.cbs.api.dto.order.AccumulationPurchaseOrderParamDto;
 import com.jaagro.cbs.api.dto.plan.*;
@@ -161,10 +160,26 @@ public interface BreedingPlanService {
     AccumulationPurchaseOrderParamDto accumulationPurchaseOrderItems(Integer purchaseOrderId);
 
     /**
-     *根据技术员ID查找该技术员负责的所有养殖计划
+     * 根据技术员ID查找该技术员负责的所有养殖计划
+     *
      * @param technicianId
      * @return
      */
     List<BreedingPlan> listBreedingPlanByTechnicianId(Integer technicianId);
 
+    /**
+     * 根据技术员ID查找养殖计划分页
+     *
+     * @param dto
+     * @return
+     */
+    PageInfo<BreedingPlanDetailDto> listBreedingBatchForTechnician(BreedingBatchParamDto dto);
+
+    /**
+     * 分页查询养殖计划
+     *
+     * @param dto
+     * @return
+     */
+    PageInfo listBreedingPlanForTechnician(BreedingBatchParamDto dto);
 }

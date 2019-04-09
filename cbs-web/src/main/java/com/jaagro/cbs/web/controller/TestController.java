@@ -9,6 +9,7 @@ import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.biz.mapper.BatchPlantCoopMapperExt;
 import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
 import com.jaagro.cbs.biz.mapper.ProductMapperExt;
+import com.jaagro.cbs.biz.schedule.BreedingPlanOverdueSchedule;
 import com.jaagro.cbs.biz.utils.SequenceCodeUtils;
 import com.netflix.discovery.converters.Auto;
 import io.swagger.annotations.ApiOperation;
@@ -47,6 +48,9 @@ public class TestController {
     private BreedingFarmerService breedingFarmerService;
     @Autowired
     private BreedingPlanMapperExt breedingPlanMapper;
+    @Autowired
+    private BreedingPlanOverdueSchedule breedingPlanOverdueSchedule;
+
 
     @PostMapping("/createProduct")
     public void createProduct() {
@@ -95,10 +99,10 @@ public class TestController {
 
     @GetMapping("/teettta/{planID}")
     public void test(@PathVariable Integer planID) throws Exception {
-        BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planID);
+        //BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planID);
+        breedingPlanOverdueSchedule.cancelBreedingPlanOverdue();
 
-
-        System.out.println(breedingFarmerService.getDayAge(breedingPlan.getPlanTime()));
+        //System.out.println(breedingFarmerService.getDayAge(breedingPlan.getPlanTime()));
         // System.out.println(breedingPlanService.getDayAge(planID));
     }
 

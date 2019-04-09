@@ -1323,6 +1323,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         calculatePurchaseOrderMap.put(productType, totalPurchaseOrderItemsStatistics);
         return calculatePurchaseOrderMap;
     }
+
     /**
      * 根据技术员ID查找该技术员负责的所有养殖计划
      *
@@ -1334,5 +1335,54 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         BreedingPlanExample example = new BreedingPlanExample();
         example.createCriteria().andEnableEqualTo(true).andTechnicianIdEqualTo(technicianId);
         return breedingPlanMapper.selectByExample(example);
+    }
+
+    /**
+     * 根据技术员ID查找养殖计划分页
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public PageInfo<BreedingPlanDetailDto> listBreedingBatchForTechnician(BreedingBatchParamDto dto) {
+        PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        Integer currentUserId = currentUser == null ? null : currentUser.getId();
+        if (currentUserId == null) {
+            throw new BusinessException("获取当前登录用户信息失败");
+        }
+        List<BreedingPlanDetailDto> breedingPlanDetailDtoList = breedingPlanMapper.listBreedingBatchForTechnician(currentUserId);
+        if (!CollectionUtils.isEmpty(breedingPlanDetailDtoList)) {
+            breedingPlanDetailDtoList.forEach(breedingPlanDetailDto -> generateBatchDetail(breedingPlanDetailDto));
+        }
+        return new PageInfo<>(breedingPlanDetailDtoList);
+    }
+
+    /**
+     * 分页查询养殖计划 出栏确认
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public PageInfo listBreedingPlanForTechnician(BreedingBatchParamDto dto) {
+        PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        Integer currentUserId = currentUser == null ? null : currentUser.getId();
+        if (currentUserId == null) {
+            throw new BusinessException("获取当前登录用户信息失败");
+        }
+        List<ReturnBreedingPlanDto> planDtoList = breedingPlanMapper.listBreedingPlanForTechnician(currentUserId);
+        for (ReturnBreedingPlanDto returnBreedingPlanDto : planDtoList) {
+            //填充养殖户信息
+            if (returnBreedingPlanDto.getCustomerId() != null) {
+                CustomerInfoParamDto customerInfo = getCustomerInfo(returnBreedingPlanDto.getCustomerId());
+                if (customerInfo != null) {
+                    returnBreedingPlanDto
+                            .setCustomerName(customerInfo.getCustomerName());
+                }
+            }
+        }
+        return new PageInfo<>(planDtoList);
     }
 }
