@@ -3,6 +3,7 @@ package com.jaagro.cbs.web.controller.technicianapp;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.farmer.BreedingBatchParamDto;
 import com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto;
+import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.web.vo.technicianapp.UnConfirmChickenPlanVo;
 import com.jaagro.utils.BaseResponse;
@@ -57,12 +58,15 @@ public class TechnicianAppController {
      */
     @PostMapping("/listUnConfirmChickenPlan")
     @ApiOperation("确认出栏列表")
-    public BaseResponse listPublishedChickenPlan(@RequestBody BreedingBatchParamDto dto) {
+    public BaseResponse listPublishedChickenPlan(@RequestBody BreedingPlanCriteriaDto dto) {
         if (dto.getPageNum() == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "起始页不能为空");
         }
         if (dto.getPageSize() == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "每页条数不能为空");
+        }
+        if (dto.getPlanStatus() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "计划状态不能为空");
         }
         PageInfo pageInfo = breedingPlanService.listBreedingPlanForTechnician(dto);
         List<UnConfirmChickenPlanVo> unConfirmChickenPlanVos = new ArrayList<>();

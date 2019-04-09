@@ -14,6 +14,7 @@ import com.jaagro.cbs.api.dto.plan.*;
 import com.jaagro.cbs.api.dto.progress.BreedingBatchParamTrackingDto;
 import com.jaagro.cbs.api.dto.standard.BreedingParameterDto;
 import com.jaagro.cbs.api.dto.standard.BreedingStandardDrugDto;
+import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
 import com.jaagro.cbs.api.enums.*;
 import com.jaagro.cbs.api.exception.BusinessException;
 import com.jaagro.cbs.api.model.*;
@@ -1365,14 +1366,15 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
      * @return
      */
     @Override
-    public PageInfo listBreedingPlanForTechnician(BreedingBatchParamDto dto) {
+    public PageInfo listBreedingPlanForTechnician(BreedingPlanCriteriaDto dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         UserInfo currentUser = currentUserService.getCurrentUser();
         Integer currentUserId = currentUser == null ? null : currentUser.getId();
         if (currentUserId == null) {
             throw new BusinessException("获取当前登录用户信息失败");
         }
-        List<ReturnBreedingPlanDto> planDtoList = breedingPlanMapper.listBreedingPlanForTechnician(currentUserId);
+        dto.setTechnicianId(currentUserId);
+        List<ReturnBreedingPlanDto> planDtoList = breedingPlanMapper.listBreedingPlanForTechnician(dto);
         for (ReturnBreedingPlanDto returnBreedingPlanDto : planDtoList) {
             //填充养殖户信息
             if (returnBreedingPlanDto.getCustomerId() != null) {
