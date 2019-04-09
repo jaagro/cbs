@@ -10,13 +10,14 @@ import java.io.Serializable;
 
 /**
  * @author gavin
- * @Date 20190228
+ * @Date 20190408
+ * 待办查询参数
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class ToDoAlarmParam implements Serializable {
+public class ToDoQueryParam implements Serializable {
 
     private static final long serialVersionUID = 3835147859136626721L;
     /**

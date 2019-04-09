@@ -4,10 +4,9 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
 import com.jaagro.cbs.api.dto.technicianapp.AlarmLogDetailDto;
 import com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto;
-import com.jaagro.cbs.api.dto.technicianapp.ToDoAlarmParam;
+import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
 import com.jaagro.cbs.api.dto.technicianapp.UpdateDeviceAlarmLogDto;
 import com.jaagro.cbs.api.model.DeviceAlarmLog;
-import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.DeviceAlarmLogService;
 import com.jaagro.cbs.biz.service.CustomerClientService;
 import com.jaagro.cbs.web.vo.technicianapp.DeviceAlarmLogVo;
@@ -51,7 +50,7 @@ public class DeviceAlarmController {
      */
     @ApiOperation("待办报警信息列表-技术员APP")
     @PostMapping("/listDeviceAlarmLogApp")
-    public BaseResponse<PageInfo> listDeviceAlarmLogApp(@RequestBody ToDoAlarmParam criteriaDto) {
+    public BaseResponse<PageInfo> listDeviceAlarmLogApp(@RequestBody ToDoQueryParam criteriaDto) {
 
         if (StringUtils.isEmpty(criteriaDto.getPageNum())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为空");
