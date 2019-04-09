@@ -43,4 +43,16 @@ public class UpdateDeviceAlarmLogDto implements Serializable {
      * 日龄
      */
     private Integer dayAge;
+
+    /**
+     * 处理描述
+     */
+    private String handleDesc;
+
+    /**
+     * 处理类型(1-电话询问,2-远程协助,3-上门处理,4-故障误报)
+     */
+    private Integer handleType;
+
+
 }

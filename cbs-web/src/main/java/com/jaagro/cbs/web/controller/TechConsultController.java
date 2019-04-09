@@ -100,7 +100,7 @@ public class TechConsultController {
      * @author gavin
      * @date 2019/03/01
      */
-    @ApiOperation("获取技术询问列表")
+    @ApiOperation("处理技术询问")
     @PostMapping("/handleTechConsultRecord")
     public BaseResponse handleTechConsultRecord(@RequestBody UpdateTechConsultDto updateDto) {
 

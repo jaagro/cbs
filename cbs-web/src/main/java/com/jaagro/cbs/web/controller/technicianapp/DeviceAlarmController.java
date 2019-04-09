@@ -39,9 +39,8 @@ import java.util.List;
 public class DeviceAlarmController {
 
     @Autowired
-    private BreedingPlanService breedingPlanService;
-    @Autowired
     private DeviceAlarmLogService deviceAlarmLogService;
+
     @Autowired
     private CustomerClientService customerClientService;
     /**
@@ -120,5 +119,18 @@ public class DeviceAlarmController {
         }
         AlarmLogDetailDto detailDto = deviceAlarmLogService.getDeviceAlarmLogDetail(queryDto);
         return BaseResponse.successInstance(detailDto);
+    }
+
+
+    @ApiOperation("处理鸡舍设备报警")
+    @PostMapping("/handleDeviceAlarmLogRecord")
+    public BaseResponse handleDeviceAlarmLogRecord(@RequestBody UpdateDeviceAlarmLogDto updateDto) {
+
+        boolean flag = deviceAlarmLogService.handleDeviceAlarmLogRecord(updateDto);
+        if (flag) {
+            return BaseResponse.successInstance("处理鸡舍设备报警!");
+        } else {
+            return BaseResponse.errorInstance("处理鸡舍设备报警失败");
+        }
     }
 }
