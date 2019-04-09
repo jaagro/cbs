@@ -165,7 +165,5 @@ public class TechnicianAppController {
         pageInfo.setList(unConfirmChickenPlanVos);
         return BaseResponse.successInstance(pageInfo);
     }
-    @Autowired
-    private BreedingPlanService breedingPlanService;
 
 }
