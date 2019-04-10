@@ -8,6 +8,7 @@ import com.jaagro.cbs.api.dto.techconsult.UpdateTechConsultDto;
 import com.jaagro.cbs.api.enums.EmergencyLevelEnum;
 import com.jaagro.cbs.api.enums.TechConsultHandleTypeEnum;
 import com.jaagro.cbs.api.enums.TechConsultStatusEnum;
+import com.jaagro.cbs.api.exception.BusinessException;
 import com.jaagro.cbs.api.model.*;
 import com.jaagro.cbs.api.service.TechConsultService;
 import com.jaagro.cbs.biz.mapper.BatchCoopDailyMapperExt;
@@ -95,7 +96,7 @@ public class TechConsultServiceImpl implements TechConsultService {
         ReturnTechConsultRecordDto returnDto = new ReturnTechConsultRecordDto();
         TechConsultRecord techConsultRecordDo = techConsultRecordMapper.selectByPrimaryKey(id);
         if (null == techConsultRecordDo) {
-            throw new RuntimeException("技术询问id=" + id + "不存在");
+            throw new BusinessException("技术询问id=" + id + "不存在");
         }
         BeanUtils.copyProperties(techConsultRecordDo, returnDto);
         returnDto.setStrTechConsultStatus(TechConsultStatusEnum.getDescByCode(techConsultRecordDo.getTechConsultStatus()));
