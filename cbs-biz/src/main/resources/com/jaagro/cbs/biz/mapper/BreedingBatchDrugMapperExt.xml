@@ -20,5 +20,13 @@
         )
     </foreach>
     </insert>
-
+    <select id="listBreedingBatchDrugs" resultType="com.jaagro.cbs.api.dto.standard.BreedingStandardDrugDto">
+        SELECT
+	      bbd.*,p.capacity_unit,p.product_name
+        FROM
+            breeding_batch_drug bbd
+        LEFT JOIN product p ON bbd.product_id = p.id
+        WHERE bbd.plan_id = #{planId}
+        order by bbd.day_age_start asc
+    </select>
 </mapper>

@@ -5,6 +5,9 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.farmer.*;
 import com.jaagro.cbs.api.dto.order.AccumulationPurchaseOrderParamDto;
 import com.jaagro.cbs.api.dto.plan.*;
+import com.jaagro.cbs.api.dto.standard.BreedingParameterListDto;
+import com.jaagro.cbs.api.dto.standard.BreedingStandardDrugDto;
+import com.jaagro.cbs.api.dto.standard.ParameterTypeDto;
 import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
 import com.jaagro.cbs.api.model.BreedingPlan;
 
@@ -183,4 +186,27 @@ public interface BreedingPlanService {
      * @return
      */
     PageInfo listBreedingPlanForTechnician(BreedingPlanCriteriaDto dto);
+
+    /**
+     * 根据计划id查询参数模块列表
+     * @param planId
+     * @return
+     */
+    List<ParameterTypeDto> listParameterNameByPlanId(Integer planId);
+
+    /**
+     * 根据计划id参数名称参数类型查看养殖模板参数
+     * @param planId
+     * @param paramName
+     * @param paramType
+     * @return
+     */
+    BreedingParameterListDto listParameterListByNameAndPlanId(Integer planId, String paramName, Integer paramType);
+
+    /**
+     * 根据计划id查询养殖药品配置
+     * @param planId
+     * @return
+     */
+    List<BreedingStandardDrugDto> listBreedingBatchDrugs(Integer planId);
 }

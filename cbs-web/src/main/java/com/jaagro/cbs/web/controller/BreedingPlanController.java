@@ -11,6 +11,8 @@ import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.BreedingPlantService;
 import com.jaagro.cbs.web.vo.plan.BreedingPlanVo;
 import com.jaagro.cbs.web.vo.plan.coop.CheckCoopVo;
+import com.jaagro.cbs.web.vo.standard.BreedingStandardDrugListVo;
+import com.jaagro.cbs.web.vo.standard.StandardVoUtil;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -174,5 +176,27 @@ public class BreedingPlanController {
             }
         }
         return BaseResponse.successInstance(checkCoopVos);
+    }
+
+    @ApiOperation("根据计划id获取养殖参数模块列表")
+    @GetMapping("/listParameterNameByPlanId/{planId}")
+    public BaseResponse listParameterNameByPlanId(@PathVariable("planId") Integer planId) {
+        log.info("O listParameterNameByPlanId planId={}", planId);
+        return BaseResponse.successInstance(breedingPlanService.listParameterNameByPlanId(planId));
+    }
+
+    @ApiOperation("根据计划id参数名称获取参数列表")
+    @GetMapping("/listParameterListByNameAndPlanId")
+    public BaseResponse listParameterListByNameAndPlanId(@RequestParam Integer planId, @RequestParam String paramName, @RequestParam Integer paramType) {
+        log.info("O listParameterListByNameAndPlanId planId={},paramName={},paramType", planId, paramName, paramType);
+        return BaseResponse.successInstance(breedingPlanService.listParameterListByNameAndPlanId(planId, paramName, paramType));
+    }
+
+    @ApiOperation("查询批次养殖模板药品配置信息")
+    @GetMapping("/listBreedingBatchDrugs/{planId}")
+    public BaseResponse listBreedingBatchDrugs(@PathVariable("planId") Integer planId) {
+        log.info("O listBreedingBatchDrugs planId={}", planId);
+        List<BreedingStandardDrugListVo> breedingStandardDrugListVoList = StandardVoUtil.generateStandardDrugs(breedingPlanService.listBreedingBatchDrugs(planId));
+        return BaseResponse.successInstance(breedingStandardDrugListVoList);
     }
 }
