@@ -2,6 +2,9 @@ package com.jaagro.cbs.web.controller.technicianapp;
 
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
+import com.jaagro.cbs.api.dto.base.EmployeeAndRoleDto;
+import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
+import com.jaagro.cbs.api.dto.base.GetTenantDto;
 import com.jaagro.cbs.api.dto.farmer.BreedingBatchParamDto;
 import com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto;
 import com.jaagro.cbs.api.dto.product.ListProductCriteria;
@@ -19,10 +22,14 @@ import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.BreedingPurchaseOrderService;
 import com.jaagro.cbs.api.service.ProductService;
 import com.jaagro.cbs.biz.service.CustomerClientService;
+import com.jaagro.cbs.biz.service.UserClientService;
+import com.jaagro.cbs.biz.service.impl.CurrentUserService;
 import com.jaagro.cbs.web.vo.plan.PublishedChickenPlanVo;
 import com.jaagro.cbs.web.vo.technicianapp.AppPurchaseOrderItemsVo;
 import com.jaagro.cbs.web.vo.technicianapp.AppPurchaseOrderVo;
+import com.jaagro.cbs.web.vo.technicianapp.EmployeeInfoVo;
 import com.jaagro.cbs.web.vo.technicianapp.UnConfirmChickenPlanVo;
+import com.jaagro.constant.UserInfo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -56,7 +63,10 @@ public class TechnicianAppController {
     private BreedingPurchaseOrderService breedingPurchaseOrderService;
     @Autowired
     private CustomerClientService customerClientService;
-
+    @Autowired
+    private UserClientService userClientService;
+    @Autowired
+    private CurrentUserService currentUserService;
     @Autowired
     private ProductService productService;
     @Autowired
@@ -204,5 +214,34 @@ public class TechnicianAppController {
         }
         pageInfo.setList(publishedChickenPlanVos);
         return BaseResponse.successInstance(pageInfo);
+    }
+
+    /**
+     * @Author gavin
+     * @return
+     */
+    @GetMapping("/technicianPersonalCenter")
+    @ApiOperation("技术端个人中心")
+    public BaseResponse technicianPersonalCenter() {
+        EmployeeInfoVo infoVo = new EmployeeInfoVo();
+        List<EmployeeAndRoleDto> empRoleList = userClientService.getAllEmpAndRole().getData();
+        UserInfo currentUser = currentUserService.getCurrentUser();
+
+        if(null != currentUser){
+            GetTenantDto tenantDto = customerClientService.getTenantById(currentUser.getTenantId()).getData();
+            infoVo.setName(currentUser.getName());
+            infoVo.setPhone(currentUser.getPhoneNumber());
+            if(null !=tenantDto) {
+                infoVo.setTenantName(tenantDto.getCompanyName());
+            }
+            List<EmployeeAndRoleDto> newEmpRoleList = empRoleList.stream().filter(c->c.getId().equals(currentUser.getId())).collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(newEmpRoleList))
+            {
+                infoVo.setRoleName(newEmpRoleList.get(0).getRoleName());
+            }
+
+        }
+
+        return BaseResponse.successInstance(infoVo);
     }
 }

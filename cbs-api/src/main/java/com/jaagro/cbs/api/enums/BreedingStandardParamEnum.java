@@ -25,7 +25,8 @@ public enum BreedingStandardParamEnum {
     FEEDING_WEIGHT(22, "FEEDING_WEIGHT", "饲喂重量(克/只/日)"),
     WEIGHT(23, "WEIGHT", "体重标准(克/只/日)"),
     DIE(24, "DIE", "死淘(只)"),
-    DRUG(25, "DRUG", "药品/疫苗");
+    DRUG(25, "DRUG", "药品/疫苗"),
+    OTHER(99,"OTHER","其他");
     private int code;
     private String type;
     private String desc;
