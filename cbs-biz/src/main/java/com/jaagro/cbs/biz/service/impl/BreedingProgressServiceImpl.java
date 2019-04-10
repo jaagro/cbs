@@ -223,7 +223,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                             List<BatchCoopDaily> batchCoopDailyList = batchCoopDailyMapper.selectByExample(batchCoopDailyExample);
                             if (!batchCoopDailyList.isEmpty()){
                                 Integer startAmount = batchCoopDailyList.get(0).getStartAmount();
-                                returnDto.setActualValue(new BigDecimal(deathTotal).divide(new BigDecimal(startAmount),4, RoundingMode.HALF_UP).multiply(new BigDecimal("100")).toPlainString());
+                                returnDto.setActualValue(new BigDecimal(deathTotal).divide(new BigDecimal(startAmount),4, RoundingMode.HALF_UP).multiply(new BigDecimal("100")).setScale(2,BigDecimal.ROUND_HALF_UP).toPlainString());
                             }
                         }
                     }

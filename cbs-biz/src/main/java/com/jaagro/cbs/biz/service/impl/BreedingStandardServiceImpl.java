@@ -189,7 +189,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
             // 如果必要参数都已配置则模板状态改为已参数配置状态
             BreedingStandardParameterExample example = new BreedingStandardParameterExample();
             List<String> necessaryParamList = new ArrayList<>();
-            necessaryParamList.add("死淘");
+            necessaryParamList.add("死淘率");
             necessaryParamList.add("体重标准");
             necessaryParamList.add("饲喂重量");
             necessaryParamList.add("饲喂次数");
@@ -323,7 +323,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         result.add(parameterTypeDtoFeedingWeight);
         ParameterTypeDto parameterTypeDtoFeedingFodderNum = new ParameterTypeDto(standardId, "饲喂次数", BreedingStandardParamEnum.FEEDING_FODDER_NUM.getCode(), "次", 3);
         result.add(parameterTypeDtoFeedingFodderNum);
-        ParameterTypeDto parameterTypeDtoDie = new ParameterTypeDto(standardId, "死淘", BreedingStandardParamEnum.DIE.getCode(), "%", 4);
+        ParameterTypeDto parameterTypeDtoDie = new ParameterTypeDto(standardId, "死淘率", BreedingStandardParamEnum.DIE.getCode(), "%", 4);
         result.add(parameterTypeDtoDie);
         return result;
     }
@@ -378,7 +378,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         boolean isInitParam = ("体重标准".equals(paramName) && BreedingStandardParamEnum.WEIGHT.getCode() == paramType)
                 || ("饲喂重量".equals(paramName) && BreedingStandardParamEnum.FEEDING_WEIGHT.getCode() == paramType)
                 || ("饲喂次数".equals(paramName) && BreedingStandardParamEnum.FEEDING_FODDER_NUM.getCode() == paramType)
-                || ("死淘".equals(paramName) && BreedingStandardParamEnum.DIE.getCode() == paramType);
+                || ("死淘率".equals(paramName) && BreedingStandardParamEnum.DIE.getCode() == paramType);
         if (isInitParam) {
             BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(standardId);
             if (breedingStandard == null) {
@@ -401,7 +401,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
                     dto.setDisplayOrder(3);
                     dto.setUnit("次");
                     break;
-                case "死淘":
+                case "死淘率":
                     dto.setDisplayOrder(4);
                     dto.setUnit("%");
                     break;
