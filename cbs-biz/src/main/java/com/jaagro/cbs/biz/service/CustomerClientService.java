@@ -2,6 +2,7 @@ package com.jaagro.cbs.biz.service;
 
 import com.jaagro.cbs.api.dto.base.CustomerContacts;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
+import com.jaagro.cbs.api.dto.base.GetTenantDto;
 import com.jaagro.cbs.api.dto.base.ShowCustomerDto;
 import com.jaagro.utils.BaseResponse;
 import jdk.nashorn.internal.ir.annotations.Ignore;
@@ -62,4 +63,12 @@ public interface CustomerClientService {
      */
     @GetMapping("/listContractByCustomerId/{customerId}")
     BaseResponse listByCustomerId(@PathVariable("customerId") Integer customerId);
+
+    /**
+     * 根据租户ID获取租户详情
+     * @param id
+     * @return
+     */
+    @GetMapping("/getTenantById/{id}")
+    BaseResponse<GetTenantDto> getTenantById(@PathVariable("id") int id);
 }

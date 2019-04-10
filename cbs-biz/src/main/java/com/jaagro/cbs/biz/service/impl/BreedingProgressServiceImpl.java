@@ -23,6 +23,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -67,6 +68,8 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
     private BreedingPlanService breedingPlanService;
     @Autowired
     private ProductMapperExt productMapper;
+    @Autowired
+    private BatchCoopDailyMapperExt batchCoopDailyMapper;
 
     /**
      * 根据养殖计划Id、养殖厂Id获取养殖过程喂养头信息
@@ -171,7 +174,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
             batchParameterExample.createCriteria().andPlanIdEqualTo(planId).andDayAgeEqualTo(dayAge).andEnableEqualTo(true);
             batchParameterExample.setOrderByClause("display_order asc");
             List<BreedingBatchParameter> breedingBatchParameterDos = breedingBatchParameterMapper.selectByExample(batchParameterExample);
-
+            BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);
             if (!CollectionUtils.isEmpty(breedingBatchParameterDos)) {
                 //鸡舍绑定的设备
                 CoopDeviceExample coopDeviceExample = new CoopDeviceExample();
@@ -209,9 +212,22 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                     BreedingBatchParamTrackingDto returnDto = new BreedingBatchParamTrackingDto();
                     BeanUtils.copyProperties(breedingBatchParameterDo, returnDto);
                     if (null != breedingRecordDto && BreedingStandardParamEnum.DIE.getCode() == breedingBatchParameterDo.getParamType()) {
-                        returnDto.setActualValue(breedingRecordDto.getDeathTotal().toString());
-                        if (StringUtils.hasText(breedingRecordDto.getDeathUnit())) {
-                            returnDto.setUnit(breedingRecordDto.getDeathUnit());
+                        // 死淘率等于今日死淘除以今日起始数量
+                        Integer deathTotal = breedingRecordDto.getDeathTotal();
+                        if (deathTotal != null){
+                            BatchCoopDailyExample batchCoopDailyExample = new BatchCoopDailyExample();
+                            batchCoopDailyExample.createCriteria().andEnableEqualTo(Boolean.TRUE)
+                                    .andCoopIdEqualTo(coopId).andPlanIdEqualTo(planId).andDayAgeEqualTo(dayAge-1);
+                            batchCoopDailyExample.setOrderByClause("create_time desc");
+                            batchCoopDailyExample.setLimit(1);
+                            List<BatchCoopDaily> batchCoopDailyList = batchCoopDailyMapper.selectByExample(batchCoopDailyExample);
+                            Integer startAmount;
+                            if (!batchCoopDailyList.isEmpty()){
+                                startAmount = batchCoopDailyList.get(0).getCurrentAmount();
+                            }else {
+                                startAmount = breedingPlan.getPlanChickenQuantity();
+                            }
+                            returnDto.setActualValue(new BigDecimal(deathTotal).divide(new BigDecimal(startAmount),4, RoundingMode.HALF_UP).multiply(new BigDecimal("100")).setScale(2,BigDecimal.ROUND_HALF_UP).toPlainString());
                         }
                     }
                     if (null != breedingRecordDto && BreedingStandardParamEnum.FEEDING_WEIGHT.getCode() == breedingBatchParameterDo.getParamType()) {

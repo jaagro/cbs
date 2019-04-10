@@ -3,6 +3,9 @@ package com.jaagro.cbs.web.controller.technicianapp;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
+import com.jaagro.cbs.api.dto.base.EmployeeAndRoleDto;
+import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
+import com.jaagro.cbs.api.dto.base.GetTenantDto;
 import com.jaagro.cbs.api.dto.farmer.BreedingBatchParamDto;
 import com.jaagro.cbs.api.dto.plan.CreateBreedingPlanDto;
 import com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto;
@@ -14,15 +17,22 @@ import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
 import com.jaagro.cbs.api.enums.PackageUnitEnum;
 import com.jaagro.cbs.api.enums.ProductTypeEnum;
 import com.jaagro.cbs.api.enums.PurchaseOrderStatusEnum;
+import com.jaagro.cbs.api.model.BreedingPlan;
 import com.jaagro.cbs.api.model.Product;
 import com.jaagro.cbs.api.model.PurchaseOrderItems;
+import com.jaagro.cbs.api.service.BreedingFarmerService;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.BreedingPurchaseOrderService;
 import com.jaagro.cbs.api.service.ProductService;
 import com.jaagro.cbs.biz.service.CustomerClientService;
+import com.jaagro.cbs.biz.service.UserClientService;
+import com.jaagro.cbs.biz.service.impl.CurrentUserService;
+import com.jaagro.cbs.web.vo.plan.PublishedChickenPlanVo;
 import com.jaagro.cbs.web.vo.technicianapp.AppPurchaseOrderItemsVo;
 import com.jaagro.cbs.web.vo.technicianapp.AppPurchaseOrderVo;
+import com.jaagro.cbs.web.vo.technicianapp.EmployeeInfoVo;
 import com.jaagro.cbs.web.vo.technicianapp.UnConfirmChickenPlanVo;
+import com.jaagro.constant.UserInfo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -56,10 +66,14 @@ public class TechnicianAppController {
     private BreedingPurchaseOrderService breedingPurchaseOrderService;
     @Autowired
     private CustomerClientService customerClientService;
-
+    @Autowired
+    private UserClientService userClientService;
+    @Autowired
+    private CurrentUserService currentUserService;
     @Autowired
     private ProductService productService;
-
+    @Autowired
+    private BreedingFarmerService breedingFarmerService;
     /**
      * 养殖
      *
@@ -74,6 +88,11 @@ public class TechnicianAppController {
         return BaseResponse.successInstance(breedingPlanService.listBreedingBatchForTechnician(dto));
     }
 
+    /**
+     * @Author gavin
+     * @param criteriaDto
+     * @return
+     */
     @PostMapping("/listPurchaseOrdersApp")
     @ApiOperation("技术员App待办-采购订单列表")
     public BaseResponse<PageInfo> listPurchaseOrdersApp(@RequestBody ToDoQueryParam criteriaDto) {
@@ -130,7 +149,11 @@ public class TechnicianAppController {
         return BaseResponse.successInstance(pageInfo);
     }
 
-
+    /**
+     * @Author gavin
+     * @param purchaseOrderId
+     * @return
+     */
     @GetMapping("/purchaseOrderDetailsApp/{purchaseOrderId}")
     @ApiOperation("采购订单详情")
     public BaseResponse purchaseOrderDetailsApp(@PathVariable("purchaseOrderId") Integer purchaseOrderId) {
@@ -143,7 +166,7 @@ public class TechnicianAppController {
 
     /**
      * 确认出栏列表
-     *
+     * @Author byr
      * @param dto
      * @return
      */
@@ -173,6 +196,57 @@ public class TechnicianAppController {
         return BaseResponse.successInstance(pageInfo);
     }
 
+    /**
+     * @Author gavin
+     * @param dto
+     * @return
+     */
+    @PostMapping("/listTechnicianBreedingPlan")
+    @ApiOperation("技术员上鸡计划列表")
+    public BaseResponse listTechnicianBreedingPlan(@RequestBody @Validated BreedingBatchParamDto dto) {
+
+        PageInfo pageInfo = breedingFarmerService.listPublishedChickenPlan(dto);
+        List<PublishedChickenPlanVo> publishedChickenPlanVos = new ArrayList<>();
+        List<BreedingPlan> breedingPlans = pageInfo.getList();
+        if (!CollectionUtils.isEmpty(breedingPlans)) {
+            for (BreedingPlan breedingPlan : breedingPlans) {
+                PublishedChickenPlanVo publishedChickenPlanVo = new PublishedChickenPlanVo();
+                BeanUtils.copyProperties(breedingPlan, publishedChickenPlanVo);
+                publishedChickenPlanVos.add(publishedChickenPlanVo);
+            }
+        }
+        pageInfo.setList(publishedChickenPlanVos);
+        return BaseResponse.successInstance(pageInfo);
+    }
+
+    /**
+     * @Author gavin
+     * @return
+     */
+    @GetMapping("/technicianPersonalCenter")
+    @ApiOperation("技术端个人中心")
+    public BaseResponse technicianPersonalCenter() {
+        EmployeeInfoVo infoVo = new EmployeeInfoVo();
+        List<EmployeeAndRoleDto> empRoleList = userClientService.getAllEmpAndRole().getData();
+        UserInfo currentUser = currentUserService.getCurrentUser();
+
+        if(null != currentUser){
+            GetTenantDto tenantDto = customerClientService.getTenantById(currentUser.getTenantId()).getData();
+            infoVo.setName(currentUser.getName());
+            infoVo.setPhone(currentUser.getPhoneNumber());
+            if(null !=tenantDto) {
+                infoVo.setTenantName(tenantDto.getCompanyName());
+            }
+            List<EmployeeAndRoleDto> newEmpRoleList = empRoleList.stream().filter(c->c.getId().equals(currentUser.getId())).collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(newEmpRoleList))
+            {
+                infoVo.setRoleName(newEmpRoleList.get(0).getRoleName());
+            }
+
+        }
+
+        return BaseResponse.successInstance(infoVo);
+    }
     /**
      * 报表
      *
