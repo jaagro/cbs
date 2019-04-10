@@ -1,12 +1,15 @@
 package com.jaagro.cbs.web.controller.technicianapp;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
 import com.jaagro.cbs.api.dto.farmer.BreedingBatchParamDto;
+import com.jaagro.cbs.api.dto.plan.CreateBreedingPlanDto;
 import com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto;
 import com.jaagro.cbs.api.dto.product.ListProductCriteria;
 import com.jaagro.cbs.api.dto.technicianapp.AppPurchaseOrderDto;
 import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
+import com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto;
 import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
 import com.jaagro.cbs.api.enums.PackageUnitEnum;
 import com.jaagro.cbs.api.enums.ProductTypeEnum;
@@ -168,6 +171,25 @@ public class TechnicianAppController {
         }
         pageInfo.setList(unConfirmChickenPlanVos);
         return BaseResponse.successInstance(pageInfo);
+    }
+
+    /**
+     * 报表
+     *
+     * @param dto
+     * @return
+     */
+    @GetMapping("/reportForms")
+    @ApiOperation("报表")
+    public BaseResponse reportForms() {
+        ReportFormsDto reportFormsDto;
+        try {
+            reportFormsDto = breedingPlanService.reportForms();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return BaseResponse.errorInstance(e.getMessage());
+        }
+        return BaseResponse.successInstance(reportFormsDto);
     }
 
 }

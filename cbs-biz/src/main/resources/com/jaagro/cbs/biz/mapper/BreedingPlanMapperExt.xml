@@ -184,4 +184,29 @@
         and technician_id = #{technicianId}
         and plan_status = #{planStatus}
     </select>
+    <select id="reportForms" parameterType="java.lang.Integer"
+            resultType="com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto">
+    SELECT
+        tenant_id,
+        SUM(plan_chicken_quantity) as chicken_quantity,
+        (SELECT COUNT(1) FROM crmserver.customer WHERE tenant_id = #{tenantId} and customer_status = 1) AS customer_amount,
+        (SELECT COUNT(c.id) FROM coop c INNER JOIN plant p ON c.plant_id = p.id WHERE p.tenant_id = #{tenantId} AND p.ENABLE = 1 AND c.ENABLE = 1) AS coop_amount,
+        (SELECT COUNT(1) FROM purchase_order o,breeding_plan p WHERE o.plan_id = p.id AND p.tenant_id = #{tenantId} AND p.ENABLE = 1 AND o.ENABLE = 1) AS purchase_order,
+        (SELECT SUM(current_amount) FROM ( SELECT current_amount FROM batch_info info, breeding_plan plan WHERE info.plan_id = plan.id AND info.ENABLE = 1 AND plan.ENABLE = 1 AND plan.tenant_id = 2 GROUP BY info.plan_id  ORDER BY info.day_age, info.create_time DESC ) temp_a) AS current_amount,
+        (SELECT SUM(r.breeding_value) FROM breeding_record r, breeding_plan p WHERE r.plan_id = p.id AND p.ENABLE = 1 AND r.ENABLE = 1 AND p.tenant_id = #{tenantId} AND r.record_type = 1 ) as consumption_of_feed,
+        (SELECT count( product_id )  FROM ( SELECT m.product_id FROM breeding_record_items m, breeding_record r, breeding_plan l WHERE m.breeding_record_id = r.id
+					AND r.plan_id = l.id
+					AND l.tenant_id = #{tenantId}
+					AND m.ENABLE = 1
+					AND r.ENABLE = 1
+					AND l.ENABLE = 1
+				GROUP BY
+					m.product_id
+					) temp_m)	AS drugs_vaccine
+    FROM
+        breeding_plan
+    WHERE
+        plan_status NOT IN ( 0, 7 )
+        AND tenant_id = #{tenantId}
+    </select>
 </mapper>

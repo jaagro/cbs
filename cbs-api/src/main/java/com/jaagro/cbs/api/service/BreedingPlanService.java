@@ -6,6 +6,7 @@ import com.jaagro.cbs.api.dto.farmer.*;
 import com.jaagro.cbs.api.dto.order.AccumulationPurchaseOrderParamDto;
 import com.jaagro.cbs.api.dto.plan.*;
 import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
+import com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto;
 import com.jaagro.cbs.api.model.BreedingPlan;
 
 import java.util.List;
@@ -183,4 +184,11 @@ public interface BreedingPlanService {
      * @return
      */
     PageInfo listBreedingPlanForTechnician(BreedingPlanCriteriaDto dto);
+
+    /**
+     * 报表-管理app
+     *
+     * @return
+     */
+   ReportFormsDto reportForms();
 }
