@@ -281,7 +281,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
     public FarmerPersonalCenterDto farmerPersonalCenter() {
         FarmerPersonalCenterDto farmerPersonalCenterDto = new FarmerPersonalCenterDto();
         UserInfo currentUser = currentUserService.getCurrentUser();
-        if (currentUser != null && currentUser.getId() != null && currentUser.getLoginName() != null) {
+        if (currentUser != null && currentUser.getId() != null && currentUser.getName() != null) {
             farmerPersonalCenterDto
                     .setPhoneNumber(currentUser.getPhoneNumber())
                     .setLoginName(currentUser.getName());
