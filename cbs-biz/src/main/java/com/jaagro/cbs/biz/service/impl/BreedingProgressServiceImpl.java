@@ -212,18 +212,18 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                     BreedingBatchParamTrackingDto returnDto = new BreedingBatchParamTrackingDto();
                     BeanUtils.copyProperties(breedingBatchParameterDo, returnDto);
                     if (null != breedingRecordDto && BreedingStandardParamEnum.DIE.getCode() == breedingBatchParameterDo.getParamType()) {
-                        // 死淘率等于今日死淘除以上个日龄最终存栏量
+                        // 死淘率等于今日死淘除以今日起始数量
                         Integer deathTotal = breedingRecordDto.getDeathTotal();
                         if (deathTotal != null){
                             BatchCoopDailyExample batchCoopDailyExample = new BatchCoopDailyExample();
                             batchCoopDailyExample.createCriteria().andEnableEqualTo(Boolean.TRUE)
-                                    .andCoopIdEqualTo(coopId).andPlanIdEqualTo(planId).andDayAgeEqualTo(dayAge-1);
+                                    .andCoopIdEqualTo(coopId).andPlanIdEqualTo(planId).andDayAgeEqualTo(dayAge);
                             batchCoopDailyExample.setOrderByClause("create_time desc");
                             batchCoopDailyExample.setLimit(1);
                             List<BatchCoopDaily> batchCoopDailyList = batchCoopDailyMapper.selectByExample(batchCoopDailyExample);
                             if (!batchCoopDailyList.isEmpty()){
-                                Integer currentAmount = batchCoopDailyList.get(0).getCurrentAmount();
-                                returnDto.setActualValue(new BigDecimal(deathTotal).divide(new BigDecimal(currentAmount),2, RoundingMode.HALF_UP).toPlainString());
+                                Integer startAmount = batchCoopDailyList.get(0).getStartAmount();
+                                returnDto.setActualValue(new BigDecimal(deathTotal).divide(new BigDecimal(startAmount),2, RoundingMode.HALF_UP).toPlainString());
                             }
                         }
                     }
