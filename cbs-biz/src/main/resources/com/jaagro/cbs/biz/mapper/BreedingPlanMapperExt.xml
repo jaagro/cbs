@@ -59,7 +59,7 @@
         <include refid="Base_Column_List"/>
         from breeding_plan
         where customer_id = #{customerId,jdbcType=INTEGER}
-        and enable = 1
+        and enable = 1 and plan_status in (3,4)
         order by create_time desc
     </select>
 
