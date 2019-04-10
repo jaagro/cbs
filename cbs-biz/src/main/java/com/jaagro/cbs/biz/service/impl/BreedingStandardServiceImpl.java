@@ -323,7 +323,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         result.add(parameterTypeDtoFeedingWeight);
         ParameterTypeDto parameterTypeDtoFeedingFodderNum = new ParameterTypeDto(standardId, "饲喂次数", BreedingStandardParamEnum.FEEDING_FODDER_NUM.getCode(), "次", 3);
         result.add(parameterTypeDtoFeedingFodderNum);
-        ParameterTypeDto parameterTypeDtoDie = new ParameterTypeDto(standardId, "死淘", BreedingStandardParamEnum.DIE.getCode(), "只", 4);
+        ParameterTypeDto parameterTypeDtoDie = new ParameterTypeDto(standardId, "死淘", BreedingStandardParamEnum.DIE.getCode(), "%", 4);
         result.add(parameterTypeDtoDie);
         return result;
     }
@@ -403,7 +403,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
                     break;
                 case "死淘":
                     dto.setDisplayOrder(4);
-                    dto.setUnit("只");
+                    dto.setUnit("%");
                     break;
                 default:
                     break;

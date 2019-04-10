@@ -23,6 +23,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -67,6 +68,8 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
     private BreedingPlanService breedingPlanService;
     @Autowired
     private ProductMapperExt productMapper;
+    @Autowired
+    private BatchCoopDailyMapperExt batchCoopDailyMapper;
 
     /**
      * 根据养殖计划Id、养殖厂Id获取养殖过程喂养头信息
@@ -209,9 +212,19 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                     BreedingBatchParamTrackingDto returnDto = new BreedingBatchParamTrackingDto();
                     BeanUtils.copyProperties(breedingBatchParameterDo, returnDto);
                     if (null != breedingRecordDto && BreedingStandardParamEnum.DIE.getCode() == breedingBatchParameterDo.getParamType()) {
-                        returnDto.setActualValue(breedingRecordDto.getDeathTotal().toString());
-                        if (StringUtils.hasText(breedingRecordDto.getDeathUnit())) {
-                            returnDto.setUnit(breedingRecordDto.getDeathUnit());
+                        // 死淘率等于今日死淘除以上个日龄最终存栏量
+                        Integer deathTotal = breedingRecordDto.getDeathTotal();
+                        if (deathTotal != null){
+                            BatchCoopDailyExample batchCoopDailyExample = new BatchCoopDailyExample();
+                            batchCoopDailyExample.createCriteria().andEnableEqualTo(Boolean.TRUE)
+                                    .andCoopIdEqualTo(coopId).andPlanIdEqualTo(planId).andDayAgeEqualTo(dayAge-1);
+                            batchCoopDailyExample.setOrderByClause("create_time desc");
+                            batchCoopDailyExample.setLimit(1);
+                            List<BatchCoopDaily> batchCoopDailyList = batchCoopDailyMapper.selectByExample(batchCoopDailyExample);
+                            if (!batchCoopDailyList.isEmpty()){
+                                Integer currentAmount = batchCoopDailyList.get(0).getCurrentAmount();
+                                returnDto.setActualValue(new BigDecimal(deathTotal).divide(new BigDecimal(currentAmount),2, RoundingMode.HALF_UP).toPlainString());
+                            }
                         }
                     }
                     if (null != breedingRecordDto && BreedingStandardParamEnum.FEEDING_WEIGHT.getCode() == breedingBatchParameterDo.getParamType()) {
