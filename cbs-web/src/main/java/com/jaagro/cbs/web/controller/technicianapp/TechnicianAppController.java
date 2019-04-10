@@ -11,12 +11,15 @@ import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
 import com.jaagro.cbs.api.enums.PackageUnitEnum;
 import com.jaagro.cbs.api.enums.ProductTypeEnum;
 import com.jaagro.cbs.api.enums.PurchaseOrderStatusEnum;
+import com.jaagro.cbs.api.model.BreedingPlan;
 import com.jaagro.cbs.api.model.Product;
 import com.jaagro.cbs.api.model.PurchaseOrderItems;
+import com.jaagro.cbs.api.service.BreedingFarmerService;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.BreedingPurchaseOrderService;
 import com.jaagro.cbs.api.service.ProductService;
 import com.jaagro.cbs.biz.service.CustomerClientService;
+import com.jaagro.cbs.web.vo.plan.PublishedChickenPlanVo;
 import com.jaagro.cbs.web.vo.technicianapp.AppPurchaseOrderItemsVo;
 import com.jaagro.cbs.web.vo.technicianapp.AppPurchaseOrderVo;
 import com.jaagro.cbs.web.vo.technicianapp.UnConfirmChickenPlanVo;
@@ -56,7 +59,8 @@ public class TechnicianAppController {
 
     @Autowired
     private ProductService productService;
-
+    @Autowired
+    private BreedingFarmerService breedingFarmerService;
     /**
      * 养殖
      *
@@ -71,6 +75,11 @@ public class TechnicianAppController {
         return BaseResponse.successInstance(breedingPlanService.listBreedingBatchForTechnician(dto));
     }
 
+    /**
+     * @Author gavin
+     * @param criteriaDto
+     * @return
+     */
     @PostMapping("/listPurchaseOrdersApp")
     @ApiOperation("技术员App待办-采购订单列表")
     public BaseResponse<PageInfo> listPurchaseOrdersApp(@RequestBody ToDoQueryParam criteriaDto) {
@@ -127,7 +136,11 @@ public class TechnicianAppController {
         return BaseResponse.successInstance(pageInfo);
     }
 
-
+    /**
+     * @Author gavin
+     * @param purchaseOrderId
+     * @return
+     */
     @GetMapping("/purchaseOrderDetailsApp/{purchaseOrderId}")
     @ApiOperation("采购订单详情")
     public BaseResponse purchaseOrderDetailsApp(@PathVariable("purchaseOrderId") Integer purchaseOrderId) {
@@ -140,7 +153,7 @@ public class TechnicianAppController {
 
     /**
      * 确认出栏列表
-     *
+     * @Author byr
      * @param dto
      * @return
      */
@@ -170,4 +183,26 @@ public class TechnicianAppController {
         return BaseResponse.successInstance(pageInfo);
     }
 
+    /**
+     * @Author gavin
+     * @param dto
+     * @return
+     */
+    @PostMapping("/listTechnicianBreedingPlan")
+    @ApiOperation("技术员上鸡计划列表")
+    public BaseResponse listTechnicianBreedingPlan(@RequestBody @Validated BreedingBatchParamDto dto) {
+
+        PageInfo pageInfo = breedingFarmerService.listPublishedChickenPlan(dto);
+        List<PublishedChickenPlanVo> publishedChickenPlanVos = new ArrayList<>();
+        List<BreedingPlan> breedingPlans = pageInfo.getList();
+        if (!CollectionUtils.isEmpty(breedingPlans)) {
+            for (BreedingPlan breedingPlan : breedingPlans) {
+                PublishedChickenPlanVo publishedChickenPlanVo = new PublishedChickenPlanVo();
+                BeanUtils.copyProperties(breedingPlan, publishedChickenPlanVo);
+                publishedChickenPlanVos.add(publishedChickenPlanVo);
+            }
+        }
+        pageInfo.setList(publishedChickenPlanVos);
+        return BaseResponse.successInstance(pageInfo);
+    }
 }
