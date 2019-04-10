@@ -14,6 +14,7 @@ import com.jaagro.cbs.api.dto.plan.*;
 import com.jaagro.cbs.api.dto.progress.BreedingBatchParamTrackingDto;
 import com.jaagro.cbs.api.dto.standard.*;
 import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
+import com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto;
 import com.jaagro.cbs.api.enums.*;
 import com.jaagro.cbs.api.exception.BusinessException;
 import com.jaagro.cbs.api.model.*;
@@ -1478,5 +1479,25 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
     @Override
     public List<BreedingStandardDrugDto> listBreedingBatchDrugs(Integer planId) {
         return breedingBatchDrugMapper.listBreedingBatchDrugs(planId);
+    }
+
+    /**
+     * 报表-管理app
+     *
+     * @return
+     */
+    @Override
+    public ReportFormsDto reportForms() {
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        if (currentUser == null) {
+            throw new RuntimeException("获取当前登录用户失败");
+        }
+        ReportFormsDto formsDto = breedingPlanMapper.reportForms(currentUser.getTenantId());
+        if (formsDto != null) {
+            //总成活率
+            BigDecimal b = new BigDecimal((float) formsDto.getCurrentAmount() * 10 / formsDto.getChickenQuantity() * 10);
+            formsDto.setTotalSurvivalRate(b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+        }
+        return formsDto;
     }
 }

@@ -15,7 +15,7 @@ public enum PlanStatusEnum {
     BREEDING(3, "BREEDING", "养殖中"),
     SLAUGHTER_CONFIRM(4, "SLAUGHTER_CONFIRM", "待出栏确认"),
     SLAUGHTER_PLAN(5, "SLAUGHTER_PLAN", "待出栏计划"),
-    COMPLETED(6,"COMPLETED","已完成"),
+    COMPLETED(6, "COMPLETED", "已完成"),
     CANCEL(7, "CANCEL", "已取消");
 
     private int code;

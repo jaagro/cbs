@@ -9,6 +9,7 @@ import com.jaagro.cbs.api.dto.standard.BreedingParameterListDto;
 import com.jaagro.cbs.api.dto.standard.BreedingStandardDrugDto;
 import com.jaagro.cbs.api.dto.standard.ParameterTypeDto;
 import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
+import com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto;
 import com.jaagro.cbs.api.model.BreedingPlan;
 
 import java.util.List;
@@ -209,4 +210,11 @@ public interface BreedingPlanService {
      * @return
      */
     List<BreedingStandardDrugDto> listBreedingBatchDrugs(Integer planId);
+
+    /**
+     * 报表-管理app
+     *
+     * @return
+     */
+   ReportFormsDto reportForms();
 }
