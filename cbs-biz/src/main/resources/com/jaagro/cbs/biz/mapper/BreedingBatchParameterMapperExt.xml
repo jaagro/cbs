@@ -17,7 +17,7 @@
         #{item.paramId,jdbcType=INTEGER}, #{item.paramName,jdbcType=VARCHAR}, #{item.dayAge,jdbcType=INTEGER},
         #{item.paramType,jdbcType=INTEGER}, #{item.valueType,jdbcType=INTEGER}, #{item.lowerLimit,jdbcType=DECIMAL},
         #{item.upperLimit,jdbcType=DECIMAL}, #{item.unit,jdbcType=VARCHAR}, #{item.alarm,jdbcType=BIT},
-        #{item.paramValue,jdbcType=VARCHAR}, #{item.thresholdDirection,jdbcType=INTEGER}, #{item.status,jdbcType=INTEGER}, #{item.necessary,jdbcType=BIT}, #{displayOrder,jdbcType=INTEGER},
+        #{item.paramValue,jdbcType=VARCHAR}, #{item.thresholdDirection,jdbcType=INTEGER}, #{item.status,jdbcType=INTEGER}, #{item.necessary,jdbcType=BIT}, #{item.displayOrder,jdbcType=INTEGER},
         #{item.enable,jdbcType=BIT}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.createUserId,jdbcType=INTEGER},
         #{item.modifyTime,jdbcType=TIMESTAMP}, #{item.modifyUserId,jdbcType=INTEGER})
     </foreach>
