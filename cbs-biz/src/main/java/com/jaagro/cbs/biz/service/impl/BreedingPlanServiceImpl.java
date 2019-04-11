@@ -12,9 +12,9 @@ import com.jaagro.cbs.api.dto.farmer.*;
 import com.jaagro.cbs.api.dto.order.AccumulationPurchaseOrderParamDto;
 import com.jaagro.cbs.api.dto.plan.*;
 import com.jaagro.cbs.api.dto.progress.BreedingBatchParamTrackingDto;
-import com.jaagro.cbs.api.dto.standard.BreedingParameterDto;
-import com.jaagro.cbs.api.dto.standard.BreedingStandardDrugDto;
+import com.jaagro.cbs.api.dto.standard.*;
 import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
+import com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto;
 import com.jaagro.cbs.api.enums.*;
 import com.jaagro.cbs.api.exception.BusinessException;
 import com.jaagro.cbs.api.model.*;
@@ -114,6 +114,8 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
     private BreedingFarmerService breedingFarmerService;
     @Autowired
     private RedisLock redisLock;
+    @Autowired
+    private BreedingStandardParameterMapperExt breedingStandardParameterMapper;
 
     /**
      * 创建养殖计划
@@ -1386,5 +1388,116 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             }
         }
         return new PageInfo<>(planDtoList);
+    }
+
+    /**
+     * 根据计划id查询参数模块列表
+     *
+     * @param planId
+     * @return
+     */
+    @Override
+    public List<ParameterTypeDto> listParameterNameByPlanId(Integer planId) {
+        BreedingBatchParameterExample parameterExample = new BreedingBatchParameterExample();
+        parameterExample.createCriteria().andEnableEqualTo(Boolean.TRUE).andPlanIdEqualTo(planId);
+        List<BreedingBatchParameter> batchParameterList = breedingBatchParameterMapper.selectByExample(parameterExample);
+        if (CollectionUtils.isEmpty(batchParameterList)){
+            throw new BusinessException("计划id="+planId+"未做参数配置");
+        }
+        Integer paramId = batchParameterList.get(0).getParamId();
+        BreedingStandardParameter standardParameter = breedingStandardParameterMapper.selectByPrimaryKey(paramId);
+        Integer standardId = standardParameter.getStandardId();
+        Set<ParameterTypeDto> parameterTypeDtoSet = new HashSet<>();
+        for (BreedingBatchParameter parameter : batchParameterList){
+            parameterTypeDtoSet.add(new ParameterTypeDto(standardId, parameter.getParamName(), parameter.getParamType(), parameter.getUnit(), parameter.getDisplayOrder()));
+        }
+        List<ParameterTypeDto> parameterTypeDtoList = new ArrayList<>(parameterTypeDtoSet);
+        boolean displayOrderHasNull = false;
+        for (ParameterTypeDto parameterTypeDto : parameterTypeDtoList) {
+            if (parameterTypeDto.getDisplayOrder() == null) {
+                displayOrderHasNull = true;
+            }
+        }
+        // 排序
+        if (!displayOrderHasNull) {
+            Collections.sort(parameterTypeDtoList, Comparator.comparingInt(ParameterTypeDto::getDisplayOrder));
+        }
+        return parameterTypeDtoList;
+    }
+
+    /**
+     * 根据计划id参数名称参数类型查看养殖模板参数
+     *
+     * @param planId
+     * @param paramName
+     * @param paramType
+     * @return
+     */
+    @Override
+    public BreedingParameterListDto listParameterListByNameAndPlanId(Integer planId, String paramName, Integer paramType) {
+            BreedingBatchParameterExample parameterExample = new BreedingBatchParameterExample();
+            parameterExample.createCriteria().andEnableEqualTo(Boolean.TRUE)
+                    .andPlanIdEqualTo(planId).andParamTypeEqualTo(paramType).andParamNameEqualTo(paramName);
+            parameterExample.setOrderByClause("day_age asc");
+            List<BreedingBatchParameter> parameterList = breedingBatchParameterMapper.selectByExample(parameterExample);
+            BreedingParameterListDto dto = new BreedingParameterListDto();
+            if (!CollectionUtils.isEmpty(parameterList)) {
+                BreedingBatchParameter parameter = parameterList.get(0);
+                BreedingStandardParameter standardParameter = breedingStandardParameterMapper.selectByPrimaryKey(parameter.getParamId());
+                Integer standardId = standardParameter.getStandardId();
+                dto.setAlarm(parameter.getAlarm())
+                        .setNecessary(parameter.getNecessary())
+                        .setParamName(paramName)
+                        .setParamType(paramType)
+                        .setStandardId(standardId)
+                        .setStatus(parameter.getStatus())
+                        .setUnit(parameter.getUnit())
+                        .setValueType(parameter.getValueType())
+                        .setDisplayOrder(parameter.getDisplayOrder());
+                List<BreedingStandardParameterItemDto> breedingStandardParameterList = new ArrayList<>();
+                for (BreedingBatchParameter parameterIn : parameterList) {
+                    BreedingStandardParameterItemDto itemDto = new BreedingStandardParameterItemDto();
+                    itemDto.setDayAge(parameterIn.getDayAge())
+                            .setId(parameterIn.getId())
+                            .setLowerLimit(parameterIn.getLowerLimit())
+                            .setUpperLimit(parameterIn.getUpperLimit())
+                            .setParamValue(parameterIn.getParamValue())
+                            .setThresholdDirection(parameterIn.getThresholdDirection());
+                    breedingStandardParameterList.add(itemDto);
+                }
+                dto.setBreedingStandardParameterList(breedingStandardParameterList);
+            }
+            return dto;
+    }
+
+    /**
+     * 根据计划id查询养殖药品配置
+     *
+     * @param planId
+     * @return
+     */
+    @Override
+    public List<BreedingStandardDrugDto> listBreedingBatchDrugs(Integer planId) {
+        return breedingBatchDrugMapper.listBreedingBatchDrugs(planId);
+    }
+
+    /**
+     * 报表-管理app
+     *
+     * @return
+     */
+    @Override
+    public ReportFormsDto reportForms() {
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        if (currentUser == null) {
+            throw new RuntimeException("获取当前登录用户失败");
+        }
+        ReportFormsDto formsDto = breedingPlanMapper.reportForms(currentUser.getTenantId());
+        if (formsDto != null) {
+            //总成活率
+            BigDecimal b = new BigDecimal((float) formsDto.getCurrentAmount() * 10 / formsDto.getChickenQuantity() * 10);
+            formsDto.setTotalSurvivalRate(b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+        }
+        return formsDto;
     }
 }

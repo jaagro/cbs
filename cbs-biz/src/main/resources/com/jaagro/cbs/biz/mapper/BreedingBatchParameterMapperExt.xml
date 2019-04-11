@@ -8,7 +8,7 @@
       param_id, param_name, day_age,
       param_type, value_type, lower_limit,
       upper_limit, unit, alarm,
-      param_value, threshold_direction, status, necessary,
+      param_value, threshold_direction, status, necessary,display_order,
       enable, create_time, create_user_id,
       modify_time, modify_user_id)
     values
@@ -17,7 +17,7 @@
         #{item.paramId,jdbcType=INTEGER}, #{item.paramName,jdbcType=VARCHAR}, #{item.dayAge,jdbcType=INTEGER},
         #{item.paramType,jdbcType=INTEGER}, #{item.valueType,jdbcType=INTEGER}, #{item.lowerLimit,jdbcType=DECIMAL},
         #{item.upperLimit,jdbcType=DECIMAL}, #{item.unit,jdbcType=VARCHAR}, #{item.alarm,jdbcType=BIT},
-        #{item.paramValue,jdbcType=VARCHAR}, #{item.thresholdDirection,jdbcType=INTEGER}, #{item.status,jdbcType=INTEGER}, #{item.necessary,jdbcType=BIT},
+        #{item.paramValue,jdbcType=VARCHAR}, #{item.thresholdDirection,jdbcType=INTEGER}, #{item.status,jdbcType=INTEGER}, #{item.necessary,jdbcType=BIT}, #{displayOrder,jdbcType=INTEGER},
         #{item.enable,jdbcType=BIT}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.createUserId,jdbcType=INTEGER},
         #{item.modifyTime,jdbcType=TIMESTAMP}, #{item.modifyUserId,jdbcType=INTEGER})
     </foreach>
