@@ -99,7 +99,7 @@ public interface UserClientService {
      * @param employeeId
      * @return
      */
-    @GetMapping("/listTechnician/{employeeId}")
+    @GetMapping("/getTechnician/{employeeId}")
     BaseResponse<ListEmployeeDto> getTechnicianById(@PathVariable("employeeId") Integer employeeId);
 
     /**

@@ -120,5 +120,13 @@ public class AlarmLogDetailDto implements Serializable {
      * 处理备注说明
      */
     private String handleDesc;
+    /**
+     * 处理人姓名
+     */
+    private String handleName;
+    /**
+     * 处理时间
+     */
+    private Date handleTime;
 
 }
