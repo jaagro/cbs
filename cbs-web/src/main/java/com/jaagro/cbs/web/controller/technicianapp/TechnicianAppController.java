@@ -209,6 +209,10 @@ public class TechnicianAppController {
             for (BreedingPlan breedingPlan : breedingPlans) {
                 PublishedChickenPlanVo publishedChickenPlanVo = new PublishedChickenPlanVo();
                 BeanUtils.copyProperties(breedingPlan, publishedChickenPlanVo);
+                CustomerContactsReturnDto customerDto = customerClientService.getCustomerContactByCustomerId(breedingPlan.getCustomerId());
+                if (null != customerDto) {
+                    publishedChickenPlanVo.setCustomerName(customerDto.getCustomerName());
+                }
                 publishedChickenPlanVos.add(publishedChickenPlanVo);
             }
         }
