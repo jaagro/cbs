@@ -142,7 +142,9 @@ public class DeviceAlarmLogServiceImpl implements DeviceAlarmLogService {
                 DeviceAlarmLog deviceAlarmLog = alarmLogs.get(0);
                 alarmLogDetailDto.setLatestValue(deviceAlarmLog.getCurrentValue());
                 alarmLogDetailDto.setLatestAlarmDate(deviceAlarmLog.getCreateTime());
-                alarmLogDetailDto.setHandleTypeStr(AlarmLogHandleTypeEnum.getTypeByCode(deviceAlarmLog.getHandleType()));
+                if(null != deviceAlarmLog.getHandleType()) {
+                    alarmLogDetailDto.setHandleTypeStr(AlarmLogHandleTypeEnum.getTypeByCode(deviceAlarmLog.getHandleType()));
+                }
                 alarmLogDetailDto.setHandleDesc(deviceAlarmLog.getHandleDesc());
             }
         }

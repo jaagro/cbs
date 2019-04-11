@@ -1,15 +1,18 @@
 package com.jaagro.cbs.web.controller.technicianapp;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
 import com.jaagro.cbs.api.dto.base.EmployeeAndRoleDto;
 import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
 import com.jaagro.cbs.api.dto.base.GetTenantDto;
 import com.jaagro.cbs.api.dto.farmer.BreedingBatchParamDto;
+import com.jaagro.cbs.api.dto.plan.CreateBreedingPlanDto;
 import com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto;
 import com.jaagro.cbs.api.dto.product.ListProductCriteria;
 import com.jaagro.cbs.api.dto.technicianapp.AppPurchaseOrderDto;
 import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
+import com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto;
 import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
 import com.jaagro.cbs.api.enums.PackageUnitEnum;
 import com.jaagro.cbs.api.enums.ProductTypeEnum;
@@ -209,6 +212,10 @@ public class TechnicianAppController {
             for (BreedingPlan breedingPlan : breedingPlans) {
                 PublishedChickenPlanVo publishedChickenPlanVo = new PublishedChickenPlanVo();
                 BeanUtils.copyProperties(breedingPlan, publishedChickenPlanVo);
+                CustomerContactsReturnDto customerDto = customerClientService.getCustomerContactByCustomerId(breedingPlan.getCustomerId());
+                if (null != customerDto) {
+                    publishedChickenPlanVo.setCustomerName(customerDto.getCustomerName());
+                }
                 publishedChickenPlanVos.add(publishedChickenPlanVo);
             }
         }
@@ -244,4 +251,23 @@ public class TechnicianAppController {
 
         return BaseResponse.successInstance(infoVo);
     }
+    /**
+     * 报表
+     *
+     * @param dto
+     * @return
+     */
+    @GetMapping("/reportForms")
+    @ApiOperation("报表")
+    public BaseResponse reportForms() {
+        ReportFormsDto reportFormsDto;
+        try {
+            reportFormsDto = breedingPlanService.reportForms();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return BaseResponse.errorInstance(e.getMessage());
+        }
+        return BaseResponse.successInstance(reportFormsDto);
+    }
+
 }

@@ -43,4 +43,9 @@ public class PublishedChickenPlanVo implements Serializable {
      */
     private Date createTime;
 
+    /**
+     * 养殖户名称
+     */
+    private String customerName;
+
 }

@@ -9,6 +9,7 @@ import com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto;
 import com.jaagro.cbs.api.dto.standard.BreedingParamTemplateCriteria;
 import com.jaagro.cbs.api.dto.standard.ReturnBreedingParamTemplateDto;
 import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
+import com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto;
 import com.jaagro.cbs.api.model.BreedingPlan;
 import com.jaagro.cbs.api.model.BreedingPlanExample;
 import com.jaagro.cbs.biz.mapper.base.BaseMapper;
@@ -104,8 +105,8 @@ public interface BreedingPlanMapperExt extends BaseMapper<BreedingPlan, Breeding
     List<BreedingPlan> listBreedingPlanOverdue();
 
     /**
-     *
      * 批量更新养殖计划超时状态了
+     *
      * @param planIds
      */
     void batchUpdateBreedingPlanStatus(@Param("planIds") List<Integer> planIds);
@@ -121,8 +122,17 @@ public interface BreedingPlanMapperExt extends BaseMapper<BreedingPlan, Breeding
 
     /**
      * 分页查询养殖计划 出栏确认
+     *
      * @param currentUserId
      * @return
      */
     List<ReturnBreedingPlanDto> listBreedingPlanForTechnician(BreedingPlanCriteriaDto criteriaDto);
+
+    /**
+     * 根据tenantId统计报表
+     *
+     * @param tenantId
+     * @return
+     */
+    ReportFormsDto reportForms(@Param("tenantId") Integer tenantId);
 }
