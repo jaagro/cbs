@@ -25,8 +25,23 @@ public class ReturnTechConsultRecordDto extends TechConsultRecord implements Ser
     private String strEmergencyLevel;
 
     private String strTechConsultStatus;
-
+    /**
+     * 处理的方式、途径
+     */
     private String strHandleType;
+
+    /**
+     * 处理备注说明
+     */
+    private String handleDesc;
+    /**
+     * 处理人姓名
+     */
+    private String handleName;
+    /**
+     * 处理时间
+     */
+    private Date handleTime;
     /**
      * 存栏量
      */
