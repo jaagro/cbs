@@ -14,6 +14,7 @@ import com.jaagro.cbs.api.dto.plan.*;
 import com.jaagro.cbs.api.dto.progress.BreedingBatchParamTrackingDto;
 import com.jaagro.cbs.api.dto.standard.*;
 import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
+import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanPlantsDto;
 import com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto;
 import com.jaagro.cbs.api.enums.*;
 import com.jaagro.cbs.api.exception.BusinessException;
@@ -954,6 +955,24 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
     }
 
     /**
+     * 获取养殖计划鸡舍信息 -技术管理app
+     *
+     * @param planId
+     * @return
+     * @author byr
+     */
+    @Override
+    public List<BreedingPlanPlantsDto> listPlanPlantsForTechnicianChoose(Integer planId) {
+        List<BreedingPlanPlantsDto> plantsDtoList = batchPlantCoopMapper.listPlanPlantsForTechnicianChoose(planId);
+        if (!CollectionUtils.isEmpty(plantsDtoList)) {
+            for (BreedingPlanPlantsDto dto : plantsDtoList) {
+                dto.setCoops(batchPlantCoopMapper.listPlanCoopsByPlanId(dto));
+            }
+        }
+        return plantsDtoList;
+    }
+
+    /**
      * 养殖计划参数配置
      *
      * @param dto
@@ -1401,14 +1420,14 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         BreedingBatchParameterExample parameterExample = new BreedingBatchParameterExample();
         parameterExample.createCriteria().andEnableEqualTo(Boolean.TRUE).andPlanIdEqualTo(planId);
         List<BreedingBatchParameter> batchParameterList = breedingBatchParameterMapper.selectByExample(parameterExample);
-        if (CollectionUtils.isEmpty(batchParameterList)){
-            throw new BusinessException("计划id="+planId+"未做参数配置");
+        if (CollectionUtils.isEmpty(batchParameterList)) {
+            throw new BusinessException("计划id=" + planId + "未做参数配置");
         }
         Integer paramId = batchParameterList.get(0).getParamId();
         BreedingStandardParameter standardParameter = breedingStandardParameterMapper.selectByPrimaryKey(paramId);
         Integer standardId = standardParameter.getStandardId();
         Set<ParameterTypeDto> parameterTypeDtoSet = new HashSet<>();
-        for (BreedingBatchParameter parameter : batchParameterList){
+        for (BreedingBatchParameter parameter : batchParameterList) {
             parameterTypeDtoSet.add(new ParameterTypeDto(standardId, parameter.getParamName(), parameter.getParamType(), parameter.getUnit(), parameter.getDisplayOrder()));
         }
         List<ParameterTypeDto> parameterTypeDtoList = new ArrayList<>(parameterTypeDtoSet);
@@ -1435,39 +1454,39 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
      */
     @Override
     public BreedingParameterListDto listParameterListByNameAndPlanId(Integer planId, String paramName, Integer paramType) {
-            BreedingBatchParameterExample parameterExample = new BreedingBatchParameterExample();
-            parameterExample.createCriteria().andEnableEqualTo(Boolean.TRUE)
-                    .andPlanIdEqualTo(planId).andParamTypeEqualTo(paramType).andParamNameEqualTo(paramName);
-            parameterExample.setOrderByClause("day_age asc");
-            List<BreedingBatchParameter> parameterList = breedingBatchParameterMapper.selectByExample(parameterExample);
-            BreedingParameterListDto dto = new BreedingParameterListDto();
-            if (!CollectionUtils.isEmpty(parameterList)) {
-                BreedingBatchParameter parameter = parameterList.get(0);
-                BreedingStandardParameter standardParameter = breedingStandardParameterMapper.selectByPrimaryKey(parameter.getParamId());
-                Integer standardId = standardParameter.getStandardId();
-                dto.setAlarm(parameter.getAlarm())
-                        .setNecessary(parameter.getNecessary())
-                        .setParamName(paramName)
-                        .setParamType(paramType)
-                        .setStandardId(standardId)
-                        .setStatus(parameter.getStatus())
-                        .setUnit(parameter.getUnit())
-                        .setValueType(parameter.getValueType())
-                        .setDisplayOrder(parameter.getDisplayOrder());
-                List<BreedingStandardParameterItemDto> breedingStandardParameterList = new ArrayList<>();
-                for (BreedingBatchParameter parameterIn : parameterList) {
-                    BreedingStandardParameterItemDto itemDto = new BreedingStandardParameterItemDto();
-                    itemDto.setDayAge(parameterIn.getDayAge())
-                            .setId(parameterIn.getId())
-                            .setLowerLimit(parameterIn.getLowerLimit())
-                            .setUpperLimit(parameterIn.getUpperLimit())
-                            .setParamValue(parameterIn.getParamValue())
-                            .setThresholdDirection(parameterIn.getThresholdDirection());
-                    breedingStandardParameterList.add(itemDto);
-                }
-                dto.setBreedingStandardParameterList(breedingStandardParameterList);
+        BreedingBatchParameterExample parameterExample = new BreedingBatchParameterExample();
+        parameterExample.createCriteria().andEnableEqualTo(Boolean.TRUE)
+                .andPlanIdEqualTo(planId).andParamTypeEqualTo(paramType).andParamNameEqualTo(paramName);
+        parameterExample.setOrderByClause("day_age asc");
+        List<BreedingBatchParameter> parameterList = breedingBatchParameterMapper.selectByExample(parameterExample);
+        BreedingParameterListDto dto = new BreedingParameterListDto();
+        if (!CollectionUtils.isEmpty(parameterList)) {
+            BreedingBatchParameter parameter = parameterList.get(0);
+            BreedingStandardParameter standardParameter = breedingStandardParameterMapper.selectByPrimaryKey(parameter.getParamId());
+            Integer standardId = standardParameter.getStandardId();
+            dto.setAlarm(parameter.getAlarm())
+                    .setNecessary(parameter.getNecessary())
+                    .setParamName(paramName)
+                    .setParamType(paramType)
+                    .setStandardId(standardId)
+                    .setStatus(parameter.getStatus())
+                    .setUnit(parameter.getUnit())
+                    .setValueType(parameter.getValueType())
+                    .setDisplayOrder(parameter.getDisplayOrder());
+            List<BreedingStandardParameterItemDto> breedingStandardParameterList = new ArrayList<>();
+            for (BreedingBatchParameter parameterIn : parameterList) {
+                BreedingStandardParameterItemDto itemDto = new BreedingStandardParameterItemDto();
+                itemDto.setDayAge(parameterIn.getDayAge())
+                        .setId(parameterIn.getId())
+                        .setLowerLimit(parameterIn.getLowerLimit())
+                        .setUpperLimit(parameterIn.getUpperLimit())
+                        .setParamValue(parameterIn.getParamValue())
+                        .setThresholdDirection(parameterIn.getThresholdDirection());
+                breedingStandardParameterList.add(itemDto);
             }
-            return dto;
+            dto.setBreedingStandardParameterList(breedingStandardParameterList);
+        }
+        return dto;
     }
 
     /**
@@ -1500,4 +1519,5 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         }
         return formsDto;
     }
+
 }

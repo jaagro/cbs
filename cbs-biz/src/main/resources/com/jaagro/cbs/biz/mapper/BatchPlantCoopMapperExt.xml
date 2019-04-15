@@ -22,7 +22,6 @@
             #{item.modifyTime,jdbcType=TIMESTAMP}, #{item.modifyUserId,jdbcType=INTEGER})
         </foreach>
     </insert>
-
     <select id="listBreedingPlanCoopsForChoose" resultType="com.jaagro.cbs.api.dto.plan.BreedingPlanCoopDto">
         SELECT
             bpc.plant_id,
@@ -41,6 +40,48 @@
             LEFT JOIN coop c ON bpc.plant_id = c.plant_id
             WHERE
             bpc.plan_id = #{planId}
+            AND coop_id IS NULL
+            AND bpc.`enable` = 1
+            AND c.`enable` = 1
+            AND c.coop_status = 1
+    </select>
+    <select id="listPlanPlantsForTechnicianChoose"
+            resultType="com.jaagro.cbs.api.dto.technicianapp.BreedingPlanPlantsDto">
+        SELECT
+            bpc.plan_id,
+            bpc.plant_id,
+            p.plant_name
+            FROM
+            batch_plant_coop bpc
+            LEFT JOIN plant p on bpc.plant_id = p.id
+            LEFT JOIN coop c ON bpc.plant_id = c.plant_id
+            WHERE
+            bpc.plan_id = #{planId}
+            AND coop_id IS NULL
+            AND bpc.`enable` = 1
+            AND c.`enable` = 1
+            AND c.coop_status = 1
+        GROUP BY
+	        bpc.plant_id
+    </select>
+    <select id="listPlanCoopsByPlanId" parameterType="com.jaagro.cbs.api.dto.technicianapp.BreedingPlanPlantsDto"
+            resultType="com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCoopsDto">
+        SELECT
+            c.breeding_value,
+            c.capacity,
+            c.coop_name,
+            c.coop_status,
+            c.id,
+            c.device_quantity,
+            c.last_start_date,
+            c.last_end_date
+        FROM
+            batch_plant_coop bpc
+            LEFT JOIN plant p ON bpc.plant_id = p.id
+            LEFT JOIN coop c ON bpc.plant_id = c.plant_id
+        WHERE
+            bpc.plan_id = #{planId}
+            AND bpc.plant_id = #{plantId}
             AND coop_id IS NULL
             AND bpc.`enable` = 1
             AND c.`enable` = 1
