@@ -13,9 +13,7 @@ import com.jaagro.cbs.api.dto.order.AccumulationPurchaseOrderParamDto;
 import com.jaagro.cbs.api.dto.plan.*;
 import com.jaagro.cbs.api.dto.progress.BreedingBatchParamTrackingDto;
 import com.jaagro.cbs.api.dto.standard.*;
-import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
-import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanPlantsDto;
-import com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto;
+import com.jaagro.cbs.api.dto.technicianapp.*;
 import com.jaagro.cbs.api.enums.*;
 import com.jaagro.cbs.api.exception.BusinessException;
 import com.jaagro.cbs.api.model.*;
@@ -1059,6 +1057,97 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         breedingBrainService.calculatePhaseOneFoodWeightById(breedingPlan);
         redisLock.unLock(key);
     }
+
+    /**
+     * 养殖计划参数配置 -技术管理app
+     *
+     * @param dto
+     * @author yj
+     */
+    @Override
+    public void ParamConfiguration(ParamConfigurationDto dto) {
+        String key = "paramConfiguration_" + dto.getPlanId();
+        redisLock.lock(key, System.currentTimeMillis() + "", 5, TimeUnit.SECONDS);
+        List<BreedingPlanPlantsDto> breedingPlanPlantsList = dto.getBreedingPlanCoopDtoList();
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        Integer currentUserId = currentUser == null ? null : currentUser.getId();
+        // 插入养殖计划和鸡舍关系更新鸡舍在养数量和状态
+        BreedingPlan breedingPlan = judgeBreedingPlan(dto.getPlanId());
+        // 插入养殖计划参数
+        List<BreedingParameterDto> breedingParameterDtoList = dto.getBreedingParameterDtoList();
+        Integer standardId = null;
+        if (!CollectionUtils.isEmpty(breedingParameterDtoList)) {
+            List<BreedingBatchParameter> batchParameterList = new ArrayList<>();
+            for (BreedingParameterDto parameterDto : breedingParameterDtoList) {
+                List<BreedingStandardParameter> breedingStandardParameterList = parameterDto.getBreedingStandardParameterList();
+                if (!CollectionUtils.isEmpty(breedingStandardParameterList)) {
+                    if (standardId == null) {
+                        standardId = breedingStandardParameterList.get(0).getStandardId();
+                    }
+                    for (BreedingStandardParameter standardParameter : breedingStandardParameterList) {
+                        BreedingBatchParameter batchParameter = new BreedingBatchParameter();
+                        BeanUtils.copyProperties(standardParameter, batchParameter);
+                        batchParameter.setParamId(standardParameter.getId())
+                                .setPlanId(dto.getPlanId())
+                                .setBatchNo(dto.getBatchNo())
+                                .setCreateTime(new Date())
+                                .setCreateUserId(currentUserId)
+                                .setCustomerId(breedingPlan.getCustomerId())
+                                .setStatus(ParameterStatusEnum.USEFUL.getCode())
+                                .setEnable(Boolean.TRUE);
+                        batchParameterList.add(batchParameter);
+                    }
+                }
+            }
+            if (!CollectionUtils.isEmpty(batchParameterList)) {
+                breedingBatchParameterMapper.batchInsert(batchParameterList);
+            }
+        }
+        BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(standardId);
+        if (!CollectionUtils.isEmpty(breedingPlanPlantsList)) {
+            for (BreedingPlanPlantsDto plantsDto : breedingPlanPlantsList) {
+                List<BreedingPlanCoopsDto> coops = plantsDto.getCoops();
+                List<BatchPlantCoop> batchPlantCoopList = new ArrayList<>();
+                List<Coop> coopList = new ArrayList<>();
+                for (BreedingPlanCoopsDto breedingPlanCoopsDto : coops) {
+                    if (breedingPlanCoopsDto.getBreedingValue() != null && breedingPlanCoopsDto.getBreedingValue() > 0) {
+                        BatchPlantCoop batchPlantCoop = new BatchPlantCoop();
+                        batchPlantCoop.setCoopId(breedingPlanCoopsDto.getId())
+                                .setCreateTime(new Date())
+                                .setCreateUserId(currentUserId)
+                                .setEnable(Boolean.TRUE)
+                                .setPlanId(dto.getPlanId())
+                                .setPlantId(plantsDto.getPlantId());
+                        batchPlantCoopList.add(batchPlantCoop);
+                        Coop coop = new Coop();
+                        coop.setId(breedingPlanCoopsDto.getId())
+                                .setBreedingValue(breedingPlanCoopsDto.getBreedingValue())
+                                .setCoopStatus(CoopStatusEnum.BREEDING.getCode())
+                                .setLastStartDate(breedingPlan.getPlanTime())
+                                .setLastEndDate(DateUtils.addDays(breedingPlan.getPlanTime(), breedingStandard.getBreedingDays()))
+                                .setModifyTime(new Date())
+                                .setModifyUserId(currentUserId);
+                        coopList.add(coop);
+                    }
+                }
+                if (!CollectionUtils.isEmpty(batchPlantCoopList)) {
+                    batchPlantCoopMapper.insertBatch(batchPlantCoopList);
+                }
+                if (!CollectionUtils.isEmpty(coopList)) {
+                    coopMapper.batchUpdateByPrimaryKeySelective(coopList);
+                }
+            }
+        }
+        // 更新养殖计划
+        updateBreedingPlanToSignChicken(breedingPlan, breedingStandard, currentUserId);
+        // 生成药品配置
+        configPlanDrug(breedingPlan, standardId, currentUserId);
+        // 生成第一批鸡苗,饲料,药品采购单
+        breedingBrainService.calculateDrugPurchaseOrderById(breedingPlan);
+        breedingBrainService.calculatePhaseOneFoodWeightById(breedingPlan);
+        redisLock.unLock(key);
+    }
+
 
     private BreedingPlan judgeBreedingPlan(Integer planId) {
         BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(planId);

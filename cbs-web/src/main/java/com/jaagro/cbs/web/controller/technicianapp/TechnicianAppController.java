@@ -1,19 +1,13 @@
 package com.jaagro.cbs.web.controller.technicianapp;
 
-import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
 import com.jaagro.cbs.api.dto.base.EmployeeAndRoleDto;
-import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
 import com.jaagro.cbs.api.dto.base.GetTenantDto;
 import com.jaagro.cbs.api.dto.farmer.BreedingBatchParamDto;
-import com.jaagro.cbs.api.dto.plan.CreateBreedingPlanDto;
 import com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto;
 import com.jaagro.cbs.api.dto.product.ListProductCriteria;
-import com.jaagro.cbs.api.dto.technicianapp.AppPurchaseOrderDto;
-import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
-import com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto;
-import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
+import com.jaagro.cbs.api.dto.technicianapp.*;
 import com.jaagro.cbs.api.enums.PackageUnitEnum;
 import com.jaagro.cbs.api.enums.ProductTypeEnum;
 import com.jaagro.cbs.api.enums.PurchaseOrderStatusEnum;
@@ -286,4 +280,17 @@ public class TechnicianAppController {
         return BaseResponse.successInstance(breedingPlanService.listPlanPlantsForTechnicianChoose(planId));
     }
 
+    /**
+     * 养殖计划参数配置
+     *
+     * @param dto
+     * @return
+     */
+    @PostMapping("/paramConfigurationFortechnician")
+    @ApiOperation("养殖计划参数配置")
+    public BaseResponse paramConfigurationFortechnician(@RequestBody @Validated ParamConfigurationDto dto) {
+        log.info("O paramConfigurationFortechnician param={}", dto);
+        breedingPlanService.ParamConfiguration(dto);
+        return BaseResponse.successInstance("参数配置成功");
+    }
 }

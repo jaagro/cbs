@@ -10,6 +10,7 @@ import com.jaagro.cbs.api.dto.standard.BreedingStandardDrugDto;
 import com.jaagro.cbs.api.dto.standard.ParameterTypeDto;
 import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
 import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanPlantsDto;
+import com.jaagro.cbs.api.dto.technicianapp.ParamConfigurationDto;
 import com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto;
 import com.jaagro.cbs.api.model.BreedingPlan;
 
@@ -91,6 +92,14 @@ public interface BreedingPlanService {
      * @author yj
      */
     void breedingPlanParamConfiguration(BreedingPlanParamConfigurationDto dto);
+
+    /**
+     * 养殖计划参数配置 -技术管理app
+     *
+     * @param dto
+     * @author yj
+     */
+    void ParamConfiguration(ParamConfigurationDto dto);
 
     /**
      * 根据计划id获取当前日龄
