@@ -50,7 +50,7 @@ public class BreedingRecordService {
      * 批次养殖记录表日汇总
      */
 //    @Scheduled(cron = "0 20 23 1/1 * ?")
-//    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     public void breedingRecordDaily() {
         log.info("breedingRecordDaily:定时钟执行开始");

@@ -3,6 +3,7 @@ package com.jaagro.cbs.biz.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
+import com.jaagro.cbs.api.dto.base.ListEmployeeDto;
 import com.jaagro.cbs.api.dto.technicianapp.AlarmLogDetailDto;
 import com.jaagro.cbs.api.dto.technicianapp.DeviceAlarmLogDto;
 import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
@@ -15,7 +16,9 @@ import com.jaagro.cbs.biz.mapper.BatchCoopDailyMapperExt;
 import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
 import com.jaagro.cbs.biz.mapper.DeviceAlarmLogMapperExt;
 import com.jaagro.cbs.biz.service.CustomerClientService;
+import com.jaagro.cbs.biz.service.UserClientService;
 import com.jaagro.constant.UserInfo;
+import com.jaagro.utils.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +39,14 @@ import java.util.Map;
 public class DeviceAlarmLogServiceImpl implements DeviceAlarmLogService {
     @Autowired
     private CurrentUserService currentUserService;
-
+    @Autowired
+    private UserClientService userClientService;
     @Autowired
     private DeviceAlarmLogMapperExt deviceAlarmLogMapperExt;
-    @Autowired
-    private BreedingPlanMapperExt breedingPlanMapperExt;
     @Autowired
     private BatchCoopDailyMapperExt batchCoopDailyMapperExt;
     @Autowired
     private CustomerClientService customerClientService;
-
 
 
     /**
@@ -142,10 +143,17 @@ public class DeviceAlarmLogServiceImpl implements DeviceAlarmLogService {
                 DeviceAlarmLog deviceAlarmLog = alarmLogs.get(0);
                 alarmLogDetailDto.setLatestValue(deviceAlarmLog.getCurrentValue());
                 alarmLogDetailDto.setLatestAlarmDate(deviceAlarmLog.getCreateTime());
-                if(null != deviceAlarmLog.getHandleType()) {
+                if (null != deviceAlarmLog.getHandleType()) {
                     alarmLogDetailDto.setHandleTypeStr(AlarmLogHandleTypeEnum.getTypeByCode(deviceAlarmLog.getHandleType()));
                 }
                 alarmLogDetailDto.setHandleDesc(deviceAlarmLog.getHandleDesc());
+                alarmLogDetailDto.setHandleTime(deviceAlarmLog.getHandleTime());
+                if (null != deviceAlarmLog.getHandleUserId()) {
+                    ListEmployeeDto employeeDto = userClientService.getTechnicianById(deviceAlarmLog.getHandleUserId()).getData();
+                    if(null != employeeDto) {
+                        alarmLogDetailDto.setHandleName(employeeDto.getName());
+                    }
+                }
             }
         }
         return alarmLogDetailDto;

@@ -2,6 +2,7 @@ package com.jaagro.cbs.biz.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jaagro.cbs.api.dto.base.ListEmployeeDto;
 import com.jaagro.cbs.api.dto.techconsult.ReturnTechConsultRecordDto;
 import com.jaagro.cbs.api.dto.techconsult.TechConsultParamDto;
 import com.jaagro.cbs.api.dto.techconsult.UpdateTechConsultDto;
@@ -15,6 +16,7 @@ import com.jaagro.cbs.biz.mapper.BatchCoopDailyMapperExt;
 import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
 import com.jaagro.cbs.biz.mapper.TechConsultImagesMapperExt;
 import com.jaagro.cbs.biz.mapper.TechConsultRecordMapperExt;
+import com.jaagro.cbs.biz.service.UserClientService;
 import com.jaagro.cbs.biz.utils.UrlPathUtil;
 import com.jaagro.constant.UserInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,8 @@ import java.util.List;
 public class TechConsultServiceImpl implements TechConsultService {
     @Autowired
     private CurrentUserService currentUserService;
+    @Autowired
+    private UserClientService userClientService;
     @Autowired
     private TechConsultRecordMapperExt techConsultRecordMapper;
     @Autowired
@@ -103,6 +107,14 @@ public class TechConsultServiceImpl implements TechConsultService {
         returnDto.setStrEmergencyLevel(EmergencyLevelEnum.getDescByCode(techConsultRecordDo.getEmergencyLevel()));
         if (null != techConsultRecordDo.getHandleType()) {
             returnDto.setStrHandleType(TechConsultHandleTypeEnum.getDescByCode(techConsultRecordDo.getHandleType()));
+        }
+        returnDto.setHandleDesc(techConsultRecordDo.getHandleDesc());
+        returnDto.setHandleTime(techConsultRecordDo.getHandleTime());
+        if (null != techConsultRecordDo.getHandleUserId()) {
+            ListEmployeeDto employeeDto = userClientService.getTechnicianById(techConsultRecordDo.getHandleUserId()).getData();
+            if(null != employeeDto) {
+                returnDto.setHandleName(employeeDto.getName());
+            }
         }
         int planId = techConsultRecordDo.getPlanId();
         int livingAmount = 0;

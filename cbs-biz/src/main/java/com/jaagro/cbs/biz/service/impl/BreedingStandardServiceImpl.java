@@ -117,7 +117,9 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         BeanUtils.copyProperties(breedingStandard, breedingStandardDto);
 
         BreedingStandardParameterExample example = new BreedingStandardParameterExample();
-        example.createCriteria().andStandardIdEqualTo(standardId);
+        example.createCriteria().andStandardIdEqualTo(standardId)
+                                .andStatusEqualTo(BreedingStandardStatusEnum.ENABLE.getCode())
+                                .andEnableEqualTo(true);
         List<BreedingStandardParameter> parameterList = standardParameterMapper.selectByExample(example);
 
 

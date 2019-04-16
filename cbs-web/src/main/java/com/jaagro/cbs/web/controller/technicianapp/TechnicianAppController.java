@@ -1,19 +1,13 @@
 package com.jaagro.cbs.web.controller.technicianapp;
 
-import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
 import com.jaagro.cbs.api.dto.base.EmployeeAndRoleDto;
-import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
 import com.jaagro.cbs.api.dto.base.GetTenantDto;
 import com.jaagro.cbs.api.dto.farmer.BreedingBatchParamDto;
-import com.jaagro.cbs.api.dto.plan.CreateBreedingPlanDto;
 import com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto;
 import com.jaagro.cbs.api.dto.product.ListProductCriteria;
-import com.jaagro.cbs.api.dto.technicianapp.AppPurchaseOrderDto;
-import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
-import com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto;
-import com.jaagro.cbs.api.dto.technicianapp.ToDoQueryParam;
+import com.jaagro.cbs.api.dto.technicianapp.*;
 import com.jaagro.cbs.api.enums.PackageUnitEnum;
 import com.jaagro.cbs.api.enums.ProductTypeEnum;
 import com.jaagro.cbs.api.enums.PurchaseOrderStatusEnum;
@@ -74,6 +68,7 @@ public class TechnicianAppController {
     private ProductService productService;
     @Autowired
     private BreedingFarmerService breedingFarmerService;
+
     /**
      * 养殖
      *
@@ -89,9 +84,9 @@ public class TechnicianAppController {
     }
 
     /**
-     * @Author gavin
      * @param criteriaDto
      * @return
+     * @Author gavin
      */
     @PostMapping("/listPurchaseOrdersApp")
     @ApiOperation("技术员App待办-采购订单列表")
@@ -150,9 +145,9 @@ public class TechnicianAppController {
     }
 
     /**
-     * @Author gavin
      * @param purchaseOrderId
      * @return
+     * @Author gavin
      */
     @GetMapping("/purchaseOrderDetailsApp/{purchaseOrderId}")
     @ApiOperation("采购订单详情")
@@ -166,9 +161,10 @@ public class TechnicianAppController {
 
     /**
      * 确认出栏列表
-     * @Author byr
+     *
      * @param dto
      * @return
+     * @Author byr
      */
     @PostMapping("/listUnConfirmChickenPlan")
     @ApiOperation("确认出栏列表")
@@ -197,9 +193,9 @@ public class TechnicianAppController {
     }
 
     /**
-     * @Author gavin
      * @param dto
      * @return
+     * @Author gavin
      */
     @PostMapping("/listTechnicianBreedingPlan")
     @ApiOperation("技术员上鸡计划列表")
@@ -224,8 +220,8 @@ public class TechnicianAppController {
     }
 
     /**
-     * @Author gavin
      * @return
+     * @Author gavin
      */
     @GetMapping("/technicianPersonalCenter")
     @ApiOperation("技术端个人中心")
@@ -234,16 +230,15 @@ public class TechnicianAppController {
         List<EmployeeAndRoleDto> empRoleList = userClientService.getAllEmpAndRole().getData();
         UserInfo currentUser = currentUserService.getCurrentUser();
 
-        if(null != currentUser){
+        if (null != currentUser) {
             GetTenantDto tenantDto = customerClientService.getTenantById(currentUser.getTenantId()).getData();
             infoVo.setName(currentUser.getName());
             infoVo.setPhone(currentUser.getPhoneNumber());
-            if(null !=tenantDto) {
+            if (null != tenantDto) {
                 infoVo.setTenantName(tenantDto.getCompanyName());
             }
-            List<EmployeeAndRoleDto> newEmpRoleList = empRoleList.stream().filter(c->c.getId().equals(currentUser.getId())).collect(Collectors.toList());
-            if(!CollectionUtils.isEmpty(newEmpRoleList))
-            {
+            List<EmployeeAndRoleDto> newEmpRoleList = empRoleList.stream().filter(c -> c.getId().equals(currentUser.getId())).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(newEmpRoleList)) {
                 infoVo.setRoleName(newEmpRoleList.get(0).getRoleName());
             }
 
@@ -251,10 +246,10 @@ public class TechnicianAppController {
 
         return BaseResponse.successInstance(infoVo);
     }
+
     /**
      * 报表
      *
-     * @param dto
      * @return
      */
     @GetMapping("/reportForms")
@@ -270,4 +265,32 @@ public class TechnicianAppController {
         return BaseResponse.successInstance(reportFormsDto);
     }
 
+    /**
+     * 获取养殖计划鸡舍信息
+     *
+     * @param planId
+     * @return
+     */
+    @GetMapping("/listPlanCoops/{planId}")
+    @ApiOperation("获取养殖计划鸡舍信息")
+    public BaseResponse listBreedingPlanCoops(@PathVariable("planId") Integer planId) {
+        if (planId == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "养殖计划id不能为空");
+        }
+        return BaseResponse.successInstance(breedingPlanService.listPlanPlantsForTechnicianChoose(planId));
+    }
+
+    /**
+     * 养殖计划参数配置
+     *
+     * @param dto
+     * @return
+     */
+    @PostMapping("/paramConfigurationFortechnician")
+    @ApiOperation("养殖计划参数配置")
+    public BaseResponse paramConfigurationFortechnician(@RequestBody @Validated ParamConfigurationDto dto) {
+        log.info("O paramConfigurationFortechnician param={}", dto);
+        breedingPlanService.ParamConfiguration(dto);
+        return BaseResponse.successInstance("参数配置成功");
+    }
 }

@@ -9,6 +9,8 @@ import com.jaagro.cbs.api.dto.standard.BreedingParameterListDto;
 import com.jaagro.cbs.api.dto.standard.BreedingStandardDrugDto;
 import com.jaagro.cbs.api.dto.standard.ParameterTypeDto;
 import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanCriteriaDto;
+import com.jaagro.cbs.api.dto.technicianapp.BreedingPlanPlantsDto;
+import com.jaagro.cbs.api.dto.technicianapp.ParamConfigurationDto;
 import com.jaagro.cbs.api.dto.technicianapp.ReportFormsDto;
 import com.jaagro.cbs.api.model.BreedingPlan;
 
@@ -90,6 +92,14 @@ public interface BreedingPlanService {
      * @author yj
      */
     void breedingPlanParamConfiguration(BreedingPlanParamConfigurationDto dto);
+
+    /**
+     * 养殖计划参数配置 -技术管理app
+     *
+     * @param dto
+     * @author yj
+     */
+    void ParamConfiguration(ParamConfigurationDto dto);
 
     /**
      * 根据计划id获取当前日龄
@@ -190,6 +200,7 @@ public interface BreedingPlanService {
 
     /**
      * 根据计划id查询参数模块列表
+     *
      * @param planId
      * @return
      */
@@ -197,6 +208,7 @@ public interface BreedingPlanService {
 
     /**
      * 根据计划id参数名称参数类型查看养殖模板参数
+     *
      * @param planId
      * @param paramName
      * @param paramType
@@ -206,6 +218,7 @@ public interface BreedingPlanService {
 
     /**
      * 根据计划id查询养殖药品配置
+     *
      * @param planId
      * @return
      */
@@ -216,5 +229,14 @@ public interface BreedingPlanService {
      *
      * @return
      */
-   ReportFormsDto reportForms();
+    ReportFormsDto reportForms();
+
+    /**
+     * 获取养殖计划鸡舍信息 -技术管理app
+     *
+     * @param planId
+     * @return
+     * @author byr
+     */
+    List<BreedingPlanPlantsDto> listPlanPlantsForTechnicianChoose(Integer planId);
 }

@@ -2,6 +2,7 @@ package com.jaagro.cbs.biz.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
 import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
 import com.jaagro.cbs.api.dto.order.*;
 import com.jaagro.cbs.api.dto.plan.CustomerInfoParamDto;
@@ -20,7 +21,9 @@ import com.jaagro.cbs.api.service.BreedingPurchaseOrderService;
 import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
 import com.jaagro.cbs.biz.mapper.PurchaseOrderItemsMapperExt;
 import com.jaagro.cbs.biz.mapper.PurchaseOrderMapperExt;
+import com.jaagro.cbs.biz.service.CustomerClientService;
 import com.jaagro.cbs.biz.service.UserClientService;
+import com.jaagro.cbs.biz.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +55,8 @@ public class BreedingPurchaseOrderServiceImpl implements BreedingPurchaseOrderSe
     private PurchaseOrderMapperExt purchaseOrderMapper;
     @Autowired
     private PurchaseOrderItemsMapperExt purchaseOrderItemsMapperExt;
+    @Autowired
+    private CustomerClientService customerClientService;
 
     /**
      * 采购预置列表
@@ -132,9 +137,17 @@ public class BreedingPurchaseOrderServiceImpl implements BreedingPurchaseOrderSe
                 List<BreedingPlan> breedingPlans = breedingPlanMapper.selectByExample(breedingPlanExample);
                 if (!CollectionUtils.isEmpty(breedingPlans)) {
                     BreedingPlan breedingPlan = breedingPlans.get(0);
+                    //计算预计出栏时间
+                    String expectSuchTime = null;
+                    if (breedingPlan.getPlanTime() != null && breedingPlan.getBreedingDays() != null) {
+                        expectSuchTime = DateUtil.accumulateDateByDay(breedingPlan.getPlanTime(), breedingPlan.getBreedingDays());
+                    }
+                    returnPurchaseOrderPresetDetailsDto.setExpectSuchTime(expectSuchTime);
+                    //雏鸡数量
                     if (breedingPlan.getPlanChickenQuantity() != null) {
                         returnPurchaseOrderPresetDetailsDto.setPlanChickenQuantity(breedingPlan.getPlanChickenQuantity());
                     }
+                    //上鸡时间
                     if (breedingPlan.getPlanTime() != null) {
                         returnPurchaseOrderPresetDetailsDto.setPlanTime(breedingPlan.getPlanTime());
                     }
@@ -153,6 +166,12 @@ public class BreedingPurchaseOrderServiceImpl implements BreedingPurchaseOrderSe
                             if (customerInfo.getCustomerAddress() != null) {
                                 returnPurchaseOrderPresetDetailsDto.setCustomerAddress(customerInfo.getCustomerAddress());
                             }
+                        }
+                        //客户、客户联系人
+                        CustomerContactsReturnDto customerDto = customerClientService.getCustomerContactByCustomerId(breedingPlan.getCustomerId());
+                        if (null != customerDto) {
+                            returnPurchaseOrderPresetDetailsDto.setCustomerContactPhone(customerDto.getPhone());
+                            returnPurchaseOrderPresetDetailsDto.setCustomerContactName(customerDto.getContact());
                         }
                     }
                 }

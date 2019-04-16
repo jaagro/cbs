@@ -37,7 +37,7 @@ public class DateUtil {
         String strDate = threadLocal.get().format(date);
         Date formatDate = stringToDate(strDate);
         fromCal.setTime(formatDate);
-        fromCal.add(Calendar.DATE, day);
+        fromCal.add(Calendar.DATE, day-7);
         return threadLocal.get().format(fromCal.getTime());
     }
 

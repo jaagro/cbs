@@ -88,7 +88,21 @@ public class ReturnPurchaseOrderPresetDetailsDto implements Serializable {
      */
     private String customerAddress;
     /**
+     * //计算预计出栏时间
+     */
+    private String expectSuchTime;
+    /**
+     * 养殖户联系人名称
+     */
+    private String customerContactName;
+
+    /**
+     * 养殖户联系人电话
+     */
+    private String customerContactPhone;
+    /**
      * 采购订单商品
      */
     private List<ReturnProductDto> returnProductDtos;
+
 }
