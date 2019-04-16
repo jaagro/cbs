@@ -112,7 +112,7 @@ public class TechConsultServiceImpl implements TechConsultService {
         returnDto.setHandleTime(techConsultRecordDo.getHandleTime());
         if (null != techConsultRecordDo.getHandleUserId()) {
             ListEmployeeDto employeeDto = userClientService.getTechnicianById(techConsultRecordDo.getHandleUserId()).getData();
-            if(null != employeeDto) {
+            if (null != employeeDto) {
                 returnDto.setHandleName(employeeDto.getName());
             }
         }

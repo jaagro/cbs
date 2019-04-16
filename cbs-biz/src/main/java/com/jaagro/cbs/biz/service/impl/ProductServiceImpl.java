@@ -5,9 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.cbs.api.dto.product.CreateProductDto;
 import com.jaagro.cbs.api.dto.product.ListDrugCriteria;
 import com.jaagro.cbs.api.dto.product.ListProductCriteria;
-import com.jaagro.cbs.api.enums.ProductTypeEnum;
 import com.jaagro.cbs.api.model.Product;
-import com.jaagro.cbs.api.model.ProductExample;
 import com.jaagro.cbs.api.model.TenantDrugStock;
 import com.jaagro.cbs.api.service.ProductService;
 import com.jaagro.cbs.biz.mapper.ProductMapperExt;
@@ -18,8 +16,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
-import java.util.Arrays;
 import java.util.List;
 
 /**

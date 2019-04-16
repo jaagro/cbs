@@ -54,6 +54,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
      * 必要参数类型个数
      */
     private static final Integer necessaryParamTypeNum = 4;
+
     /**
      * 创建养殖模版与参数
      *
@@ -84,11 +85,11 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         Integer currentUserId = getCurrentUserId();
         BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(dto.getId());
         // 如果养殖天数减少则删除大于修改后养殖天数日龄的养殖参数
-        if (breedingStandard.getBreedingDays() != null && dto.getBreedingDays() != null ) {
-            if (breedingStandard.getBreedingDays() < dto.getBreedingDays()){
+        if (breedingStandard.getBreedingDays() != null && dto.getBreedingDays() != null) {
+            if (breedingStandard.getBreedingDays() < dto.getBreedingDays()) {
                 throw new BusinessException("亲,不允许增加养殖天数");
             }
-            if (breedingStandard.getBreedingDays() > dto.getBreedingDays()){
+            if (breedingStandard.getBreedingDays() > dto.getBreedingDays()) {
                 BreedingStandardParameterExample example = new BreedingStandardParameterExample();
                 example.createCriteria().andEnableEqualTo(Boolean.TRUE).andStandardIdEqualTo(dto.getId())
                         .andDayAgeGreaterThan(dto.getBreedingDays());
@@ -118,8 +119,8 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
 
         BreedingStandardParameterExample example = new BreedingStandardParameterExample();
         example.createCriteria().andStandardIdEqualTo(standardId)
-                                .andStatusEqualTo(BreedingStandardStatusEnum.ENABLE.getCode())
-                                .andEnableEqualTo(true);
+                .andStatusEqualTo(BreedingStandardStatusEnum.ENABLE.getCode())
+                .andEnableEqualTo(true);
         List<BreedingStandardParameter> parameterList = standardParameterMapper.selectByExample(example);
 
 
@@ -145,8 +146,8 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
      * @param dto
      */
     @Override
-    public Map<String,Object> saveOrUpdateParameter(BreedingParameterListDto dto) {
-        Map<String,Object> result = new HashMap<>(2);
+    public Map<String, Object> saveOrUpdateParameter(BreedingParameterListDto dto) {
+        Map<String, Object> result = new HashMap<>(2);
         List<BreedingStandardParameterItemDto> breedingStandardParameterList = dto.getBreedingStandardParameterList();
         if (!CollectionUtils.isEmpty(breedingStandardParameterList)) {
             List<BreedingStandardParameterItemDto> newParameterList = new ArrayList<>();
@@ -201,34 +202,34 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
             List<BreedingStandardParameter> parameterList = standardParameterMapper.selectByExample(example);
             Set<String> necessaryParamSet = new HashSet<>();
             BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(dto.getStandardId());
-            if (!CollectionUtils.isEmpty(parameterList) && parameterList.size() == breedingStandard.getBreedingDays()*necessaryParamTypeNum){
-                if (breedingStandard.getStandardStatus() != null &&  StandardStatusEnum.NORMAL.getCode() != breedingStandard.getStandardStatus()){
+            if (!CollectionUtils.isEmpty(parameterList) && parameterList.size() == breedingStandard.getBreedingDays() * necessaryParamTypeNum) {
+                if (breedingStandard.getStandardStatus() != null && StandardStatusEnum.NORMAL.getCode() != breedingStandard.getStandardStatus()) {
                     breedingStandard.setStandardStatus(StandardStatusEnum.WAIT_DRUG_CONFIGURATION.getCode())
                             .setModifyUserId(currentUserId);
                     breedingStandardMapper.updateByPrimaryKeySelective(breedingStandard);
                 }
             }
-            putConfigureMessage(necessaryParamList,parameterList,necessaryParamSet,result);
-        }else {
+            putConfigureMessage(necessaryParamList, parameterList, necessaryParamSet, result);
+        } else {
             throw new BusinessException("参数列表为空");
         }
         return result;
     }
 
-    private void putConfigureMessage(List<String> necessaryParamList,List<BreedingStandardParameter> parameterList, Set<String> necessaryParamSet, Map<String,Object> result) {
-        if (!CollectionUtils.isEmpty(parameterList)){
-            parameterList.forEach(parameter->necessaryParamSet.add(parameter.getParamName()));
+    private void putConfigureMessage(List<String> necessaryParamList, List<BreedingStandardParameter> parameterList, Set<String> necessaryParamSet, Map<String, Object> result) {
+        if (!CollectionUtils.isEmpty(parameterList)) {
+            parameterList.forEach(parameter -> necessaryParamSet.add(parameter.getParamName()));
         }
         necessaryParamList.removeAll(necessaryParamSet);
-        if (CollectionUtils.isEmpty(necessaryParamList)){
-            result.put("necessaryAllConfigured",true);
-        }else {
-            result.put("necessaryAllConfigured",false);
+        if (CollectionUtils.isEmpty(necessaryParamList)) {
+            result.put("necessaryAllConfigured", true);
+        } else {
+            result.put("necessaryAllConfigured", false);
             StringBuffer sb = new StringBuffer();
-            necessaryParamList.forEach(paramName->sb.append(paramName).append(","));
+            necessaryParamList.forEach(paramName -> sb.append(paramName).append(","));
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("未配置");
-            result.put("unConfiguredMessage",sb.toString());
+            result.put("unConfiguredMessage", sb.toString());
         }
     }
 
@@ -511,7 +512,7 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         example.createCriteria().andEnableEqualTo(Boolean.TRUE).andParamNameEqualTo(dto.getParamName())
                 .andParamTypeEqualTo(dto.getParamType()).andStandardIdEqualTo(dto.getStandardId());
         List<BreedingStandardParameter> parameterList = standardParameterMapper.selectByExample(example);
-        if (CollectionUtils.isEmpty(parameterList)){
+        if (CollectionUtils.isEmpty(parameterList)) {
             throw new BusinessException("参数不存在");
         }
         Integer displayOrder = parameterList.get(0).getDisplayOrder();
@@ -521,9 +522,9 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         example.createCriteria().andStandardIdEqualTo(dto.getStandardId()).andEnableEqualTo(Boolean.TRUE)
                 .andDisplayOrderGreaterThan(displayOrder);
         List<BreedingStandardParameter> needUpdateParameterList = standardParameterMapper.selectByExample(upDateExample);
-        if (!CollectionUtils.isEmpty(needUpdateParameterList)){
-            for (BreedingStandardParameter parameter : needUpdateParameterList){
-                parameter.setDisplayOrder(parameter.getDisplayOrder()-1);
+        if (!CollectionUtils.isEmpty(needUpdateParameterList)) {
+            for (BreedingStandardParameter parameter : needUpdateParameterList) {
+                parameter.setDisplayOrder(parameter.getDisplayOrder() - 1);
             }
         }
         standardParameterMapper.batchUpdateByPrimaryKeySelective(needUpdateParameterList);
@@ -544,8 +545,8 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
             List<BreedingStandardDrug> standardDrugList = new ArrayList<>();
             for (BreedingStandardDrugListDto dto : drugList) {
                 List<BreedingStandardDrugItemDto> drugItemVoList = dto.getBreedingStandardDrugItemVoList();
-               boolean flag =  (dto.getStopDrugFlag() == null || !dto.getStopDrugFlag()) && CollectionUtils.isEmpty(drugItemVoList);
-                if (flag){
+                boolean flag = (dto.getStopDrugFlag() == null || !dto.getStopDrugFlag()) && CollectionUtils.isEmpty(drugItemVoList);
+                if (flag) {
                     throw new BusinessException("非停药日必须要配置药品");
                 }
                 if (CollectionUtils.isEmpty(drugItemVoList)) {
@@ -573,27 +574,28 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
 
     /**
      * 判断是否能进行药品配置
+     *
      * @param drugList
      */
     private void judgeCanConfiguration(ValidList<BreedingStandardDrugListDto> drugList) {
         Integer standardId = drugList.get(0).getStandardId();
         BreedingStandard breedingStandard = breedingStandardMapper.selectByPrimaryKey(standardId);
-        if(StandardStatusEnum.WAIT_DRUG_CONFIGURATION.getCode() != breedingStandard.getStandardStatus() && StandardStatusEnum.NORMAL.getCode() != breedingStandard.getStandardStatus()){
+        if (StandardStatusEnum.WAIT_DRUG_CONFIGURATION.getCode() != breedingStandard.getStandardStatus() && StandardStatusEnum.NORMAL.getCode() != breedingStandard.getStandardStatus()) {
             throw new BusinessException("必要参数需要都已配置才能进行药品配置");
         }
         // 一个养殖周期必须有两个以上停药日
         Integer stopDrugCount = 0;
-        for (BreedingStandardDrugListDto drugListDto : drugList){
-            if (drugListDto.getStopDrugFlag() != null && drugListDto.getStopDrugFlag()){
+        for (BreedingStandardDrugListDto drugListDto : drugList) {
+            if (drugListDto.getStopDrugFlag() != null && drugListDto.getStopDrugFlag()) {
                 stopDrugCount++;
             }
         }
-        if (stopDrugCount < breedingStopDrugCount){
+        if (stopDrugCount < breedingStopDrugCount) {
             throw new BusinessException("一个养殖周期必须有两个以上停药日");
         }
         BreedingStandardDrugListDto drugListDto = drugList.get(drugList.size() - 1);
         Integer dayAgeEnd = drugListDto.getDayAgeEnd();
-        if(dayAgeEnd == null || !dayAgeEnd.equals(breedingStandard.getBreedingDays())){
+        if (dayAgeEnd == null || !dayAgeEnd.equals(breedingStandard.getBreedingDays())) {
             throw new BusinessException("药品配置需要配置整个养殖周期才能提交");
         }
     }

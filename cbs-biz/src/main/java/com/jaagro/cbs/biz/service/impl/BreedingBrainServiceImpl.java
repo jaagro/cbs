@@ -197,11 +197,11 @@ public class BreedingBrainServiceImpl implements BreedingBrainService {
         //1-14日龄区间每天每只鸡吃的饲料（小料510）总和
         BigDecimal totalFeedWeight114 = getSumFoodWeightByPlanIdAndDayAgeArea(planId, dayAgeStart, dayAgeEnd);
         //第一阶段小料510需要采购的数量
-        BigDecimal PhaseOneWeight = planChickenQuantity.multiply(totalFeedWeight114);
+        BigDecimal phaseOneWeight = planChickenQuantity.multiply(totalFeedWeight114);
         //计算出来的订单重量如果大于0，则插入生产并插入该订单
-        if (PhaseOneWeight.compareTo(BigDecimal.ZERO) == 1) {
+        if (phaseOneWeight.compareTo(BigDecimal.ZERO) == 1) {
             //单位由克化成吨
-            PhaseOneWeight = PhaseOneWeight.divide(new BigDecimal(1000000)).setScale(3, BigDecimal.ROUND_HALF_UP);
+            phaseOneWeight = phaseOneWeight.divide(new BigDecimal(1000000)).setScale(3, BigDecimal.ROUND_HALF_UP);
             //1.删除第一个饲料订单
             PurchaseOrderBo orderBo = new PurchaseOrderBo();
             orderBo.setPlanId(planId)
@@ -212,7 +212,7 @@ public class BreedingBrainServiceImpl implements BreedingBrainService {
             PurchaseOrder purchaseOrder = this.savePurchaseOrder(breedingPlan, PurchaseOrderPhaseEnum.PHASE_ONE.getCode(), ProductTypeEnum.FEED.getCode(), breedingPlan.getPlanTime());
             //3. 保存订单明细
             Integer orderId = purchaseOrder.getId();
-            List<PurchaseOrderItems> orderItems = this.getPurchaseOrderItems(feedConfig.getProductId(), PhaseOneWeight);
+            List<PurchaseOrderItems> orderItems = this.getPurchaseOrderItems(feedConfig.getProductId(), phaseOneWeight);
             this.savePurchaseOrderItems(orderId, orderItems, batchContract);
             phaseOneOrders.add(purchaseOrder);
         }
@@ -271,10 +271,10 @@ public class BreedingBrainServiceImpl implements BreedingBrainService {
             //计算 1->12日龄区间剩余饲料
             BigDecimal b = getSumLeftFoodWeightByPlanIdAndDayAgeArea(planId, 1, ageDay12);
             //第二阶段小料510需要采购的数量
-            BigDecimal PhaseTwo1Weight = a.subtract(b);
-            if (PhaseTwo1Weight.compareTo(BigDecimal.ZERO) == 1) {
+            BigDecimal phaseTwo1Weight = a.subtract(b);
+            if (phaseTwo1Weight.compareTo(BigDecimal.ZERO) == 1) {
                 //克转换成吨
-                PhaseTwo1Weight = PhaseTwo1Weight.divide(new BigDecimal(1000000)).setScale(3, BigDecimal.ROUND_HALF_UP);
+                phaseTwo1Weight = phaseTwo1Weight.divide(new BigDecimal(1000000)).setScale(3, BigDecimal.ROUND_HALF_UP);
                 //1.删除第二次饲料订单和订单明细
                 PurchaseOrderBo orderBo = new PurchaseOrderBo();
                 orderBo.setPlanId(planId)
@@ -286,7 +286,7 @@ public class BreedingBrainServiceImpl implements BreedingBrainService {
                 PurchaseOrder purchaseOrder = this.savePurchaseOrder(breedingPlan, PurchaseOrderPhaseEnum.PHASE_TWO.getCode(), ProductTypeEnum.FEED.getCode(), new Date());
                 //3. 保存订单明细
                 Integer orderId = purchaseOrder.getId();
-                List<PurchaseOrderItems> orderItems = this.getPurchaseOrderItems(feedConfig.getProductId(), PhaseTwo1Weight);
+                List<PurchaseOrderItems> orderItems = this.getPurchaseOrderItems(feedConfig.getProductId(), phaseTwo1Weight);
                 this.savePurchaseOrderItems(orderId, orderItems, batchContract);
 
                 phaseTwoOrders.add(purchaseOrder);
@@ -335,10 +335,10 @@ public class BreedingBrainServiceImpl implements BreedingBrainService {
             //20->28日龄区间每天每只鸡吃的饲料（大料511）总和
             BigDecimal totalFeedWeight2028 = getSumFoodWeightByPlanIdAndDayAgeArea(planId, dayAgeStart, dayAgeEnd);
             //第二阶段大料511需要采购的数量
-            BigDecimal PhaseTwo2Weight = totalFeedWeight2028.multiply(new BigDecimal(ageDay12LivingQuantity));
-            if (PhaseTwo2Weight.compareTo(BigDecimal.ZERO) == 1) {
+            BigDecimal phaseTwo2Weight = totalFeedWeight2028.multiply(new BigDecimal(ageDay12LivingQuantity));
+            if (phaseTwo2Weight.compareTo(BigDecimal.ZERO) == 1) {
                 //克转换成吨
-                PhaseTwo2Weight = PhaseTwo2Weight.divide(new BigDecimal(1000000)).setScale(3, BigDecimal.ROUND_HALF_UP);
+                phaseTwo2Weight = phaseTwo2Weight.divide(new BigDecimal(1000000)).setScale(3, BigDecimal.ROUND_HALF_UP);
 
                 //1.删除第二次饲料订单和明细
                 PurchaseOrderBo orderBo = new PurchaseOrderBo();
@@ -351,7 +351,7 @@ public class BreedingBrainServiceImpl implements BreedingBrainService {
                 PurchaseOrder purchaseOrder = this.savePurchaseOrder(breedingPlan, PurchaseOrderPhaseEnum.PHASE_THREE.getCode(), ProductTypeEnum.FEED.getCode(), new Date());
                 //3. 保存订单明细
                 Integer orderId = purchaseOrder.getId();
-                List<PurchaseOrderItems> orderItems = this.getPurchaseOrderItems(feedConfigPhaseThree.getProductId(), PhaseTwo2Weight);
+                List<PurchaseOrderItems> orderItems = this.getPurchaseOrderItems(feedConfigPhaseThree.getProductId(), phaseTwo2Weight);
                 this.savePurchaseOrderItems(orderId, orderItems, batchContract);
 
                 phaseTwoOrders.add(purchaseOrder);
@@ -415,17 +415,17 @@ public class BreedingBrainServiceImpl implements BreedingBrainService {
             //26日龄存栏数乘以sum(29->breedingDays)
             BigDecimal a = totalFeedWeight29BreedingDays.multiply(new BigDecimal(ageDay26LivingQuantity));
             //12->19日龄期间死掉的数量
-            Integer diffLivingQuantity1219 = ageDay12LivingQuantity - ageDay19LivingQuantity;
+            int diffLivingQuantity1219 = ageDay12LivingQuantity - ageDay19LivingQuantity;
             //12->19日龄期间剩余的饲料
             BigDecimal b = totalFeedWeight2028.multiply(new BigDecimal(diffLivingQuantity1219));
             //计算 20->26日龄区间剩余饲料
             BigDecimal c = getSumLeftFoodWeightByPlanIdAndDayAgeArea(planId, feedConfigPhaseThree.getDayAgeStart(), ageDay26);
             //第三次大料511需要采购的数量
-            BigDecimal PhaseFourWeight = a.subtract(b).subtract(c);
+            BigDecimal phaseFourWeight = a.subtract(b).subtract(c);
 
-            if (PhaseFourWeight.compareTo(BigDecimal.ZERO) == 1) {
+            if (phaseFourWeight.compareTo(BigDecimal.ZERO) == 1) {
                 //克转换成吨
-                PhaseFourWeight = PhaseFourWeight.divide(new BigDecimal(1000000)).setScale(3, BigDecimal.ROUND_HALF_UP);
+                phaseFourWeight = phaseFourWeight.divide(new BigDecimal(1000000)).setScale(3, BigDecimal.ROUND_HALF_UP);
                 //1.删除第三次饲料订单和明细
                 PurchaseOrderBo orderBo = new PurchaseOrderBo();
                 orderBo.setPlanId(planId)
@@ -437,7 +437,7 @@ public class BreedingBrainServiceImpl implements BreedingBrainService {
                 PurchaseOrder purchaseOrder = this.savePurchaseOrder(breedingPlan, PurchaseOrderPhaseEnum.PHASE_FOUR.getCode(), ProductTypeEnum.FEED.getCode(), new Date());
                 //3. 保存订单明细
                 Integer orderId = purchaseOrder.getId();
-                List<PurchaseOrderItems> orderItems = this.getPurchaseOrderItems(feedConfigPhaseFour.getProductId(), PhaseFourWeight);
+                List<PurchaseOrderItems> orderItems = this.getPurchaseOrderItems(feedConfigPhaseFour.getProductId(), phaseFourWeight);
                 this.savePurchaseOrderItems(orderId, orderItems, batchContract);
 
                 phaseTwoOrders.add(purchaseOrder);
