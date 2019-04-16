@@ -1552,7 +1552,10 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         if (!CollectionUtils.isEmpty(parameterList)) {
             BreedingBatchParameter parameter = parameterList.get(0);
             BreedingStandardParameter standardParameter = breedingStandardParameterMapper.selectByPrimaryKey(parameter.getParamId());
-            Integer standardId = standardParameter.getStandardId();
+            Integer standardId = null;
+            if (null != standardParameter) {
+                standardId = standardParameter.getStandardId();
+            }
             dto.setAlarm(parameter.getAlarm())
                     .setNecessary(parameter.getNecessary())
                     .setParamName(paramName)
