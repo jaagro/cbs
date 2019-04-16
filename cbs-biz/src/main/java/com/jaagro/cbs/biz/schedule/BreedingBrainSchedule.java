@@ -101,6 +101,7 @@ public class BreedingBrainSchedule {
         long time = System.currentTimeMillis() + 10 * 1000;
         boolean success = redisLock.lock("Scheduled:redisLock:" + method, String.valueOf(time), 10, TimeUnit.MINUTES);
         if (!success) {
+            log.info("BreedingBrainSchedule method:"+ method+" 方法在执行....");
             return breedingPlanList;
         }
         //从redis里去取养殖计划
