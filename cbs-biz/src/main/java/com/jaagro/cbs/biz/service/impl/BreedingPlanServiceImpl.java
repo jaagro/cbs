@@ -672,7 +672,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
         Date now = new Date();
         String strNow = sdf.format(now);
-        Integer monthLength = 2;
+        int monthLength = 2;
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
         if (Integer.parseInt(strNow.substring(0, monthLength)) < Integer.parseInt(strDate.substring(0, monthLength))) {

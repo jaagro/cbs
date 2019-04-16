@@ -141,8 +141,8 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                 BigDecimal dayAgeAreaFeedWeight = breedingBrainService.getSumFoodWeightByPlanIdAndDayAgeArea(planId, currentDayAgeLong.intValue(), k);
                 BigDecimal dayAgeAreaFeedTotalWeight = livingQuantity.multiply(dayAgeAreaFeedWeight);
                 //单位：克
-                BigDecimal LeftFoodWight = totalLeftFood.subtract(dayAgeAreaFeedTotalWeight);
-                if (LeftFoodWight.compareTo(BigDecimal.ZERO) == -1) {
+                BigDecimal leftFoodWight = totalLeftFood.subtract(dayAgeAreaFeedTotalWeight);
+                if (leftFoodWight.compareTo(BigDecimal.ZERO) == -1) {
                     break;
                 }
                 leftUsageDays++;
@@ -214,20 +214,20 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
                     if (null != breedingRecordDto && BreedingStandardParamEnum.DIE.getCode() == breedingBatchParameterDo.getParamType()) {
                         // 死淘率等于今日死淘除以今日起始数量
                         Integer deathTotal = breedingRecordDto.getDeathTotal();
-                        if (deathTotal != null){
+                        if (deathTotal != null) {
                             BatchCoopDailyExample batchCoopDailyExample = new BatchCoopDailyExample();
                             batchCoopDailyExample.createCriteria().andEnableEqualTo(Boolean.TRUE)
-                                    .andCoopIdEqualTo(coopId).andPlanIdEqualTo(planId).andDayAgeEqualTo(dayAge-1);
+                                    .andCoopIdEqualTo(coopId).andPlanIdEqualTo(planId).andDayAgeEqualTo(dayAge - 1);
                             batchCoopDailyExample.setOrderByClause("create_time desc");
                             batchCoopDailyExample.setLimit(1);
                             List<BatchCoopDaily> batchCoopDailyList = batchCoopDailyMapper.selectByExample(batchCoopDailyExample);
                             Integer startAmount;
-                            if (!batchCoopDailyList.isEmpty()){
+                            if (!batchCoopDailyList.isEmpty()) {
                                 startAmount = batchCoopDailyList.get(0).getCurrentAmount();
-                            }else {
+                            } else {
                                 startAmount = breedingPlan.getPlanChickenQuantity();
                             }
-                            returnDto.setActualValue(new BigDecimal(deathTotal).divide(new BigDecimal(startAmount),4, RoundingMode.HALF_UP).multiply(new BigDecimal("100")).setScale(2,BigDecimal.ROUND_HALF_UP).toPlainString());
+                            returnDto.setActualValue(new BigDecimal(deathTotal).divide(new BigDecimal(startAmount), 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100")).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
                         }
                     }
                     if (null != breedingRecordDto && BreedingStandardParamEnum.FEEDING_WEIGHT.getCode() == breedingBatchParameterDo.getParamType()) {

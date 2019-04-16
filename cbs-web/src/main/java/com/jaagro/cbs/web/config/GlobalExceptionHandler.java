@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
     private BaseResponse methodArgumentNotValidExceptionHandler(Exception ex){
         log.info("methodArgumentNotValidExceptionHandler",ex);
         //处理Validation异常
-        StringBuffer errorMsg = new StringBuffer();
+        StringBuilder errorMsg = new StringBuilder();
         MethodArgumentNotValidException c = (MethodArgumentNotValidException) ex;
         List<ObjectError> errors = c.getBindingResult().getAllErrors();
         for (ObjectError error : errors) {

@@ -60,9 +60,9 @@ public class DeviceAlarmLogServiceImpl implements DeviceAlarmLogService {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         Map<String, Integer> queryParam = new HashMap<>(10);
         queryParam.put("technicianId", dto.getTechnicianId());
-        List<DeviceAlarmLogDto> DeviceAlarmLogDtoList = deviceAlarmLogMapperExt.listDeviceAlarmLogApp(queryParam);
+        List<DeviceAlarmLogDto> deviceAlarmLogDtoList = deviceAlarmLogMapperExt.listDeviceAlarmLogApp(queryParam);
 
-        return new PageInfo(DeviceAlarmLogDtoList);
+        return new PageInfo(deviceAlarmLogDtoList);
     }
 
     /**
@@ -150,7 +150,7 @@ public class DeviceAlarmLogServiceImpl implements DeviceAlarmLogService {
                 alarmLogDetailDto.setHandleTime(deviceAlarmLog.getHandleTime());
                 if (null != deviceAlarmLog.getHandleUserId()) {
                     ListEmployeeDto employeeDto = userClientService.getTechnicianById(deviceAlarmLog.getHandleUserId()).getData();
-                    if(null != employeeDto) {
+                    if (null != employeeDto) {
                         alarmLogDetailDto.setHandleName(employeeDto.getName());
                     }
                 }
