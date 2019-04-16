@@ -104,4 +104,22 @@ public class DateUtil {
     public static String dateToStr(Date date) {
         return threadLocal.get().format(date);
     }
+    /**
+     * 日期添加指定天数
+     *
+     * @return
+     * @author: @gavin
+     */
+    public static String accumulateDayAge(Date date, int day) {
+        String strDate = threadLocal.get().format(date);
+        Date formatDate = stringToDate(strDate);
+        fromCal.setTime(formatDate);
+        fromCal.add(Calendar.DATE, day);
+        return threadLocal.get().format(fromCal.getTime());
+    }
+
+    public static void main(String[] args) {
+        System.out.println(accumulateDateByDay(new Date(),0));
+        System.out.println(accumulateDayAge(new Date(),0));
+    }
 }

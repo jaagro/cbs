@@ -124,7 +124,7 @@ public class BreedingProgressServiceImpl implements BreedingProgressService {
             List<Map<Integer, String>> progressDayAges = new ArrayList<>();
             for (int i = 0; i < breedingPlan.getBreedingDays(); i++) {
                 Map<Integer, String> map = new HashMap<>();
-                map.put(i + 1, DateUtil.accumulateDateByDay(breedingPlan.getPlanTime(), i));
+                map.put(i + 1, DateUtil.accumulateDayAge(breedingPlan.getPlanTime(), i));
                 progressDayAges.add(map);
             }
             breedingProgressDto.setProgressDayAges(progressDayAges);
