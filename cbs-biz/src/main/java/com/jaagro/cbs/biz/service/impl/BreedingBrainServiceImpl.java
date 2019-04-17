@@ -143,7 +143,7 @@ public class BreedingBrainServiceImpl implements BreedingBrainService {
             //获取第二次停药日期
             Map<Integer, String> progressDayAgesMap = new HashMap<>();
             for (int j = 0; j < breedingPlan.getBreedingDays(); j++) {
-                progressDayAgesMap.put(j + 1, DateUtil.accumulateDateByDay(breedingPlan.getPlanTime(), j));
+                progressDayAgesMap.put(j + 1, DateUtil.accumulateDayAge(breedingPlan.getPlanTime(), j));
             }
             Date secondStopDrugDate = new Date();
             int j = 0;
