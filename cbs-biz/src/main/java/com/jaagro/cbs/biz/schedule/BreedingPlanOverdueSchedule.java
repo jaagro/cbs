@@ -26,7 +26,7 @@ public class BreedingPlanOverdueSchedule {
     /**
      * 50分钟执行一次
      */
-    @Scheduled(cron = "0 0/50 * * * ?")
+    @Scheduled(cron = "0 50 * * * ?")
     public void cancelBreedingPlanOverdue() {
         log.info("O cancelBreedingPlanOverdue start");
         List<BreedingPlan> breedingPlans = breedingPlanMapper.listBreedingPlanOverdue();
