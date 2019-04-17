@@ -611,8 +611,17 @@ public class BreedingStandardServiceImpl implements BreedingStandardService {
         if (breedingStandard == null) {
             throw new BusinessException("养殖模板id=" + standardId + "不存在");
         }
-        breedingStandardMapper.deleteByPrimaryKey(standardId);
-        standardParameterMapper.deleteByStandardId(standardId);
+        //修改为逻辑删除
+        breedingStandard.setEnable(false);
+        breedingStandardMapper.updateByPrimaryKeySelective(breedingStandard);
+
+        BreedingStandardParameter parameter = new BreedingStandardParameter();
+        parameter.setStandardId(standardId);
+        parameter.setEnable(false);
+        standardParameterMapper.updateByPrimaryKeySelective(parameter);
+
+        //breedingStandardMapper.deleteByPrimaryKey(standardId);
+       // standardParameterMapper.deleteByStandardId(standardId);
     }
 
     /**
