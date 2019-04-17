@@ -16,15 +16,21 @@
     </select>
     <select id="listHistoryByParams" resultType="com.jaagro.cbs.api.model.DeviceValue">
         SELECT
-        <include refid="Base_Column_List"/>
+        *
+        FROM
+        (
+        SELECT
+        *
         FROM
         device_value_history
         WHERE
         DATE_FORMAT( create_time, '%Y-%m-%d' ) = DATE_FORMAT( NOW( ), '%Y-%m-%d' )
+        ORDER BY
+        create_time DESC
+        LIMIT 999999999999
+        ) temp_a
         GROUP BY
         device_id,
         value_type
-        ORDER BY
-        create_time DESC
     </select>
 </mapper>
