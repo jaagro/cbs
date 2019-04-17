@@ -7,7 +7,7 @@
     <select id="listAllBreedingStandard"  resultMap="BaseResultMap">
         SELECT 
           <include refid="Base_Column_List"/>
-        FROM breeding_standard
+        FROM breeding_standard where enable=1
         ORDER BY create_time desc
     </select>
 
