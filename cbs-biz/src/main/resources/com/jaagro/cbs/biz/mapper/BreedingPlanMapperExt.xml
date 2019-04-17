@@ -128,8 +128,8 @@
             <if test="batchNo!=null">
                 and bp.batch_no like concat('%', #{batchNo},'%')
             </if>
-            order by bp.plan_status asc , bs.create_time desc
         </where>
+        order by bp.plan_status asc , bs.create_time desc
     </select>
     <select id="listToSlaughterConfirm" resultMap="BaseResultMap">
         SELECT
