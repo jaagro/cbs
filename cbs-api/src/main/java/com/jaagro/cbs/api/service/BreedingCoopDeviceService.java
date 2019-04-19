@@ -36,4 +36,5 @@ public interface BreedingCoopDeviceService {
      * @return
      */
     List<CoopDevice> listCoopDeviceByCoopId(Integer coopId);
+
 }

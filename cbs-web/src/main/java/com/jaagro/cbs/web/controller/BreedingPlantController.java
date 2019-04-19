@@ -138,6 +138,28 @@ public class BreedingPlantController {
         return BaseResponse.service(result);
     }
 
+    /**
+     * 鸡舍-修改
+     *
+     * @param coopDto
+     * @return
+     */
+    @ApiOperation("鸡舍-修改")
+    @PostMapping("/updateCoop")
+    public BaseResponse updateCoop(@RequestBody UpdateCoopDto coopDto) {
+        if (StringUtils.isEmpty(coopDto.getPlantId())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "养殖场id不能为空");
+        }
+        Map<String, Object> result;
+        try {
+            result = breedingPlantService.updateCoop(coopDto);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return BaseResponse.errorInstance(e.getMessage());
+        }
+        return BaseResponse.service(result);
+    }
+
     @ApiOperation("鸡舍-删除")
     @GetMapping("/deleteCoop/{plantId}")
     public BaseResponse deleteCoop(@PathVariable("plantId") Integer coopId) {
@@ -219,5 +241,19 @@ public class BreedingPlantController {
     @GetMapping("/listFreePlantByCustomerId/{customerId}")
     public BaseResponse<List<ReturnBasicPlantDto>> listFreePlantByCustomerId(@PathVariable("customerId") Integer customerId) {
         return BaseResponse.successInstance(breedingPlantService.listFreePlantByCustomerId(customerId));
+    }
+
+    @ApiOperation("获取设备Id列表")
+    @GetMapping("/listDeviceIdList")
+    public BaseResponse<List<ReturnBasicPlantDto>> listDeviceIdList() {
+        try {
+            String loginName = "";
+            String passWord = "";
+            breedingCoopDeviceService.listDeviceIdList(loginName, passWord);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return BaseResponse.errorInstance("获取设备id列表失败");
+        }
+        return BaseResponse.successInstance("");
     }
 }

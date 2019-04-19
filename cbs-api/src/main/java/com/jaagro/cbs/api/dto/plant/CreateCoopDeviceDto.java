@@ -33,6 +33,11 @@ public class CreateCoopDeviceDto implements Serializable {
     private String apiUrl;
 
     /**
+     * IOT设备唯一识别号
+     */
+    private String deviceCode;
+
+    /**
      * 设备类型(1-温感设备,2-湿感设备)
      */
     private Integer deviceType;
