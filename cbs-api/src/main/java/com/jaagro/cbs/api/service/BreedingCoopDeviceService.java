@@ -1,6 +1,7 @@
 package com.jaagro.cbs.api.service;
 
 
+import com.jaagro.cbs.api.dto.base.DeviceIdDto;
 import com.jaagro.cbs.api.dto.plant.CreateCoopDeviceDto;
 import com.jaagro.cbs.api.dto.plant.ReturnCoopDeviceDto;
 import com.jaagro.cbs.api.model.CoopDevice;
@@ -37,4 +38,5 @@ public interface BreedingCoopDeviceService {
      */
     List<CoopDevice> listCoopDeviceByCoopId(Integer coopId);
 
+    List<DeviceIdDto> listDeviceIdList(Integer coopId);
 }

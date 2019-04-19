@@ -243,13 +243,13 @@ public class BreedingPlantController {
         return BaseResponse.successInstance(breedingPlantService.listFreePlantByCustomerId(customerId));
     }
 
-    @ApiOperation("获取设备Id列表")
-    @GetMapping("/listDeviceIdList")
-    public BaseResponse<List<ReturnBasicPlantDto>> listDeviceIdList() {
+    @ApiOperation("根据登录名和密码获取设备Id列表")
+    @GetMapping("/listDeviceIdListBySessionId/{coopId}")
+    public BaseResponse<List<ReturnBasicPlantDto>> listDeviceIdListBySessionId(@PathVariable Integer coopId) {
         try {
             String loginName = "";
             String passWord = "";
-            breedingCoopDeviceService.listDeviceIdList(loginName, passWord);
+            breedingCoopDeviceService.listDeviceIdList(coopId);
         } catch (Exception ex) {
             ex.printStackTrace();
             return BaseResponse.errorInstance("获取设备id列表失败");
