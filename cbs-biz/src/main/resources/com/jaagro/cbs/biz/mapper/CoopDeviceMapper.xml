@@ -5,6 +5,7 @@
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="coop_id" property="coopId" jdbcType="INTEGER" />
     <result column="plant_id" property="plantId" jdbcType="INTEGER" />
+    <result column="device_code" property="deviceCode" jdbcType="VARCHAR" />
     <result column="device_type" property="deviceType" jdbcType="INTEGER" />
     <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
     <result column="producer" property="producer" jdbcType="VARCHAR" />
@@ -47,8 +48,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    id, coop_id, plant_id, device_type, device_name, producer, model_number, api_url, 
-    coop_device_status, create_time, create_user_id, modify_time, modify_user_id, enable
+    id, coop_id, plant_id, device_code, device_type, device_name, producer, model_number, 
+    api_url, coop_device_status, create_time, create_user_id, modify_time, modify_user_id, 
+    enable
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.jaagro.cbs.api.model.CoopDeviceExample" >
     select
@@ -87,16 +89,16 @@
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into coop_device (coop_id, plant_id, device_type, 
-      device_name, producer, model_number, 
-      api_url, coop_device_status, create_time, 
-      create_user_id, modify_time, modify_user_id, 
-      enable)
-    values (#{coopId,jdbcType=INTEGER}, #{plantId,jdbcType=INTEGER}, #{deviceType,jdbcType=INTEGER}, 
-      #{deviceName,jdbcType=VARCHAR}, #{producer,jdbcType=VARCHAR}, #{modelNumber,jdbcType=VARCHAR}, 
-      #{apiUrl,jdbcType=VARCHAR}, #{coopDeviceStatus,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{createUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER}, 
-      #{enable,jdbcType=BIT})
+    insert into coop_device (coop_id, plant_id, device_code, 
+      device_type, device_name, producer, 
+      model_number, api_url, coop_device_status, 
+      create_time, create_user_id, modify_time, 
+      modify_user_id, enable)
+    values (#{coopId,jdbcType=INTEGER}, #{plantId,jdbcType=INTEGER}, #{deviceCode,jdbcType=VARCHAR}, 
+      #{deviceType,jdbcType=INTEGER}, #{deviceName,jdbcType=VARCHAR}, #{producer,jdbcType=VARCHAR}, 
+      #{modelNumber,jdbcType=VARCHAR}, #{apiUrl,jdbcType=VARCHAR}, #{coopDeviceStatus,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{createUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, 
+      #{modifyUserId,jdbcType=INTEGER}, #{enable,jdbcType=BIT})
   </insert>
   <insert id="insertSelective" parameterType="com.jaagro.cbs.api.model.CoopDevice" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -109,6 +111,9 @@
       </if>
       <if test="plantId != null" >
         plant_id,
+      </if>
+      <if test="deviceCode != null" >
+        device_code,
       </if>
       <if test="deviceType != null" >
         device_type,
@@ -150,6 +155,9 @@
       </if>
       <if test="plantId != null" >
         #{plantId,jdbcType=INTEGER},
+      </if>
+      <if test="deviceCode != null" >
+        #{deviceCode,jdbcType=VARCHAR},
       </if>
       <if test="deviceType != null" >
         #{deviceType,jdbcType=INTEGER},
@@ -201,6 +209,9 @@
       <if test="plantId != null" >
         plant_id = #{plantId,jdbcType=INTEGER},
       </if>
+      <if test="deviceCode != null" >
+        device_code = #{deviceCode,jdbcType=VARCHAR},
+      </if>
       <if test="deviceType != null" >
         device_type = #{deviceType,jdbcType=INTEGER},
       </if>
@@ -241,6 +252,7 @@
     update coop_device
     set coop_id = #{coopId,jdbcType=INTEGER},
       plant_id = #{plantId,jdbcType=INTEGER},
+      device_code = #{deviceCode,jdbcType=VARCHAR},
       device_type = #{deviceType,jdbcType=INTEGER},
       device_name = #{deviceName,jdbcType=VARCHAR},
       producer = #{producer,jdbcType=VARCHAR},

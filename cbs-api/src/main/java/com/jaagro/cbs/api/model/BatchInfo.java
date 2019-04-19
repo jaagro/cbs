@@ -1,16 +1,17 @@
 package com.jaagro.cbs.api.model;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+
 /**
- * @author :gavinwang
- * @date :2019/04/08
+ * @author :asus
+ * @date :2019/04/19
  */
 @Data
 @NoArgsConstructor
