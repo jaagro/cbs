@@ -13,13 +13,10 @@ import com.jaagro.cbs.biz.utils.JsonUtils;
 import lombok.extern.log4j.Log4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -27,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,8 +61,8 @@ public class IotJoinServiceImpl implements IotJoinService {
     @Override
     public List<Map<String, String>> getDeviceListFromFanLong(Integer coopId) {
         String sessionId = redisTemplate.opsForValue().get("fanLongSessionId");
+        Coop coop = coopMapper.selectByPrimaryKey(coopId);
         if (StringUtils.isEmpty(sessionId)) {
-            Coop coop = coopMapper.selectByPrimaryKey(coopId);
             if (coop == null) {
                 throw new RuntimeException("鸡舍不存在");
             }
@@ -77,37 +73,17 @@ public class IotJoinServiceImpl implements IotJoinService {
         }
         //请求接口
         String urlAddress = "http://www.ecventpro.uiot.top/APIAction!queryAllEquip.action";
-        // 创建Httpclient对象
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        String resultString = "";
-        CloseableHttpResponse response = null;
-        try {
-            // 创建uri
-            URIBuilder builder = new URIBuilder(urlAddress);
-            URI uri = builder.build();
-            // 创建http GET请求
-            HttpGet httpGet = new HttpGet(uri);
-            httpGet.setHeader(new BasicHeader("Cookie", "JSESSIONID=" + sessionId));
-            // 执行请求
-            response = httpclient.execute(httpGet);
-            // 判断返回状态是否为200
-            if (response.getStatusLine().getStatusCode() == 200) {
-                resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
-            } else {
-                throw new RuntimeException("获取第三方设备列表失败");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (response != null) {
-                    response.close();
-                }
-                httpclient.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+        Map<String, Object> clientFactory = httpClientFactory(urlAddress, sessionId);
+        // 请求失败
+        if (!clientFactory.get("statusCode").equals(200)) {
+            getTokenFromFanLong(coop.getIotUsername(), coop.getIotPassword());
+            retryCount += 1;
+            if (retryCount < 3) {
+                System.out.println(retryCount);
+                getDeviceListFromFanLong(coopId);
             }
         }
+        String resultString = (String) clientFactory.get("data");
         if (!StringUtils.isEmpty(resultString)) {
             ResultDeviceIdDto resultDeviceIdDto = JsonUtils.jsonToPojo(resultString, ResultDeviceIdDto.class);
             if (resultDeviceIdDto != null) {
