@@ -51,8 +51,8 @@ public class IotJoinServiceImpl implements IotJoinService {
     @Override
     public String getTokenFromFanLong(String loginName, String password) {
         String url = "http://www.ecventpro.uiot.top/APIAction!login.action?loginname=" + loginName + "&password=" + password;
-        Map<String, Object> result = httpClientFactory(url, null);
-        JSONObject jsonObject = JSON.parseObject(result.get("data").toString());
+        Map<String, String> result = httpClientFactory(url, null);
+        JSONObject jsonObject = JSON.parseObject(result.get("data"));
         Map tokenMap = jsonObject.toJavaObject(Map.class);
         redisTemplate.opsForValue().set("fanLongSessionId", tokenMap.get("sessionId").toString());
         return tokenMap.get("sessionId").toString();
@@ -73,9 +73,9 @@ public class IotJoinServiceImpl implements IotJoinService {
         }
         //请求接口
         String urlAddress = "http://www.ecventpro.uiot.top/APIAction!queryAllEquip.action";
-        Map<String, Object> clientFactory = httpClientFactory(urlAddress, sessionId);
+        Map<String, String> clientFactory = httpClientFactory(urlAddress, sessionId);
         // 请求失败
-        if (!clientFactory.get("statusCode").equals(200)) {
+        if (!"200".equals(clientFactory.get("statusCode"))) {
             getTokenFromFanLong(coop.getIotUsername(), coop.getIotPassword());
             retryCount += 1;
             if (retryCount < 3) {
@@ -95,10 +95,11 @@ public class IotJoinServiceImpl implements IotJoinService {
     }
 
     @Override
-    public Map<String, String> getDeviceCurrentDataByDeviceCodeFromFanLong(String deviceCode) {
+    public void createDeviceCurrentDataFromFanLong(String deviceCode) {
         String sessionId = redisTemplate.opsForValue().get("fanLongSessionId");
         String url = "http://www.ecventpro.uiot.top/APIAction!queryCurrentData.action?equipId=" + deviceCode;
-        Map<String, Object> result = httpClientFactory(url, sessionId);
+        Map<String, String> result = httpClientFactory(url, sessionId);
+        System.out.println(result.get("statusCode"));
         if (!"200".equals(result.get("statusCode"))) {
             //通过deviceCode找到coopId
             CoopDeviceExample coopDeviceExample = new CoopDeviceExample();
@@ -117,26 +118,33 @@ public class IotJoinServiceImpl implements IotJoinService {
             getTokenFromFanLong(iotLoginName, iotPassword);
             retryCount += 1;
             if (retryCount < 3) {
-                System.out.println(retryCount);
-                getDeviceCurrentDataByDeviceCodeFromFanLong(deviceCode);
+                log.info("retryCount: " + retryCount);
+                createDeviceCurrentDataFromFanLong(deviceCode);
             }
         }
+        JSONObject jsonObject = JSON.parseObject(result.get("data"));
+        String dataStr = "";
+        if (null != jsonObject) {
+            Map resultMap = jsonObject.toJavaObject(Map.class);
+            dataStr = resultMap.get("list").toString();
+        }
         Map<String, String> returnData = new LinkedHashMap<>();
-        returnData.put(deviceCode, result.get("data").toString());
-        return returnData;
+        returnData.put("deviceCode", deviceCode);
+        returnData.put("data", dataStr);
+        System.out.println(returnData);
     }
 
     /**
      * @param url 接口地址, 如果url有参数则在请求此api之前将参数拼接在url中
      * @return 结果集
      */
-    private Map<String, Object> httpClientFactory(String url, String sessionId) {
+    private Map<String, String> httpClientFactory(String url, String sessionId) {
         RequestConfig config = RequestConfig.custom().setRedirectsEnabled(false).build();
         CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(config).build();
         HttpResponse httpResponse;
         String contents = null;
-        Integer httpStatusCode = null;
-        Map<String, Object> resultMap = new LinkedHashMap<>();
+        String httpStatusCode = null;
+        Map<String, String> resultMap = new LinkedHashMap<>();
         HttpGet httpGet = new HttpGet(url);
         if (null != sessionId) {
             BasicCookieStore cookieStore = new BasicCookieStore();
@@ -145,7 +153,7 @@ public class IotJoinServiceImpl implements IotJoinService {
         try {
             httpResponse = httpClient.execute(httpGet);
             contents = EntityUtils.toString(httpResponse.getEntity(), "gbk");
-            httpStatusCode = httpResponse.getStatusLine().getStatusCode();
+            httpStatusCode = httpResponse.getStatusLine().getStatusCode() + "";
         } catch (IOException e) {
             log.warn("O httpClientFactory: fanLong API request failed url：" + url + ";" + e);
             e.printStackTrace();

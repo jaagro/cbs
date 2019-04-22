@@ -32,5 +32,5 @@ public interface IotJoinService {
      * @param deviceCode 环控设备code
      * @return 整个环控设备下所有传感器的当前数据，也是直接将json存入map
      */
-    Map<String, String> getDeviceCurrentDataByDeviceCodeFromFanLong(String deviceCode);
+    void createDeviceCurrentDataFromFanLong(String deviceCode);
 }

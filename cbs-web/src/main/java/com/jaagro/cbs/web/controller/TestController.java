@@ -130,7 +130,7 @@ public class TestController {
     }
 
     @GetMapping("/test4/{deviceCode}")
-    public Map<String, String> test4(@PathVariable("deviceCode") String deviceCode){
-        return iotJoinService.getDeviceCurrentDataByDeviceCodeFromFanLong(deviceCode);
+    public void test4(@PathVariable("deviceCode") String deviceCode){
+        iotJoinService.createDeviceCurrentDataFromFanLong(deviceCode);
     }
 }
