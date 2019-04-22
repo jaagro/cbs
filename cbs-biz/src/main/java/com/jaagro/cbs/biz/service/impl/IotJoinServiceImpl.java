@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +41,8 @@ public class IotJoinServiceImpl implements IotJoinService {
     @Override
     public String getTokenFromFanLong(String loginName, String password) {
         String url = "http://www.ecventpro.uiot.top/APIAction!login.action";
-        String tokenStr = httpClientFactory(url, loginName, password);
-        JSONObject jsonObject = JSON.parseObject(tokenStr);
+        Map<String, Object> result = httpClientFactory(url, null, loginName, password);
+        JSONObject jsonObject = JSON.parseObject(result.get("data").toString());
         Map tokenMap = jsonObject.toJavaObject(Map.class);
         redisTemplate.opsForValue().set("fanLongSessionId", tokenMap.get("sessionId").toString());
         return tokenMap.get("sessionId").toString();
@@ -110,42 +111,50 @@ public class IotJoinServiceImpl implements IotJoinService {
         return null;
     }
 
-    private String httpClientFactory(String url, String... ages) {
+    /**
+     * @param url  接口地址,
+     * @param ages 可变参数
+     * @return 结果集
+     */
+    private Map<String, Object> httpClientFactory(String url, String sessionId, String... ages) {
         RequestConfig config = RequestConfig.custom().setRedirectsEnabled(false).build();
         CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(config).build();
-
-        if (ages.length < 1) {
-            throw new RuntimeException("pNumber of invalid parameters");
-        }
-        if (ages.length == 1) {
+        HttpResponse httpResponse;
+        String contents = null;
+        int httpStatusCode = 0;
+        Map<String, Object> resultMap = new LinkedHashMap<>();
+        if (sessionId != null) {
             HttpGet httpGet = new HttpGet(url);
             BasicCookieStore cookieStore = new BasicCookieStore();
-            httpGet.setHeader("Cookie", "JSESSIONID=" + ages[0]);
-            HttpResponse httpResponse;
-            String contents = null;
+            httpGet.setHeader("Cookie", "JSESSIONID=" + sessionId);
             try {
                 httpResponse = httpClient.execute(httpGet);
                 contents = EntityUtils.toString(httpResponse.getEntity(), "gbk");
+                httpStatusCode = httpResponse.getStatusLine().getStatusCode();
             } catch (IOException e) {
                 log.warn("O httpClientFactory: fanLong API request failed url：" + url + "; ages:" + ages[0] + ";" + e);
                 e.printStackTrace();
             }
-            return contents;
-        }
-        if (ages.length == 2) {
+            resultMap.put("code", httpStatusCode);
+            resultMap.put("data", contents);
+            return resultMap;
+        } else {
+            if (ages.length != 2) {
+                throw new RuntimeException("Incorrect number of parameters");
+            }
             url = url + "?loginname=" + ages[0] + "&password=" + ages[1];
             HttpGet httpGet = new HttpGet(url);
-            HttpResponse httpResponse;
-            String contents = null;
             try {
                 httpResponse = httpClient.execute(httpGet);
+                httpStatusCode = httpResponse.getStatusLine().getStatusCode();
                 contents = EntityUtils.toString(httpResponse.getEntity(), "gbk");
             } catch (IOException e) {
                 log.warn("O httpClientFactory: fanLong Login API request failed url：" + url + "; ages1:" + ages[0] + ", ages2" + ages[1] + ";" + e);
                 e.printStackTrace();
             }
-            return contents;
+            resultMap.put("code", httpStatusCode);
+            resultMap.put("data", contents);
+            return resultMap;
         }
-        return null;
     }
 }
