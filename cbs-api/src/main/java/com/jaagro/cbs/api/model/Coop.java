@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * @author :gavinwang
- * @date :2019/04/08
+ * @author :tony
+ * @date :2019/04/22
  */
 @Data
 @NoArgsConstructor
@@ -70,6 +70,21 @@ public class Coop implements Serializable {
      * 上次截止时间
      */
     private Date lastEndDate;
+
+    /**
+     * 物联网设备供应商(1-梵龙)
+     */
+    private Integer iotBrand;
+
+    /**
+     * 物联网登录用户名
+     */
+    private String iotUsername;
+
+    /**
+     * 物联网登录密码
+     */
+    private String iotPassword;
 
     /**
      * 备注

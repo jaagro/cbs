@@ -13,6 +13,9 @@
     <result column="coop_status" property="coopStatus" jdbcType="INTEGER" />
     <result column="last_start_date" property="lastStartDate" jdbcType="DATE" />
     <result column="last_end_date" property="lastEndDate" jdbcType="DATE" />
+    <result column="iot_brand" property="iotBrand" jdbcType="INTEGER" />
+    <result column="iot_username" property="iotUsername" jdbcType="VARCHAR" />
+    <result column="iot_password" property="iotPassword" jdbcType="VARCHAR" />
     <result column="notes" property="notes" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="create_user_id" property="createUserId" jdbcType="INTEGER" />
@@ -51,8 +54,8 @@
   </sql>
   <sql id="Base_Column_List" >
     id, coop_no, coop_name, customer_id, plant_id, capacity, breeding_value, device_quantity, 
-    coop_status, last_start_date, last_end_date, notes, create_time, create_user_id, 
-    modify_time, modify_user_id, enable
+    coop_status, last_start_date, last_end_date, iot_brand, iot_username, iot_password, 
+    notes, create_time, create_user_id, modify_time, modify_user_id, enable
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.jaagro.cbs.api.model.CoopExample" >
     select
@@ -94,13 +97,15 @@
     insert into coop (coop_no, coop_name, customer_id, 
       plant_id, capacity, breeding_value, 
       device_quantity, coop_status, last_start_date, 
-      last_end_date, notes, create_time, 
+      last_end_date, iot_brand, iot_username, 
+      iot_password, notes, create_time, 
       create_user_id, modify_time, modify_user_id, 
       enable)
     values (#{coopNo,jdbcType=VARCHAR}, #{coopName,jdbcType=VARCHAR}, #{customerId,jdbcType=INTEGER}, 
       #{plantId,jdbcType=INTEGER}, #{capacity,jdbcType=INTEGER}, #{breedingValue,jdbcType=INTEGER}, 
       #{deviceQuantity,jdbcType=INTEGER}, #{coopStatus,jdbcType=INTEGER}, #{lastStartDate,jdbcType=DATE}, 
-      #{lastEndDate,jdbcType=DATE}, #{notes,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{lastEndDate,jdbcType=DATE}, #{iotBrand,jdbcType=INTEGER}, #{iotUsername,jdbcType=VARCHAR}, 
+      #{iotPassword,jdbcType=VARCHAR}, #{notes,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{createUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER}, 
       #{enable,jdbcType=BIT})
   </insert>
@@ -139,6 +144,15 @@
       </if>
       <if test="lastEndDate != null" >
         last_end_date,
+      </if>
+      <if test="iotBrand != null" >
+        iot_brand,
+      </if>
+      <if test="iotUsername != null" >
+        iot_username,
+      </if>
+      <if test="iotPassword != null" >
+        iot_password,
       </if>
       <if test="notes != null" >
         notes,
@@ -189,6 +203,15 @@
       </if>
       <if test="lastEndDate != null" >
         #{lastEndDate,jdbcType=DATE},
+      </if>
+      <if test="iotBrand != null" >
+        #{iotBrand,jdbcType=INTEGER},
+      </if>
+      <if test="iotUsername != null" >
+        #{iotUsername,jdbcType=VARCHAR},
+      </if>
+      <if test="iotPassword != null" >
+        #{iotPassword,jdbcType=VARCHAR},
       </if>
       <if test="notes != null" >
         #{notes,jdbcType=VARCHAR},
@@ -249,6 +272,15 @@
       <if test="lastEndDate != null" >
         last_end_date = #{lastEndDate,jdbcType=DATE},
       </if>
+      <if test="iotBrand != null" >
+        iot_brand = #{iotBrand,jdbcType=INTEGER},
+      </if>
+      <if test="iotUsername != null" >
+        iot_username = #{iotUsername,jdbcType=VARCHAR},
+      </if>
+      <if test="iotPassword != null" >
+        iot_password = #{iotPassword,jdbcType=VARCHAR},
+      </if>
       <if test="notes != null" >
         notes = #{notes,jdbcType=VARCHAR},
       </if>
@@ -282,6 +314,9 @@
       coop_status = #{coopStatus,jdbcType=INTEGER},
       last_start_date = #{lastStartDate,jdbcType=DATE},
       last_end_date = #{lastEndDate,jdbcType=DATE},
+      iot_brand = #{iotBrand,jdbcType=INTEGER},
+      iot_username = #{iotUsername,jdbcType=VARCHAR},
+      iot_password = #{iotPassword,jdbcType=VARCHAR},
       notes = #{notes,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       create_user_id = #{createUserId,jdbcType=INTEGER},

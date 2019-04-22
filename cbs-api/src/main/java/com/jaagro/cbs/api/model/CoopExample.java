@@ -835,6 +835,206 @@ public class CoopExample implements Serializable {
             return (Criteria) this;
         }
 
+        public Criteria andIotBrandIsNull() {
+            addCriterion("iot_brand is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotBrandIsNotNull() {
+            addCriterion("iot_brand is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotBrandEqualTo(Integer value) {
+            addCriterion("iot_brand =", value, "iotBrand");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotBrandNotEqualTo(Integer value) {
+            addCriterion("iot_brand <>", value, "iotBrand");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotBrandGreaterThan(Integer value) {
+            addCriterion("iot_brand >", value, "iotBrand");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotBrandGreaterThanOrEqualTo(Integer value) {
+            addCriterion("iot_brand >=", value, "iotBrand");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotBrandLessThan(Integer value) {
+            addCriterion("iot_brand <", value, "iotBrand");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotBrandLessThanOrEqualTo(Integer value) {
+            addCriterion("iot_brand <=", value, "iotBrand");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotBrandIn(List<Integer> values) {
+            addCriterion("iot_brand in", values, "iotBrand");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotBrandNotIn(List<Integer> values) {
+            addCriterion("iot_brand not in", values, "iotBrand");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotBrandBetween(Integer value1, Integer value2) {
+            addCriterion("iot_brand between", value1, value2, "iotBrand");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotBrandNotBetween(Integer value1, Integer value2) {
+            addCriterion("iot_brand not between", value1, value2, "iotBrand");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameIsNull() {
+            addCriterion("iot_username is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameIsNotNull() {
+            addCriterion("iot_username is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameEqualTo(String value) {
+            addCriterion("iot_username =", value, "iotUsername");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameNotEqualTo(String value) {
+            addCriterion("iot_username <>", value, "iotUsername");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameGreaterThan(String value) {
+            addCriterion("iot_username >", value, "iotUsername");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameGreaterThanOrEqualTo(String value) {
+            addCriterion("iot_username >=", value, "iotUsername");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameLessThan(String value) {
+            addCriterion("iot_username <", value, "iotUsername");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameLessThanOrEqualTo(String value) {
+            addCriterion("iot_username <=", value, "iotUsername");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameLike(String value) {
+            addCriterion("iot_username like", value, "iotUsername");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameNotLike(String value) {
+            addCriterion("iot_username not like", value, "iotUsername");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameIn(List<String> values) {
+            addCriterion("iot_username in", values, "iotUsername");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameNotIn(List<String> values) {
+            addCriterion("iot_username not in", values, "iotUsername");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameBetween(String value1, String value2) {
+            addCriterion("iot_username between", value1, value2, "iotUsername");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotUsernameNotBetween(String value1, String value2) {
+            addCriterion("iot_username not between", value1, value2, "iotUsername");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordIsNull() {
+            addCriterion("iot_password is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordIsNotNull() {
+            addCriterion("iot_password is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordEqualTo(String value) {
+            addCriterion("iot_password =", value, "iotPassword");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordNotEqualTo(String value) {
+            addCriterion("iot_password <>", value, "iotPassword");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordGreaterThan(String value) {
+            addCriterion("iot_password >", value, "iotPassword");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordGreaterThanOrEqualTo(String value) {
+            addCriterion("iot_password >=", value, "iotPassword");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordLessThan(String value) {
+            addCriterion("iot_password <", value, "iotPassword");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordLessThanOrEqualTo(String value) {
+            addCriterion("iot_password <=", value, "iotPassword");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordLike(String value) {
+            addCriterion("iot_password like", value, "iotPassword");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordNotLike(String value) {
+            addCriterion("iot_password not like", value, "iotPassword");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordIn(List<String> values) {
+            addCriterion("iot_password in", values, "iotPassword");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordNotIn(List<String> values) {
+            addCriterion("iot_password not in", values, "iotPassword");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordBetween(String value1, String value2) {
+            addCriterion("iot_password between", value1, value2, "iotPassword");
+            return (Criteria) this;
+        }
+
+        public Criteria andIotPasswordNotBetween(String value1, String value2) {
+            addCriterion("iot_password not between", value1, value2, "iotPassword");
+            return (Criteria) this;
+        }
+
         public Criteria andNotesIsNull() {
             addCriterion("notes is null");
             return (Criteria) this;

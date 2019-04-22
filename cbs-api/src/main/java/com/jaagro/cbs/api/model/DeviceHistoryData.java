@@ -1,7 +1,6 @@
 package com.jaagro.cbs.api.model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,36 +15,19 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class DeviceValue implements Serializable {
-    /**
-     * 设备当前数值id
-     */
+public class DeviceHistoryData implements Serializable {
     private Integer id;
 
-    /**
-     * 设备id
-     */
-    private Integer deviceId;
+    private String deviceCode;
 
-    /**
-     * 数值类型(1-温度,2-湿度)
-     */
-    private Integer valueType;
-
-    /**
-     * 当前值
-     */
-    private BigDecimal currentValue;
-
-    /**
-     * 创建时间
-     */
     private Date createTime;
 
     /**
-     * 是否有效（1-有效 0 无效）
+     * `1
      */
     private Boolean enable;
+
+    private String dataJson;
 
     private static final long serialVersionUID = 1L;
 }

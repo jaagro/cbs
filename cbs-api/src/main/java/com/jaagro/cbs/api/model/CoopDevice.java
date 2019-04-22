@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * @author :gavinwang
- * @date :2019/04/08
+ * @author :tony
+ * @date :2019/04/22
  */
 @Data
 @NoArgsConstructor
@@ -32,7 +32,12 @@ public class CoopDevice implements Serializable {
     private Integer plantId;
 
     /**
-     * 检测类型(（10-温度,11-湿度,12-光照强度,13-光照时间,14-氮气,15-二氧化碳,16-通风,17-负压值,20-饲喂(次/日),21-饲喂(克/日),22-体重(克/只/日),23-死淘率(%),24-药品/疫苗,99-其他))
+     * IOT设备唯一识别号
+     */
+    private String deviceCode;
+
+    /**
+     * 检测类型(（10-温度,11-湿度,12-光照强度,13-光照时间,14-氮气,15-二氧化碳,16-通风,17-负压值,20-饲喂(次/日),21-饲喂(克/日),22-体重(克/只/日),23-死淘(只),24-药品/疫苗))
      */
     private Integer deviceType;
 
