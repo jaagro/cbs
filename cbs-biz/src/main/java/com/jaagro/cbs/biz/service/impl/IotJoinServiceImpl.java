@@ -3,7 +3,9 @@ package com.jaagro.cbs.biz.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jaagro.cbs.api.dto.base.ResultDeviceIdDto;
+import com.jaagro.cbs.api.model.Coop;
 import com.jaagro.cbs.api.service.IotJoinService;
+import com.jaagro.cbs.biz.mapper.CoopMapperExt;
 import com.jaagro.cbs.biz.utils.JsonUtils;
 import lombok.extern.log4j.Log4j;
 import org.apache.http.HttpResponse;
@@ -22,8 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +39,8 @@ public class IotJoinServiceImpl implements IotJoinService {
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private CoopMapperExt coopMapper;
 
     @Override
     public String getTokenFromFanLong(String loginName, String password) {
@@ -48,22 +52,19 @@ public class IotJoinServiceImpl implements IotJoinService {
         return tokenMap.get("sessionId").toString();
     }
 
-    /**
-     * 从redis获取sessionId
-     *
-     * @return
-     */
-    private String getSessionIdFromRedis() {
-        String fanLongSessionId = redisTemplate.opsForValue().get("fanLongSessionId");
-        if (StringUtils.isEmpty(fanLongSessionId)) {
-            fanLongSessionId = getTokenFromFanLong("", "");
-        }
-        return fanLongSessionId;
-    }
-
     @Override
-    public List<Map<String, String>> getDeviceListFromFanLong() {
-        String sessionId = getSessionIdFromRedis();
+    public List<Map<String, String>> getDeviceListFromFanLong(Integer coopId) {
+        String sessionId = redisTemplate.opsForValue().get("fanLongSessionId");
+        if (StringUtils.isEmpty(sessionId)) {
+            Coop coop = coopMapper.selectByPrimaryKey(coopId);
+            if (coop == null) {
+                throw new RuntimeException("鸡舍不存在");
+            }
+            if (StringUtils.isEmpty(coop.getIotUsername()) || StringUtils.isEmpty(coop.getIotPassword())) {
+                throw new RuntimeException("鸡舍用户名密码错误");
+            }
+            sessionId = getTokenFromFanLong(coop.getIotUsername(), coop.getIotPassword());
+        }
         //请求接口
         String urlAddress = "http://www.ecventpro.uiot.top/APIAction!queryAllEquip.action";
         // 创建Httpclient对象
@@ -77,12 +78,13 @@ public class IotJoinServiceImpl implements IotJoinService {
             // 创建http GET请求
             HttpGet httpGet = new HttpGet(uri);
             httpGet.setHeader(new BasicHeader("Cookie", "JSESSIONID=" + sessionId));
-//            httpGet.setHeader(new BasicHeader("Cookie", "JSESSIONID=6B585A2B159FCC5AE0A1621BEF3A6771"));
             // 执行请求
             response = httpclient.execute(httpGet);
             // 判断返回状态是否为200
             if (response.getStatusLine().getStatusCode() == 200) {
                 resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
+            } else {
+                throw new RuntimeException("获取第三方设备列表失败");
             }
         } catch (Exception e) {
             e.printStackTrace();

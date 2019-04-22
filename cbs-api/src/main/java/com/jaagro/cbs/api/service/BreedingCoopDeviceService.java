@@ -6,7 +6,6 @@ import com.jaagro.cbs.api.dto.plant.ReturnCoopDeviceDto;
 import com.jaagro.cbs.api.model.CoopDevice;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 养殖鸡舍设备服务相关api
@@ -38,11 +37,4 @@ public interface BreedingCoopDeviceService {
      */
     List<CoopDevice> listCoopDeviceByCoopId(Integer coopId);
 
-    /**
-     * 通过鸡舍的登录名密码获得第三方设备ID列表
-     *
-     * @param coopId
-     * @return
-     */
-    List<Map<String, String>> listDeviceIdListByCoopId(Integer coopId);
 }

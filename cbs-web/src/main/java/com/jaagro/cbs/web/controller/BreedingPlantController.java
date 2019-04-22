@@ -3,6 +3,7 @@ package com.jaagro.cbs.web.controller;
 import com.jaagro.cbs.api.dto.plant.*;
 import com.jaagro.cbs.api.service.BreedingCoopDeviceService;
 import com.jaagro.cbs.api.service.BreedingPlantService;
+import com.jaagro.cbs.api.service.IotJoinService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -31,6 +32,8 @@ public class BreedingPlantController {
     private BreedingPlantService breedingPlantService;
     @Autowired
     private BreedingCoopDeviceService breedingCoopDeviceService;
+    @Autowired
+    private IotJoinService iotJoinService;
 
     /**
      * 养殖场-新增
@@ -240,12 +243,17 @@ public class BreedingPlantController {
         return BaseResponse.successInstance(breedingPlantService.listFreePlantByCustomerId(customerId));
     }
 
-    @ApiOperation("根据登录名和密码获取设备Id列表")
+    /**
+     * 根据鸡舍id获取设备ID列表
+     *
+     * @param coopId
+     * @return
+     */
+    @ApiOperation("根据鸡舍id获取设备ID列表")
     @GetMapping("/listDeviceIdListByCoopId/{coopId}")
     public BaseResponse listDeviceIdListBySessionId(@PathVariable Integer coopId) {
         try {
-            List<Map<String, String>> mapList = breedingCoopDeviceService.listDeviceIdListByCoopId(coopId);
-            return BaseResponse.successInstance(mapList);
+            return BaseResponse.successInstance(iotJoinService.getDeviceListFromFanLong(coopId));
         } catch (Exception ex) {
             ex.printStackTrace();
             return BaseResponse.errorInstance("获取设备id列表失败");

@@ -21,9 +21,10 @@ public interface IotJoinService {
     /**
      * 获取【梵龙】账号下所有我司设备接口
      *
+     * @param coopId
      * @return 当前养殖场下所有的环控设备列表（将获取的json直接存入map）
      */
-    List<Map<String, String>> getDeviceListFromFanLong();
+    List<Map<String, String>> getDeviceListFromFanLong(Integer coopId);
 
     /**
      * 获取【梵龙】单台设备当前数据

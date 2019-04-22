@@ -1,6 +1,5 @@
 package com.jaagro.cbs.biz.service.impl;
 
-import com.jaagro.cbs.api.dto.base.ResultDeviceIdDto;
 import com.jaagro.cbs.api.dto.base.SessionIdDto;
 import com.jaagro.cbs.api.dto.plant.CreateCoopDeviceDto;
 import com.jaagro.cbs.api.dto.plant.ReturnCoopDeviceDto;
@@ -13,22 +12,17 @@ import com.jaagro.cbs.biz.mapper.CoopMapperExt;
 import com.jaagro.cbs.biz.utils.JsonUtils;
 import com.jaagro.constant.UserInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author @Gao.
@@ -90,70 +84,6 @@ public class BreedingCoopDeviceServiceImpl implements BreedingCoopDeviceService 
                 .andEnableEqualTo(true);
         deviceExample.setOrderByClause("create_time desc");
         return coopDeviceMapper.selectByExample(deviceExample);
-    }
-
-    /**
-     * 通过鸡舍的登录名密码获得第三方设备ID列表
-     *
-     * @param coopId
-     * @return
-     */
-    @Override
-    public List<Map<String, String>> listDeviceIdListByCoopId(Integer coopId) {
-        Coop coop = coopMapper.selectByPrimaryKey(coopId);
-        if (coop == null) {
-            throw new RuntimeException("鸡舍用户名密码错误");
-        }
-        String loginName = coop.getIotUsername();
-        String passWord = coop.getIotPassword();
-        if (StringUtils.isEmpty(loginName) || StringUtils.isEmpty(passWord)) {
-            throw new RuntimeException("鸡舍用户名密码错误");
-        }
-        //通过 鸡舍登录名和密码获取sessionId
-        String sessionId = getSessionId(coop);
-        if (StringUtils.isEmpty(sessionId)) {
-            throw new RuntimeException("鸡舍用户名密码错误");
-        }
-        //请求接口
-        String urlAddress = "http://www.ecventpro.uiot.top/APIAction!queryAllEquip.action";
-        // 创建Httpclient对象
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        String resultString = "";
-        CloseableHttpResponse response = null;
-        try {
-            // 创建uri
-            URIBuilder builder = new URIBuilder(urlAddress);
-            URI uri = builder.build();
-            // 创建http GET请求
-            HttpGet httpGet = new HttpGet(uri);
-            httpGet.setHeader(new BasicHeader("Cookie", "JSESSIONID=" + sessionId));
-//            httpGet.setHeader(new BasicHeader("Cookie", "JSESSIONID=6B585A2B159FCC5AE0A1621BEF3A6771"));
-            // 执行请求
-            response = httpclient.execute(httpGet);
-            // 判断返回状态是否为200
-            if (response.getStatusLine().getStatusCode() == 200) {
-                resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (response != null) {
-                    response.close();
-                }
-                httpclient.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if (!StringUtils.isEmpty(resultString)) {
-            ResultDeviceIdDto resultDeviceIdDto = JsonUtils.jsonToPojo(resultString, ResultDeviceIdDto.class);
-            if (resultDeviceIdDto != null) {
-                List<Map<String, String>> mapList = resultDeviceIdDto.getList();
-                return mapList;
-            }
-        }
-        return null;
     }
 
     /**
