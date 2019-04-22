@@ -1,12 +1,12 @@
 package com.jaagro.cbs.api.service;
 
 
-import com.jaagro.cbs.api.dto.base.DeviceIdDto;
 import com.jaagro.cbs.api.dto.plant.CreateCoopDeviceDto;
 import com.jaagro.cbs.api.dto.plant.ReturnCoopDeviceDto;
 import com.jaagro.cbs.api.model.CoopDevice;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 养殖鸡舍设备服务相关api
@@ -38,5 +38,5 @@ public interface BreedingCoopDeviceService {
      */
     List<CoopDevice> listCoopDeviceByCoopId(Integer coopId);
 
-    List<DeviceIdDto> listDeviceIdList(Integer coopId);
+    List<Map<String, String>> listDeviceIdList(Integer coopId);
 }

@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 设备
@@ -21,7 +22,7 @@ import java.util.List;
 public class ResultDeviceIdDto implements Serializable {
     private String result;
 
-    private List<DeviceIdDto> list;
+    private List<Map<String, String>> list;
 
 
 }
