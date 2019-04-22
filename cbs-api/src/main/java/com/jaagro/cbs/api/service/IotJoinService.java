@@ -10,11 +10,13 @@ import java.util.Map;
 public interface IotJoinService {
 
     /**
-     * 获取【梵龙】环控设备的授权令牌
+     * 取【梵龙】环控设备的授权令牌
      *
+     * @param loginName
+     * @param password
      * @return
      */
-    String getTokenFromFanLong();
+    String getTokenFromFanLong(String loginName, String password);
 
     /**
      * 获取【梵龙】账号下所有我司设备接口

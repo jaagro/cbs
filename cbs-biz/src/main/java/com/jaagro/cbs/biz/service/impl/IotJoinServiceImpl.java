@@ -26,17 +26,17 @@ import java.util.Map;
 @Log4j
 @Service
 public class IotJoinServiceImpl implements IotJoinService {
+
     @Autowired
     private StringRedisTemplate redisTemplate;
 
     @Override
-    public String getTokenFromFanLong() {
+    public String getTokenFromFanLong(String loginName, String password) {
         String url = "http://www.ecventpro.uiot.top/APIAction!login.action";
-        String username = "G190418";
-        String password = "12345678";
-        String tokenStr = httpClientFactory(url, username, password);
+        String tokenStr = httpClientFactory(url, loginName, password);
         JSONObject jsonObject = JSON.parseObject(tokenStr);
         Map tokenMap = jsonObject.toJavaObject(Map.class);
+        redisTemplate.opsForValue().set("fanLongSessionId", tokenMap.get("sessionId").toString());
         return tokenMap.get("sessionId").toString();
     }
 

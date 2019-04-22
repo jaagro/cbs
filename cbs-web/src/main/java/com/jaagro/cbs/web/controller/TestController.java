@@ -1,5 +1,6 @@
 package com.jaagro.cbs.web.controller;
 
+import com.jaagro.cbs.api.enums.ParameterStatusEnum;
 import com.jaagro.cbs.api.model.BatchPlantCoop;
 import com.jaagro.cbs.api.model.Product;
 import com.jaagro.cbs.api.model.ProductExample;
@@ -118,25 +119,12 @@ public class TestController {
         return null;
     }
 
-    public static void main(String[] args) throws IOException {
-//        String url = "http://www.ecventpro.uiot.top/APIAction!queryCurrentData.action?equipId=7126";
-//        RequestConfig config = RequestConfig.custom().setRedirectsEnabled(false).build();
-//        CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(config).build();
-//        HttpGet httpGet = new HttpGet(url);
-//
-//        BasicCookieStore cookieStore = new BasicCookieStore();
-//        httpGet.setHeader("Cookie", "JSESSIONID=786103659F75E06AD6778441B4B94D8");
-//        HttpResponse httpResponse = httpClient.execute(httpGet);
-//        String contents = EntityUtils.toString(httpResponse.getEntity(), "gbk");
-//        System.out.println(httpResponse.getStatusLine().getStatusCode());
-//        System.out.println(contents);
-    }
 
     @Autowired
     IotJoinService iotJoinService;
 
-    @GetMapping("/test3")
-    public String test3() {
-        return iotJoinService.getTokenFromFanLong();
+    @GetMapping("/test3/{loginName}/{password}")
+    public String test3(@PathVariable("password") String password, @PathVariable("loginName") String loginName) {
+        return iotJoinService.getTokenFromFanLong(loginName, password);
     }
 }
