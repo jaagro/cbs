@@ -2,20 +2,27 @@ package com.jaagro.cbs.biz.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.jaagro.cbs.api.dto.base.ResultDeviceIdDto;
 import com.jaagro.cbs.api.service.IotJoinService;
+import com.jaagro.cbs.biz.utils.JsonUtils;
 import lombok.extern.log4j.Log4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +47,61 @@ public class IotJoinServiceImpl implements IotJoinService {
         return tokenMap.get("sessionId").toString();
     }
 
+    /**
+     * 从redis获取sessionId
+     *
+     * @return
+     */
+    private String getSessionIdFromRedis() {
+        String fanLongSessionId = redisTemplate.opsForValue().get("fanLongSessionId");
+        if (StringUtils.isEmpty(fanLongSessionId)) {
+            fanLongSessionId = getTokenFromFanLong("", "");
+        }
+        return fanLongSessionId;
+    }
+
     @Override
     public List<Map<String, String>> getDeviceListFromFanLong() {
+        String sessionId = getSessionIdFromRedis();
+        //请求接口
+        String urlAddress = "http://www.ecventpro.uiot.top/APIAction!queryAllEquip.action";
+        // 创建Httpclient对象
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        String resultString = "";
+        CloseableHttpResponse response = null;
+        try {
+            // 创建uri
+            URIBuilder builder = new URIBuilder(urlAddress);
+            URI uri = builder.build();
+            // 创建http GET请求
+            HttpGet httpGet = new HttpGet(uri);
+            httpGet.setHeader(new BasicHeader("Cookie", "JSESSIONID=" + sessionId));
+//            httpGet.setHeader(new BasicHeader("Cookie", "JSESSIONID=6B585A2B159FCC5AE0A1621BEF3A6771"));
+            // 执行请求
+            response = httpclient.execute(httpGet);
+            // 判断返回状态是否为200
+            if (response.getStatusLine().getStatusCode() == 200) {
+                resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (response != null) {
+                    response.close();
+                }
+                httpclient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (!StringUtils.isEmpty(resultString)) {
+            ResultDeviceIdDto resultDeviceIdDto = JsonUtils.jsonToPojo(resultString, ResultDeviceIdDto.class);
+            if (resultDeviceIdDto != null) {
+                List<Map<String, String>> mapList = resultDeviceIdDto.getList();
+                return mapList;
+            }
+        }
         return null;
     }
 
