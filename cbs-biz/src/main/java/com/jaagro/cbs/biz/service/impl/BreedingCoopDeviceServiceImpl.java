@@ -92,6 +92,12 @@ public class BreedingCoopDeviceServiceImpl implements BreedingCoopDeviceService 
         return coopDeviceMapper.selectByExample(deviceExample);
     }
 
+    /**
+     * 通过鸡舍的登录名密码获得第三方设备ID列表
+     *
+     * @param coopId
+     * @return
+     */
     @Override
     public List<Map<String, String>> listDeviceIdList(Integer coopId) {
         Coop coop = coopMapper.selectByPrimaryKey(coopId);
@@ -120,7 +126,8 @@ public class BreedingCoopDeviceServiceImpl implements BreedingCoopDeviceService 
             URI uri = builder.build();
             // 创建http GET请求
             HttpGet httpGet = new HttpGet(uri);
-            httpGet.setHeader(new BasicHeader("Cookie", "JSESSIONID=" + sessionId));
+//            httpGet.setHeader(new BasicHeader("Cookie", "JSESSIONID=" + sessionId));
+            httpGet.setHeader(new BasicHeader("Cookie", "JSESSIONID=6B585A2B159FCC5AE0A1621BEF3A6771"));
             // 执行请求
             response = httpclient.execute(httpGet);
             // 判断返回状态是否为200

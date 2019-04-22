@@ -363,10 +363,6 @@ public class BreedingPlantServiceImpl implements BreedingPlantService {
      */
     @Override
     public Map<String, Object> updateCoop(UpdateCoopDto coopDto) {
-        Plant plant = plantMapper.selectByPrimaryKey(coopDto.getPlantId());
-        if (plant == null) {
-            throw new BusinessException("养殖场不存在");
-        }
         Coop coop = new Coop();
         BeanUtils.copyProperties(coopDto, coop);
         coop

@@ -38,5 +38,11 @@ public interface BreedingCoopDeviceService {
      */
     List<CoopDevice> listCoopDeviceByCoopId(Integer coopId);
 
+    /**
+     * 通过鸡舍的登录名密码获得第三方设备ID列表
+     *
+     * @param coopId
+     * @return
+     */
     List<Map<String, String>> listDeviceIdList(Integer coopId);
 }

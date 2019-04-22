@@ -147,9 +147,6 @@ public class BreedingPlantController {
     @ApiOperation("鸡舍-修改")
     @PostMapping("/updateCoop")
     public BaseResponse updateCoop(@RequestBody UpdateCoopDto coopDto) {
-        if (StringUtils.isEmpty(coopDto.getPlantId())) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "养殖场id不能为空");
-        }
         Map<String, Object> result;
         try {
             result = breedingPlantService.updateCoop(coopDto);
