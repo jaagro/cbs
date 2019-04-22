@@ -8,8 +8,13 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
+<<<<<<< HEAD
  * @author :tony
  * @date :2019/04/22
+=======
+ * @author :asus
+ * @date :2019/04/19
+>>>>>>> jaagro/v1.0.1-dev
  */
 @Data
 @NoArgsConstructor

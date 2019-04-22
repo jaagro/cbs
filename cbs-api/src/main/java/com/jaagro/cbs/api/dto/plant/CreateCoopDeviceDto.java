@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
+ * 新增设备dto
+ *
  * @author @Gao.
  * @Date 2019/2/23
  */
@@ -31,6 +33,11 @@ public class CreateCoopDeviceDto implements Serializable {
      * 回调url
      */
     private String apiUrl;
+
+    /**
+     * IOT设备唯一识别号(设备ID)
+     */
+    private String deviceCode;
 
     /**
      * 设备类型(1-温感设备,2-湿感设备)

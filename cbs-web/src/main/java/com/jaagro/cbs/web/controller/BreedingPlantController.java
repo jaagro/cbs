@@ -138,6 +138,25 @@ public class BreedingPlantController {
         return BaseResponse.service(result);
     }
 
+    /**
+     * 鸡舍-修改
+     *
+     * @param coopDto
+     * @return
+     */
+    @ApiOperation("鸡舍-修改")
+    @PostMapping("/updateCoop")
+    public BaseResponse updateCoop(@RequestBody UpdateCoopDto coopDto) {
+        Map<String, Object> result;
+        try {
+            result = breedingPlantService.updateCoop(coopDto);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return BaseResponse.errorInstance(e.getMessage());
+        }
+        return BaseResponse.service(result);
+    }
+
     @ApiOperation("鸡舍-删除")
     @GetMapping("/deleteCoop/{plantId}")
     public BaseResponse deleteCoop(@PathVariable("plantId") Integer coopId) {
@@ -219,5 +238,17 @@ public class BreedingPlantController {
     @GetMapping("/listFreePlantByCustomerId/{customerId}")
     public BaseResponse<List<ReturnBasicPlantDto>> listFreePlantByCustomerId(@PathVariable("customerId") Integer customerId) {
         return BaseResponse.successInstance(breedingPlantService.listFreePlantByCustomerId(customerId));
+    }
+
+    @ApiOperation("根据登录名和密码获取设备Id列表")
+    @GetMapping("/listDeviceIdListBySessionId/{coopId}")
+    public BaseResponse listDeviceIdListBySessionId(@PathVariable Integer coopId) {
+        try {
+            List<Map<String, String>> mapList = breedingCoopDeviceService.listDeviceIdList(coopId);
+            return BaseResponse.successInstance(mapList);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return BaseResponse.errorInstance("获取设备id列表失败");
+        }
     }
 }

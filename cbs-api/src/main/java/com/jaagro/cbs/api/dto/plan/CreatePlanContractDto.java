@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * 创建养殖计划合同参数
+ *
  * @author yj
  * @date 2019/2/25 15:16
  */
@@ -23,7 +24,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class CreatePlanContractDto implements Serializable{
+public class CreatePlanContractDto implements Serializable {
     /**
      * 合同图片列表
      */
@@ -58,8 +59,8 @@ public class CreatePlanContractDto implements Serializable{
      * 鸡苗单价
      */
     @NotNull(message = "{babychickPrice.NotNull}")
-    @Min(value = 0,message = "{babychickPrice.Min}")
-    @Max(value = 50,message = "{babychickPrice.Max}")
+    @Min(value = 0, message = "{babychickPrice.Min}")
+    @Max(value = 50, message = "{babychickPrice.Max}")
     private BigDecimal babychickPrice;
 
     /**
@@ -71,23 +72,23 @@ public class CreatePlanContractDto implements Serializable{
     /**
      * 预付金额
      */
-    @Min(value = 0,message = "{prepaidAmount.Min}")
+    @Min(value = 0, message = "{prepaidAmount.Min}")
     private BigDecimal prepaidAmount;
 
     /**
      * 饲料单价
      */
     @NotNull(message = "{fodderPrice.NotNull}")
-    @Min(value = 0,message = "{fodderPrice.Min}")
-    @Max(value = 5000,message = "{fodderPrice.Max}")
+    @Min(value = 0, message = "{fodderPrice.Min}")
+    @Max(value = 5000, message = "{fodderPrice.Max}")
     private BigDecimal fodderPrice;
 
     /**
      * 回收保护单价（kg）
      */
     @NotNull(message = "{protectionPrice.NotNull}")
-    @Min(value = 0,message = "{protectionPrice.Min}")
-    @Max(value = 100,message = "{protectionPrice.Max}")
+    @Min(value = 0, message = "{protectionPrice.Min}")
+    @Max(value = 100, message = "{protectionPrice.Max}")
     private BigDecimal protectionPrice;
 
     /**
@@ -103,6 +104,6 @@ public class CreatePlanContractDto implements Serializable{
     /**
      * 回收价格区间列表
      */
-    @NotEmpty(message = "{contractPriceSectionDtoList.NotEmpty}")
+    @NotEmpty(message = "回收价格区间列表不能为空")
     private List<ContractPriceSectionDto> contractPriceSectionDtoList;
 }

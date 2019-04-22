@@ -27,6 +27,7 @@ import org.springframework.util.StringUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -352,5 +353,25 @@ public class BreedingPlantServiceImpl implements BreedingPlantService {
             }
         }
         return returnBasicPlantDtos;
+    }
+
+    /**
+     * 修改鸡舍
+     *
+     * @param coopDto
+     * @return
+     */
+    @Override
+    public Map<String, Object> updateCoop(UpdateCoopDto coopDto) {
+        Coop coop = new Coop();
+        BeanUtils.copyProperties(coopDto, coop);
+        coop
+                .setModifyTime(new Date())
+                .setModifyUserId(currentUserService.getCurrentUser().getId());
+        int result = coopMapperExt.updateByPrimaryKeySelective(coop);
+        if (result > 0) {
+            return ServiceResult.toResult("修改成功");
+        }
+        return ServiceResult.error("修改失败");
     }
 }

@@ -93,4 +93,12 @@ public interface BreedingPlantService {
      * @return
      */
     List<ReturnBasicPlantDto> listFreePlantByCustomerId(Integer customerId);
+
+    /**
+     * 修改鸡舍
+     *
+     * @param coopDto
+     * @return
+     */
+    Map<String, Object> updateCoop(UpdateCoopDto coopDto);
 }
