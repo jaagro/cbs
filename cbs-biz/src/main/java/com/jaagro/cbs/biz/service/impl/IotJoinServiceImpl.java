@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,7 +41,7 @@ public class IotJoinServiceImpl implements IotJoinService {
     }
 
     @Override
-    public Map<String, String> getDeviceListFromFanLong() {
+    public List<Map<String, String>> getDeviceListFromFanLong() {
         return null;
     }
 

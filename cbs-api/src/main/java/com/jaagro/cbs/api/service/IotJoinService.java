@@ -1,5 +1,6 @@
 package com.jaagro.cbs.api.service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,7 +21,7 @@ public interface IotJoinService {
      *
      * @return 当前养殖场下所有的环控设备列表（将获取的json直接存入map）
      */
-    Map<String, String> getDeviceListFromFanLong();
+    List<Map<String, String>> getDeviceListFromFanLong();
 
     /**
      * 获取【梵龙】单台设备当前数据

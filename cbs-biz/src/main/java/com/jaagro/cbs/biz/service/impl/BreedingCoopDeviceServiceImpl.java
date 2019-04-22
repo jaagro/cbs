@@ -99,7 +99,7 @@ public class BreedingCoopDeviceServiceImpl implements BreedingCoopDeviceService 
      * @return
      */
     @Override
-    public List<Map<String, String>> listDeviceIdList(Integer coopId) {
+    public List<Map<String, String>> listDeviceIdListByCoopId(Integer coopId) {
         Coop coop = coopMapper.selectByPrimaryKey(coopId);
         if (coop == null) {
             throw new RuntimeException("鸡舍用户名密码错误");

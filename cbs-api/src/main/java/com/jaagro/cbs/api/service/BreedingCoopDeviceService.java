@@ -44,5 +44,5 @@ public interface BreedingCoopDeviceService {
      * @param coopId
      * @return
      */
-    List<Map<String, String>> listDeviceIdList(Integer coopId);
+    List<Map<String, String>> listDeviceIdListByCoopId(Integer coopId);
 }

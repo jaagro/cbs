@@ -241,10 +241,10 @@ public class BreedingPlantController {
     }
 
     @ApiOperation("根据登录名和密码获取设备Id列表")
-    @GetMapping("/listDeviceIdListBySessionId/{coopId}")
+    @GetMapping("/listDeviceIdListByCoopId/{coopId}")
     public BaseResponse listDeviceIdListBySessionId(@PathVariable Integer coopId) {
         try {
-            List<Map<String, String>> mapList = breedingCoopDeviceService.listDeviceIdList(coopId);
+            List<Map<String, String>> mapList = breedingCoopDeviceService.listDeviceIdListByCoopId(coopId);
             return BaseResponse.successInstance(mapList);
         } catch (Exception ex) {
             ex.printStackTrace();

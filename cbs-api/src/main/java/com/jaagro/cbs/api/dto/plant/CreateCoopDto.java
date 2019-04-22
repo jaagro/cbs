@@ -44,6 +44,21 @@ public class CreateCoopDto implements Serializable {
     private Integer deviceQuantity;
 
     /**
+     * 物联网设备供应商(1-梵龙)
+     */
+    private Integer iotBrand;
+
+    /**
+     * 物联网登录用户名
+     */
+    private String iotUsername;
+
+    /**
+     * 物联网登录密码
+     */
+    private String iotPassword;
+
+    /**
      * 状态(0-维护中,1-空闲,2-饲养中)
      */
     private Integer coopStatus;
