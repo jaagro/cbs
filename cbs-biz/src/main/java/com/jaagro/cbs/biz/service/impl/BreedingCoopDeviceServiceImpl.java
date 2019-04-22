@@ -13,12 +13,12 @@ import com.jaagro.cbs.biz.mapper.CoopMapperExt;
 import com.jaagro.cbs.biz.utils.JsonUtils;
 import com.jaagro.constant.UserInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,8 +111,8 @@ public class BreedingCoopDeviceServiceImpl implements BreedingCoopDeviceService 
             throw new RuntimeException("鸡舍用户名密码错误");
         }
         //请求接口
-//        String urlAddress = "http://www.ecventpro.uiot.top/APIAction!queryAllEquip.action?sessionId=" + sessionId;
         String urlAddress = "http://www.ecventpro.uiot.top/APIAction!queryAllEquip.action?sessionId=" + sessionId;
+//        String urlAddress = "http://www.ecventpro.uiot.top/APIAction!queryAllEquip.action?sessionId=5698D09771B1088E2E8FC3BB952C8E95";
 
 
         // 创建Httpclient对象
@@ -127,13 +127,7 @@ public class BreedingCoopDeviceServiceImpl implements BreedingCoopDeviceService 
 
             // 创建http GET请求
             HttpGet httpGet = new HttpGet(uri);
-            httpGet.setHeader("sessionId", sessionId);
-            // 执行请求
-            response = httpclient.execute(httpGet);
-            Header[] allHeaders = response.getAllHeaders();
-                for (Header h : allHeaders) {
-                System.out.println(h.getName()+"---"+h.getValue());
-            }
+            httpGet.setHeader(new BasicHeader("Cookie", "sessionId=" + sessionId));
             // 判断返回状态是否为200
             if (response.getStatusLine().getStatusCode() == 200) {
                 resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
