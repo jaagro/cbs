@@ -104,6 +104,6 @@ public class CreatePlanContractDto implements Serializable {
     /**
      * 回收价格区间列表
      */
-    @NotEmpty(message = "{回收价格区间列表不能为空}")
+    @NotEmpty(message = "回收价格区间列表不能为空")
     private List<ContractPriceSectionDto> contractPriceSectionDtoList;
 }
