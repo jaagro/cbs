@@ -4,7 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jaagro.cbs.api.dto.base.ResultDeviceIdDto;
 import com.jaagro.cbs.api.model.Coop;
+import com.jaagro.cbs.api.model.CoopDevice;
+import com.jaagro.cbs.api.model.CoopDeviceExample;
 import com.jaagro.cbs.api.service.IotJoinService;
+import com.jaagro.cbs.biz.mapper.CoopDeviceMapperExt;
 import com.jaagro.cbs.biz.mapper.CoopMapperExt;
 import com.jaagro.cbs.biz.utils.JsonUtils;
 import lombok.extern.log4j.Log4j;
@@ -40,12 +43,19 @@ public class IotJoinServiceImpl implements IotJoinService {
     @Autowired
     private StringRedisTemplate redisTemplate;
     @Autowired
+    private CoopDeviceMapperExt coopDeviceMapper;
+    @Autowired
     private CoopMapperExt coopMapper;
+
+    /**
+     * 递归控制字段，如果请求对方api超过3次失败则抛异常
+     */
+    private int retryCount = 0;
 
     @Override
     public String getTokenFromFanLong(String loginName, String password) {
-        String url = "http://www.ecventpro.uiot.top/APIAction!login.action";
-        Map<String, Object> result = httpClientFactory(url, null, loginName, password);
+        String url = "http://www.ecventpro.uiot.top/APIAction!login.action?loginname=" + loginName + "&password=" + password;
+        Map<String, Object> result = httpClientFactory(url, null);
         JSONObject jsonObject = JSON.parseObject(result.get("data").toString());
         Map tokenMap = jsonObject.toJavaObject(Map.class);
         redisTemplate.opsForValue().set("fanLongSessionId", tokenMap.get("sessionId").toString());
@@ -109,54 +119,63 @@ public class IotJoinServiceImpl implements IotJoinService {
     }
 
     @Override
-    public Map<String, String> getDeviceCurrentDataByDeviceCodeFromFanLong(Integer deviceCode) {
-        return null;
+    public Map<String, String> getDeviceCurrentDataByDeviceCodeFromFanLong(String deviceCode) {
+        String sessionId = redisTemplate.opsForValue().get("fanLongSessionId");
+        String url = "http://www.ecventpro.uiot.top/APIAction!queryCurrentData.action?equipId=" + deviceCode;
+        Map<String, Object> result = httpClientFactory(url, sessionId);
+        if (!"200".equals(result.get("statusCode"))) {
+            //通过deviceCode找到coopId
+            CoopDeviceExample coopDeviceExample = new CoopDeviceExample();
+            coopDeviceExample
+                    .createCriteria()
+                    .andDeviceCodeEqualTo(deviceCode);
+            List<CoopDevice> coopDevices = coopDeviceMapper.selectByExample(coopDeviceExample);
+            int coopId = 0;
+            if (null != coopDevices) {
+                coopId = coopDevices.get(0).getCoopId();
+            }
+            //通过coopId找到用户名和密码
+            Coop coop = coopMapper.selectByPrimaryKey(coopId);
+            String iotLoginName = coop.getIotUsername();
+            String iotPassword = coop.getIotPassword();
+            getTokenFromFanLong(iotLoginName, iotPassword);
+            retryCount += 1;
+            if (retryCount < 3) {
+                System.out.println(retryCount);
+                getDeviceCurrentDataByDeviceCodeFromFanLong(deviceCode);
+            }
+        }
+        Map<String, String> returnData = new LinkedHashMap<>();
+        returnData.put(deviceCode, result.get("data").toString());
+        return returnData;
     }
 
     /**
-     * @param url  接口地址,
-     * @param ages 可变参数
+     * @param url 接口地址, 如果url有参数则在请求此api之前将参数拼接在url中
      * @return 结果集
      */
-    private Map<String, Object> httpClientFactory(String url, String sessionId, String... ages) {
+    private Map<String, Object> httpClientFactory(String url, String sessionId) {
         RequestConfig config = RequestConfig.custom().setRedirectsEnabled(false).build();
         CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(config).build();
         HttpResponse httpResponse;
         String contents = null;
-        int httpStatusCode = 0;
+        Integer httpStatusCode = null;
         Map<String, Object> resultMap = new LinkedHashMap<>();
-        if (sessionId != null) {
-            HttpGet httpGet = new HttpGet(url);
+        HttpGet httpGet = new HttpGet(url);
+        if (null != sessionId) {
             BasicCookieStore cookieStore = new BasicCookieStore();
             httpGet.setHeader("Cookie", "JSESSIONID=" + sessionId);
-            try {
-                httpResponse = httpClient.execute(httpGet);
-                contents = EntityUtils.toString(httpResponse.getEntity(), "gbk");
-                httpStatusCode = httpResponse.getStatusLine().getStatusCode();
-            } catch (IOException e) {
-                log.warn("O httpClientFactory: fanLong API request failed url：" + url + "; ages:" + ages[0] + ";" + e);
-                e.printStackTrace();
-            }
-            resultMap.put("code", httpStatusCode);
-            resultMap.put("data", contents);
-            return resultMap;
-        } else {
-            if (ages.length != 2) {
-                throw new RuntimeException("Incorrect number of parameters");
-            }
-            url = url + "?loginname=" + ages[0] + "&password=" + ages[1];
-            HttpGet httpGet = new HttpGet(url);
-            try {
-                httpResponse = httpClient.execute(httpGet);
-                httpStatusCode = httpResponse.getStatusLine().getStatusCode();
-                contents = EntityUtils.toString(httpResponse.getEntity(), "gbk");
-            } catch (IOException e) {
-                log.warn("O httpClientFactory: fanLong Login API request failed url：" + url + "; ages1:" + ages[0] + ", ages2" + ages[1] + ";" + e);
-                e.printStackTrace();
-            }
-            resultMap.put("code", httpStatusCode);
-            resultMap.put("data", contents);
-            return resultMap;
         }
+        try {
+            httpResponse = httpClient.execute(httpGet);
+            contents = EntityUtils.toString(httpResponse.getEntity(), "gbk");
+            httpStatusCode = httpResponse.getStatusLine().getStatusCode();
+        } catch (IOException e) {
+            log.warn("O httpClientFactory: fanLong API request failed url：" + url + ";" + e);
+            e.printStackTrace();
+        }
+        resultMap.put("statusCode", httpStatusCode);
+        resultMap.put("data", contents);
+        return resultMap;
     }
 }

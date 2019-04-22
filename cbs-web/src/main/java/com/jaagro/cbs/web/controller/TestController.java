@@ -37,6 +37,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tonyZheng
@@ -126,5 +127,10 @@ public class TestController {
     @GetMapping("/test3/{loginName}/{password}")
     public String test3(@PathVariable("password") String password, @PathVariable("loginName") String loginName) {
         return iotJoinService.getTokenFromFanLong(loginName, password);
+    }
+
+    @GetMapping("/test4/{deviceCode}")
+    public Map<String, String> test4(@PathVariable("deviceCode") String deviceCode){
+        return iotJoinService.getDeviceCurrentDataByDeviceCodeFromFanLong(deviceCode);
     }
 }
