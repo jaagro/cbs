@@ -2,7 +2,6 @@ package com.jaagro.cbs.biz.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jaagro.cbs.api.dto.base.CustomerContactsReturnDto;
 import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
 import com.jaagro.cbs.api.dto.base.ShowCustomerDto;
 import com.jaagro.cbs.api.dto.farmer.*;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -480,7 +478,7 @@ public class BreedingFarmerServiceImpl implements BreedingFarmerService {
                     .createCriteria()
                     .andCreateUserIdEqualTo(currentUser.getId())
                     .andEnableEqualTo(true);
-            breedingPlanExample.setOrderByClause("plan_time desc");
+            breedingPlanExample.setOrderByClause("create_time desc");
             breedingPlans = breedingPlanMapper.selectByExample(breedingPlanExample);
         }
         return new PageInfo(breedingPlans);

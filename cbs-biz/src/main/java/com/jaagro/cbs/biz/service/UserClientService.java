@@ -2,6 +2,7 @@ package com.jaagro.cbs.biz.service;
 
 import com.jaagro.cbs.api.dto.base.EmployeeAndRoleDto;
 import com.jaagro.cbs.api.dto.base.GetCustomerUserDto;
+import com.jaagro.cbs.api.dto.base.GetEmployeeDto;
 import com.jaagro.cbs.api.dto.base.ListEmployeeDto;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.utils.BaseResponse;
@@ -104,9 +105,19 @@ public interface UserClientService {
 
     /**
      * 获取所有员工和对应的角色列表
+     *
      * @return
      */
     @GetMapping("/getAllEmpAndRole")
     BaseResponse<List<EmployeeAndRoleDto>> getAllEmpAndRole();
+
+    /**
+     * 单个查询
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/getEmpById/{id}")
+    BaseResponse<GetEmployeeDto> getEmp(@PathVariable("id") Integer id);
 }
 
