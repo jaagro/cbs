@@ -85,14 +85,10 @@ public class IotJoinServiceImpl implements IotJoinService {
             }
         }
         JSONObject jsonObject = JSON.parseObject(clientFactory.get("data"));
-        String resultString = "";
-        if (resultString != null) {
-            Map map = jsonObject.toJavaObject(Map.class);
-            resultString = map.toString();
-            ResultDeviceIdDto resultDeviceIdDto = JSON.parseObject(resultString, ResultDeviceIdDto.class);
-            if (resultDeviceIdDto != null) {
-                return resultDeviceIdDto.getList();
-            }
+        Map map = jsonObject.toJavaObject(Map.class);
+        ResultDeviceIdDto resultDeviceIdDto = JSON.parseObject(map.toString(), ResultDeviceIdDto.class);
+        if (resultDeviceIdDto != null) {
+            return resultDeviceIdDto.getList();
         }
         return null;
     }
