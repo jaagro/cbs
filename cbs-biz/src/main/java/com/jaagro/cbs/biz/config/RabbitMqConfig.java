@@ -58,6 +58,6 @@ public class RabbitMqConfig {
      */
     @Bean
     public Binding locationSendBindingTopic() {
-        return BindingBuilder.bind(fanLongIotQueue()).to(topicExchange()).with("fanLong_iot.receive");
+        return BindingBuilder.bind(fanLongIotQueue()).to(topicExchange()).with("fanLong_iot.send");
     }
 }
