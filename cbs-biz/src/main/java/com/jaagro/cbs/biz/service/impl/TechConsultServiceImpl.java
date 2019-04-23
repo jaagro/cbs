@@ -2,7 +2,7 @@ package com.jaagro.cbs.biz.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jaagro.cbs.api.dto.base.ListEmployeeDto;
+import com.jaagro.cbs.api.dto.base.GetEmployeeDto;
 import com.jaagro.cbs.api.dto.techconsult.ReturnTechConsultRecordDto;
 import com.jaagro.cbs.api.dto.techconsult.TechConsultParamDto;
 import com.jaagro.cbs.api.dto.techconsult.UpdateTechConsultDto;
@@ -24,7 +24,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -111,7 +110,7 @@ public class TechConsultServiceImpl implements TechConsultService {
         returnDto.setHandleDesc(techConsultRecordDo.getHandleDesc());
         returnDto.setHandleTime(techConsultRecordDo.getHandleTime());
         if (null != techConsultRecordDo.getHandleUserId()) {
-            ListEmployeeDto employeeDto = userClientService.getTechnicianById(techConsultRecordDo.getHandleUserId()).getData();
+            GetEmployeeDto employeeDto = userClientService.getEmp(techConsultRecordDo.getHandleUserId()).getData();
             if (null != employeeDto) {
                 returnDto.setHandleName(employeeDto.getName());
             }
