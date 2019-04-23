@@ -6,9 +6,12 @@ import com.jaagro.cbs.api.dto.base.ResultDeviceIdDto;
 import com.jaagro.cbs.api.model.Coop;
 import com.jaagro.cbs.api.model.CoopDevice;
 import com.jaagro.cbs.api.model.CoopDeviceExample;
+import com.jaagro.cbs.api.model.DeviceHistoryData;
 import com.jaagro.cbs.api.service.IotJoinService;
+import com.jaagro.cbs.biz.config.RabbitMqConfig;
 import com.jaagro.cbs.biz.mapper.CoopDeviceMapperExt;
 import com.jaagro.cbs.biz.mapper.CoopMapperExt;
+import com.jaagro.cbs.biz.mapper.DeviceHistoryDataMapperExt;
 import lombok.extern.log4j.Log4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
@@ -17,12 +20,15 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +47,10 @@ public class IotJoinServiceImpl implements IotJoinService {
     private CoopDeviceMapperExt coopDeviceMapper;
     @Autowired
     private CoopMapperExt coopMapper;
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+    @Autowired
+    private DeviceHistoryDataMapperExt deviceHistoryDataMapper;
 
     /**
      * 递归控制字段，如果请求对方api超过3次失败则抛异常
@@ -88,14 +98,10 @@ public class IotJoinServiceImpl implements IotJoinService {
             }
         }
         JSONObject jsonObject = JSON.parseObject(clientFactory.get("data"));
-        String resultString = "";
-        if (resultString != null) {
-            Map map = jsonObject.toJavaObject(Map.class);
-            resultString = map.toString();
-            ResultDeviceIdDto resultDeviceIdDto = JSON.parseObject(resultString, ResultDeviceIdDto.class);
-            if (resultDeviceIdDto != null) {
-                return resultDeviceIdDto.getList();
-            }
+        Map map = jsonObject.toJavaObject(Map.class);
+        ResultDeviceIdDto resultDeviceIdDto = JSON.parseObject(map.toString(), ResultDeviceIdDto.class);
+        if (resultDeviceIdDto != null) {
+            return resultDeviceIdDto.getList();
         }
         return null;
     }
@@ -105,7 +111,6 @@ public class IotJoinServiceImpl implements IotJoinService {
         String sessionId = redisTemplate.opsForValue().get("fanLongSessionId");
         String url = "http://www.ecventpro.uiot.top/APIAction!queryCurrentData.action?equipId=" + deviceCode;
         Map<String, String> result = httpClientFactory(url, sessionId);
-        System.out.println(result.get("statusCode"));
         if (!"200".equals(result.get("statusCode"))) {
             //通过deviceCode找到coopId
             CoopDeviceExample coopDeviceExample = new CoopDeviceExample();
@@ -137,7 +142,11 @@ public class IotJoinServiceImpl implements IotJoinService {
         Map<String, String> returnData = new LinkedHashMap<>();
         returnData.put("deviceCode", deviceCode);
         returnData.put("data", dataStr);
-        System.out.println(returnData);
+        if (!StringUtils.isEmpty(returnData.get("data"))) {
+            amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "fanLong_iot.send", returnData);
+            log.debug("R createDeviceCurrentDataFromFanLong dataSet: " + returnData);
+        }
+
     }
 
     /**
@@ -167,5 +176,20 @@ public class IotJoinServiceImpl implements IotJoinService {
         resultMap.put("statusCode", httpStatusCode);
         resultMap.put("data", contents);
         return resultMap;
+    }
+
+    @RabbitListener(queues = RabbitMqConfig.FAN_LONG_IOT_QUEUE)
+    private void receiveMessageFromFanLong(Map<String, String> data) {
+        DeviceHistoryData deviceHistoryData = new DeviceHistoryData();
+        deviceHistoryData
+                .setDeviceCode(data.get("deviceCode"))
+                .setDataJson(data.get("data"));
+        try {
+            deviceHistoryDataMapper.insertSelective(deviceHistoryData);
+        } catch (Exception ex) {
+            log.error("R receiveMessageFromFanLong throw exception: " + ex);
+            ex.printStackTrace();
+        }
+        log.info("R receiveMessageFromFanLong success");
     }
 }
