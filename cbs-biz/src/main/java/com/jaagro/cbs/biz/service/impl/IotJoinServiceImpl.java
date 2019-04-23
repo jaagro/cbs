@@ -2,6 +2,7 @@ package com.jaagro.cbs.biz.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.annotations.VisibleForTesting;
 import com.jaagro.cbs.api.dto.base.ResultDeviceIdDto;
 import com.jaagro.cbs.api.model.Coop;
 import com.jaagro.cbs.api.model.CoopDevice;
@@ -29,6 +30,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,13 +59,32 @@ public class IotJoinServiceImpl implements IotJoinService {
      */
     private int retryCount = 0;
 
+    private static final String FL_ROOT_LOGIN_NAME = "janm";
+    private static final String FL_ROOT_PASSWORD = "jaagro888888";
+
+    private String deviceListStr = null;
+
+    /**
+     * 取【梵龙】环控设备的授权令牌
+     *
+     * @param loginName
+     * @param password
+     * @param loginType 登录类型：1-root账号登录 其他-普通账号登录
+     * @return
+     */
     @Override
-    public String getTokenFromFanLong(String loginName, String password) {
+    public String getTokenFromFanLong(String loginName, String password, Integer... loginType) {
+
         String url = "http://www.ecventpro.uiot.top/APIAction!login.action?loginname=" + loginName + "&password=" + password;
         Map<String, String> result = httpClientFactory(url, null);
         JSONObject jsonObject = JSON.parseObject(result.get("data"));
         Map tokenMap = jsonObject.toJavaObject(Map.class);
-        redisTemplate.opsForValue().set("fanLongSessionId", tokenMap.get("sessionId").toString());
+
+        if (loginType.length > 0 && loginType[0] == 1) {
+            redisTemplate.opsForValue().set("fanLongRootSessionId", tokenMap.get("sessionId").toString());
+        } else {
+            redisTemplate.opsForValue().set("fanLongSessionId", tokenMap.get("sessionId").toString());
+        }
         return tokenMap.get("sessionId").toString();
     }
 
@@ -74,37 +95,52 @@ public class IotJoinServiceImpl implements IotJoinService {
      * @return 当前养殖场下所有的环控设备列表（将获取的json直接存入map）
      */
     @Override
-    public List<Map<String, String>> getDeviceListFromFanLong(Integer coopId) {
-        String sessionId = redisTemplate.opsForValue().get("fanLongSessionId");
+    public String getDeviceListFromFanLong(Integer coopId, Integer... loginType) {
+
+        String sessionId;
+        boolean isRoot = loginType.length > 0 && loginType[0] == 1;
+        if (isRoot) {
+            sessionId = redisTemplate.opsForValue().get("fanLongRootSessionId");
+        } else {
+            sessionId = redisTemplate.opsForValue().get("fanLongSessionId");
+        }
         //请求接口
         String urlAddress = "http://www.ecventpro.uiot.top/APIAction!queryAllEquip.action";
         Map<String, String> clientFactory = httpClientFactory(urlAddress, sessionId);
         // 请求失败
         if (!"200".equals(clientFactory.get("statusCode"))) {
-            Coop coop = coopMapper.selectByPrimaryKey(coopId);
-            if (coop == null) {
-                throw new RuntimeException("鸡舍不存在");
+            if (isRoot) {
+                log.debug("O getDeviceListFromFanLong this user is root");
+                getTokenFromFanLong(FL_ROOT_LOGIN_NAME, FL_ROOT_PASSWORD, 1);
+            } else {
+                Coop coop = coopMapper.selectByPrimaryKey(coopId);
+                if (coop == null) {
+                    throw new RuntimeException("鸡舍不存在");
+                }
+                if (StringUtils.isEmpty(coop.getIotUsername()) || StringUtils.isEmpty(coop.getIotPassword())) {
+                    throw new RuntimeException("鸡舍用户名密码错误");
+                }
+                getTokenFromFanLong(coop.getIotUsername(), coop.getIotPassword());
             }
-            if (StringUtils.isEmpty(coop.getIotUsername()) || StringUtils.isEmpty(coop.getIotPassword())) {
-                throw new RuntimeException("鸡舍用户名密码错误");
-            }
-            getTokenFromFanLong(coop.getIotUsername(), coop.getIotPassword());
             retryCount += 1;
             if (retryCount < 3) {
-                getDeviceListFromFanLong(coopId);
+                getDeviceListFromFanLong(coopId, loginType);
             }
         }
         JSONObject jsonObject = JSON.parseObject(clientFactory.get("data"));
-        Map map = jsonObject.toJavaObject(Map.class);
-        ResultDeviceIdDto resultDeviceIdDto = JSON.parseObject(map.toString(), ResultDeviceIdDto.class);
-        if (resultDeviceIdDto != null) {
-            return resultDeviceIdDto.getList();
+        if (null != jsonObject) {
+            Map map = jsonObject.toJavaObject(Map.class);
+            deviceListStr = map.get("list").toString();
         }
-        return null;
+        return deviceListStr;
     }
 
     @Override
-    public void createDeviceCurrentDataFromFanLong(String deviceCode) {
+    public void createDeviceCurrentDataFromFanLong() {
+        String deviceListStr = getDeviceListFromFanLong(1, 1);
+        System.out.println(deviceListStr);
+
+        
         String sessionId = redisTemplate.opsForValue().get("fanLongSessionId");
         String url = "http://www.ecventpro.uiot.top/APIAction!queryCurrentData.action?equipId=" + deviceCode;
         Map<String, String> result = httpClientFactory(url, sessionId);
@@ -127,7 +163,7 @@ public class IotJoinServiceImpl implements IotJoinService {
             retryCount += 1;
             if (retryCount < 3) {
                 log.info("retryCount: " + retryCount);
-                createDeviceCurrentDataFromFanLong(deviceCode);
+                createDeviceCurrentDataFromFanLong();
             }
         }
         JSONObject jsonObject = JSON.parseObject(result.get("data"));

@@ -12,6 +12,7 @@ import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
 import com.jaagro.cbs.biz.mapper.ProductMapperExt;
 import com.jaagro.cbs.biz.schedule.BreedingPlanOverdueSchedule;
 import com.jaagro.cbs.biz.utils.SequenceCodeUtils;
+import com.jaagro.utils.BaseResponse;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.sql.rowset.BaseRowSet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -131,6 +133,13 @@ public class TestController {
 
     @GetMapping("/test4/{deviceCode}")
     public void test4(@PathVariable("deviceCode") String deviceCode){
-        iotJoinService.createDeviceCurrentDataFromFanLong(deviceCode);
+        iotJoinService.createDeviceCurrentDataFromFanLong();
+    }
+
+    @GetMapping("/test5")
+    public void test5(){
+        String deviceListFromFanLong = iotJoinService.getDeviceListFromFanLong(1, 1);
+        BaseResponse baseResponse = BaseResponse.successInstance((Object) deviceListFromFanLong);
+        System.out.println(baseResponse);
     }
 }

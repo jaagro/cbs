@@ -252,11 +252,12 @@ public class BreedingPlantController {
     @ApiOperation("根据鸡舍id获取设备ID列表")
     @GetMapping("/listDeviceIdListByCoopId/{coopId}")
     public BaseResponse listDeviceIdListBySessionId(@PathVariable Integer coopId) {
-        try {
-            return BaseResponse.successInstance(iotJoinService.getDeviceListFromFanLong(coopId));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return BaseResponse.errorInstance("获取设备id列表失败");
+        String deviceListFromFanLong = iotJoinService.getDeviceListFromFanLong(coopId);
+        if (!StringUtils.isEmpty(deviceListFromFanLong)) {
+            return BaseResponse.successInstance(deviceListFromFanLong);
+        } else {
+            return BaseResponse.queryDataEmpty();
         }
+
     }
 }
