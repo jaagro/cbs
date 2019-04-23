@@ -9,7 +9,6 @@ import com.jaagro.cbs.api.model.CoopDeviceExample;
 import com.jaagro.cbs.api.service.IotJoinService;
 import com.jaagro.cbs.biz.mapper.CoopDeviceMapperExt;
 import com.jaagro.cbs.biz.mapper.CoopMapperExt;
-import com.jaagro.cbs.biz.utils.JsonUtils;
 import lombok.extern.log4j.Log4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
@@ -58,6 +57,12 @@ public class IotJoinServiceImpl implements IotJoinService {
         return tokenMap.get("sessionId").toString();
     }
 
+    /**
+     * 获取【梵龙】账号下所有我司设备接口
+     *
+     * @param coopId
+     * @return 当前养殖场下所有的环控设备列表（将获取的json直接存入map）
+     */
     @Override
     public List<Map<String, String>> getDeviceListFromFanLong(Integer coopId) {
         String sessionId = redisTemplate.opsForValue().get("fanLongSessionId");
@@ -79,16 +84,17 @@ public class IotJoinServiceImpl implements IotJoinService {
             getTokenFromFanLong(coop.getIotUsername(), coop.getIotPassword());
             retryCount += 1;
             if (retryCount < 3) {
-                System.out.println(retryCount);
                 getDeviceListFromFanLong(coopId);
             }
         }
-        String resultString = (String) clientFactory.get("data");
-        if (!StringUtils.isEmpty(resultString)) {
-            ResultDeviceIdDto resultDeviceIdDto = JsonUtils.jsonToPojo(resultString, ResultDeviceIdDto.class);
+        JSONObject jsonObject = JSON.parseObject(clientFactory.get("data"));
+        String resultString = "";
+        if (resultString != null) {
+            Map map = jsonObject.toJavaObject(Map.class);
+            resultString = map.toString();
+            ResultDeviceIdDto resultDeviceIdDto = JSON.parseObject(resultString, ResultDeviceIdDto.class);
             if (resultDeviceIdDto != null) {
-                List<Map<String, String>> mapList = resultDeviceIdDto.getList();
-                return mapList;
+                return resultDeviceIdDto.getList();
             }
         }
         return null;
