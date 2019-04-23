@@ -181,7 +181,10 @@ public class TechConsultServiceImpl implements TechConsultService {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         TechConsultRecordExample example = new TechConsultRecordExample();
         TechConsultRecordExample.Criteria criteria = example.createCriteria();
-        criteria.andEnableEqualTo(true).andTechnicianIdEqualTo(dto.getTechnicianId());
+        criteria
+                .andEnableEqualTo(true)
+                .andTechnicianIdEqualTo(dto.getTechnicianId());
+        example.setOrderByClause("tech_consult_status ,create_time DESC");
         List<TechConsultRecord> techConsultRecordDos = techConsultRecordMapper.selectByExample(example);
 
         return new PageInfo(techConsultRecordDos);
