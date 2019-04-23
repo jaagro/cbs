@@ -66,21 +66,18 @@ public class IotJoinServiceImpl implements IotJoinService {
     @Override
     public List<Map<String, String>> getDeviceListFromFanLong(Integer coopId) {
         String sessionId = redisTemplate.opsForValue().get("fanLongSessionId");
-        Coop coop = coopMapper.selectByPrimaryKey(coopId);
-        if (StringUtils.isEmpty(sessionId)) {
+        //请求接口
+        String urlAddress = "http://www.ecventpro.uiot.top/APIAction!queryAllEquip.action";
+        Map<String, String> clientFactory = httpClientFactory(urlAddress, sessionId);
+        // 请求失败
+        if (!"200".equals(clientFactory.get("statusCode"))) {
+            Coop coop = coopMapper.selectByPrimaryKey(coopId);
             if (coop == null) {
                 throw new RuntimeException("鸡舍不存在");
             }
             if (StringUtils.isEmpty(coop.getIotUsername()) || StringUtils.isEmpty(coop.getIotPassword())) {
                 throw new RuntimeException("鸡舍用户名密码错误");
             }
-            sessionId = getTokenFromFanLong(coop.getIotUsername(), coop.getIotPassword());
-        }
-        //请求接口
-        String urlAddress = "http://www.ecventpro.uiot.top/APIAction!queryAllEquip.action";
-        Map<String, String> clientFactory = httpClientFactory(urlAddress, sessionId);
-        // 请求失败
-        if (!"200".equals(clientFactory.get("statusCode"))) {
             getTokenFromFanLong(coop.getIotUsername(), coop.getIotPassword());
             retryCount += 1;
             if (retryCount < 3) {
