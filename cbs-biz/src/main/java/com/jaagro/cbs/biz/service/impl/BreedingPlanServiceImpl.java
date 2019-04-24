@@ -1638,7 +1638,7 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             throw new RuntimeException("获取当前登录用户失败");
         }
         ReportFormsDto formsDto = breedingPlanMapper.reportForms(currentUser.getTenantId());
-        if (formsDto != null) {
+        if (formsDto != null && formsDto.getCurrentAmount() != null && formsDto.getChickenQuantity() != null) {
             //总成活率
             BigDecimal b = new BigDecimal((float) formsDto.getCurrentAmount() * 10 / formsDto.getChickenQuantity() * 10);
             formsDto.setTotalSurvivalRate(b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());

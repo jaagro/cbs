@@ -288,8 +288,8 @@ public class TechnicianAppController {
      */
     @PostMapping("/paramConfigurationForTechnician")
     @ApiOperation("养殖计划参数配置")
-    public BaseResponse paramConfigurationFortechnician(@RequestBody @Validated ParamConfigurationDto dto) {
-        log.info("O paramConfigurationFortechnician param={}", dto);
+    public BaseResponse paramConfigurationForTechnician(@RequestBody @Validated ParamConfigurationDto dto) {
+        log.info("O paramConfigurationForTechnician param={}", dto);
         breedingPlanService.ParamConfiguration(dto);
         return BaseResponse.successInstance("参数配置成功");
     }
