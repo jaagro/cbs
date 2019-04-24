@@ -1519,14 +1519,36 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         }
         dto.setTechnicianId(currentUserId);
         List<ReturnBreedingPlanDto> planDtoList = breedingPlanMapper.listBreedingPlanForTechnician(dto);
-        for (ReturnBreedingPlanDto returnBreedingPlanDto : planDtoList) {
-            //填充养殖户信息
-            if (returnBreedingPlanDto.getCustomerId() != null) {
-                CustomerInfoParamDto customerInfo = getCustomerInfo(returnBreedingPlanDto.getCustomerId());
-                if (customerInfo != null) {
-                    returnBreedingPlanDto
-                            .setCustomerName(customerInfo.getCustomerName());
+        if (!CollectionUtils.isEmpty(planDtoList)) {
+            for (ReturnBreedingPlanDto returnBreedingPlanDto : planDtoList) {
+                //填充养殖户信息
+                if (returnBreedingPlanDto.getCustomerId() != null) {
+                    CustomerInfoParamDto customerInfo = getCustomerInfo(returnBreedingPlanDto.getCustomerId());
+                    if (customerInfo != null) {
+                        returnBreedingPlanDto
+                                .setCustomerName(customerInfo.getCustomerName());
+                    }
                 }
+                BreedingPlan breedingPlan = breedingPlanMapper.selectByPrimaryKey(returnBreedingPlanDto.getId());
+                if (breedingPlan == null) {
+                    throw new RuntimeException("计划有误");
+                }
+                //累计所有死淘数量
+                BigDecimal accumulativeDeadAmount = batchInfoMapper.accumulativeDeadAmount(returnBreedingPlanDto.getId());
+                //累计所有的出栏量
+                BigDecimal accumulativeSaleAmount = batchInfoMapper.accumulativeSaleAmount(returnBreedingPlanDto.getId());
+                //计算存栏量
+                BigDecimal breedingStock = new BigDecimal(0);
+                if (breedingPlan.getPlanChickenQuantity() != null) {
+                    breedingStock = BigDecimal.valueOf(breedingPlan.getPlanChickenQuantity());
+                }
+                if (accumulativeDeadAmount != null) {
+                    breedingStock = breedingStock.subtract(accumulativeDeadAmount);
+                }
+                if (accumulativeSaleAmount != null) {
+                    breedingStock = breedingStock.subtract(accumulativeSaleAmount);
+                }
+                returnBreedingPlanDto.setPlanChickenQuantity(breedingStock.intValue());
             }
         }
         return new PageInfo<>(planDtoList);
