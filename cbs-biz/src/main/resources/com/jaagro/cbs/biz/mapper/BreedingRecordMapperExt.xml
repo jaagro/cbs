@@ -105,4 +105,17 @@
             AND record_type = #{recordType,jdbcType=INTEGER}
         </if>
     </select>
+    <select id="getDeadAmountByCoopAndDayAge" resultType="java.lang.Integer"
+            parameterType="com.jaagro.cbs.api.model.BreedingRecord">
+        SELECT
+            SUM( breeding_value )
+        FROM
+            breeding_record
+        WHERE
+            ENABLE = 1
+            AND plan_id = #{planId,jdbcType=INTEGER}
+            AND coop_id = #{coopId,jdbcType=INTEGER}
+            AND day_age = #{dayAge,jdbcType=INTEGER}
+            AND record_type = 4
+    </select>
 </mapper>

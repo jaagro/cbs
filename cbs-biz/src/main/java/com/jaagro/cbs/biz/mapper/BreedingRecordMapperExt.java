@@ -51,4 +51,11 @@ public interface BreedingRecordMapperExt extends BaseMapper<BreedingRecord, Bree
      */
     List<BreedingRecordDto> listByParams(BreedingRecord params);
 
+    /**
+     * 查询某鸡舍今日的死淘数
+     *
+     * @param params
+     * @return
+     */
+    Integer getDeadAmountByCoopAndDayAge(BreedingRecord params);
 }

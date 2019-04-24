@@ -373,23 +373,20 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
                                     .setAlarm(false);
                             // 异常提示
                             DeviceAlarmLogExample deviceAlarmLogExample = new DeviceAlarmLogExample();
-                            deviceAlarmLogExample.createCriteria().andCoopIdEqualTo(batchPlantCoopBo.getCoopId())
-                                    .andPlanIdEqualTo(planId).andDayAgeEqualTo(dayAge);
+                            deviceAlarmLogExample.createCriteria()
+                                    .andCoopIdEqualTo(batchPlantCoopBo.getCoopId())
+                                    .andPlanIdEqualTo(planId)
+                                    .andDayAgeEqualTo(dayAge);
                             List<DeviceAlarmLog> deviceAlarmLogList = deviceAlarmLogMapper.selectByExample(deviceAlarmLogExample);
                             if (!CollectionUtils.isEmpty(deviceAlarmLogList)) {
                                 batchCoopDto.setAlarm(true);
                             }
                             // 鸡舍存栏量
-                            BatchCoopDailyExample batchCoopDailyExample = new BatchCoopDailyExample();
-                            batchCoopDailyExample.createCriteria().andPlanIdEqualTo(planId)
-                                    .andCoopIdEqualTo(batchPlantCoopBo.getCoopId())
-                                    .andDayAgeEqualTo(dayAge);
-                            List<BatchCoopDaily> batchCoopDailyList = batchCoopDailyMapper.selectByExample(batchCoopDailyExample);
-                            if (!CollectionUtils.isEmpty(batchCoopDailyList)) {
-                                batchCoopDto.setBreedingStock(batchCoopDailyList.get(0).getCurrentAmount());
-                            } else {
-                                batchCoopDto.setBreedingStock(batchPlantCoopBo.getBreedingValue());
-                            }
+                            BreedingRecord params = new BreedingRecord();
+                            params.setPlanId(planId)
+                                    .setCoopId(batchPlantCoopBo.getCoopId())
+                                    .setDayAge(dayAge);
+                            batchCoopDto.setBreedingStock(getCoopStock(params, batchPlantCoopBo));
                             batchCoopDtoList.add(batchCoopDto);
                         }
                     }
@@ -398,6 +395,37 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
             }
         } catch (Exception ex) {
             log.info("O getBatchDetail error planId=" + planId, ex);
+        }
+    }
+
+    /**
+     * 计算鸡舍的出栏数
+     *
+     * @param params
+     * @param batchPlantCoopBo
+     * @return
+     */
+    private Integer getCoopStock(BreedingRecord params, BatchPlantCoopBo batchPlantCoopBo) {
+        //死淘数量
+        Integer deadAmount = breedingRecordMapper.getDeadAmountByCoopAndDayAge(params);
+        //昨日剩余量
+        BatchCoopDailyExample batchCoopDailyExample = new BatchCoopDailyExample();
+        batchCoopDailyExample.createCriteria()
+                .andPlanIdEqualTo(params.getPlanId())
+                .andCoopIdEqualTo(params.getCoopId())
+                .andDayAgeEqualTo(params.getDayAge() - 1);
+        List<BatchCoopDaily> batchCoopDailyList = batchCoopDailyMapper.selectByExample(batchCoopDailyExample);
+        Integer yesterdayStock;
+        if (!CollectionUtils.isEmpty(batchCoopDailyList)) {
+            yesterdayStock = batchCoopDailyList.get(0).getCurrentAmount();
+        } else {
+            yesterdayStock = batchPlantCoopBo.getBreedingValue();
+        }
+        //计算鸡舍出栏数
+        if (deadAmount != null && yesterdayStock != null) {
+            return yesterdayStock - deadAmount;
+        } else {
+            return yesterdayStock;
         }
     }
 
@@ -415,6 +443,12 @@ public class BreedingPlanServiceImpl implements BreedingPlanService {
         return null;
     }
 
+    /**
+     * 批次计算存栏量
+     *
+     * @param breedingPlan
+     * @return
+     */
     private BigDecimal getBreedingStock(BreedingPlan breedingPlan) {
         //累计所有死淘数量
         BigDecimal accumulativeDeadAmount = batchInfoMapper.accumulativeDeadAmount(breedingPlan.getId());
