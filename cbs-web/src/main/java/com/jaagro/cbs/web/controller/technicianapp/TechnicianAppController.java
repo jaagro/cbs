@@ -286,7 +286,7 @@ public class TechnicianAppController {
      * @param dto
      * @return
      */
-    @PostMapping("/paramConfigurationFortechnician")
+    @PostMapping("/paramConfigurationForTechnician")
     @ApiOperation("养殖计划参数配置")
     public BaseResponse paramConfigurationFortechnician(@RequestBody @Validated ParamConfigurationDto dto) {
         log.info("O paramConfigurationFortechnician param={}", dto);
