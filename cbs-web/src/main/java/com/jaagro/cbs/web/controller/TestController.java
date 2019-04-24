@@ -1,30 +1,18 @@
 package com.jaagro.cbs.web.controller;
 
-import com.jaagro.cbs.api.enums.ParameterStatusEnum;
+import com.alibaba.fastjson.JSON;
 import com.jaagro.cbs.api.model.BatchPlantCoop;
 import com.jaagro.cbs.api.model.Product;
 import com.jaagro.cbs.api.model.ProductExample;
 import com.jaagro.cbs.api.service.BreedingFarmerService;
 import com.jaagro.cbs.api.service.BreedingPlanService;
 import com.jaagro.cbs.api.service.IotJoinService;
+import com.jaagro.cbs.biz.bo.FanLongIotDeviceBo;
 import com.jaagro.cbs.biz.mapper.BatchPlantCoopMapperExt;
 import com.jaagro.cbs.biz.mapper.BreedingPlanMapperExt;
 import com.jaagro.cbs.biz.mapper.ProductMapperExt;
 import com.jaagro.cbs.biz.schedule.BreedingPlanOverdueSchedule;
 import com.jaagro.cbs.biz.utils.SequenceCodeUtils;
-import com.jaagro.utils.BaseResponse;
-import org.apache.http.*;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,14 +20,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.sql.rowset.BaseRowSet;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author tonyZheng
@@ -131,15 +116,16 @@ public class TestController {
         return iotJoinService.getTokenFromFanLong(loginName, password);
     }
 
-    @GetMapping("/test4/{deviceCode}")
-    public void test4(@PathVariable("deviceCode") String deviceCode){
+    @GetMapping("/test4")
+    public void test4() {
         iotJoinService.createDeviceCurrentDataFromFanLong();
     }
 
     @GetMapping("/test5")
-    public void test5(){
-        String deviceListFromFanLong = iotJoinService.getDeviceListFromFanLong(1, 1);
-        BaseResponse baseResponse = BaseResponse.successInstance((Object) deviceListFromFanLong);
-        System.out.println(baseResponse);
+    public void test5() {
+        String ss = iotJoinService.getDeviceListFromFanLong(1, 1);
+        System.out.println(ss);
+        List<FanLongIotDeviceBo> deviceBoList = JSON.parseArray(iotJoinService.getDeviceListFromFanLong(1, 1), FanLongIotDeviceBo.class);
+        System.out.println(deviceBoList);
     }
 }

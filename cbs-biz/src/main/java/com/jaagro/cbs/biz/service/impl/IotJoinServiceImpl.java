@@ -1,5 +1,6 @@
 package com.jaagro.cbs.biz.service.impl;
 
+import cn.jpush.api.device.DeviceClient;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.annotations.VisibleForTesting;
@@ -9,6 +10,7 @@ import com.jaagro.cbs.api.model.CoopDevice;
 import com.jaagro.cbs.api.model.CoopDeviceExample;
 import com.jaagro.cbs.api.model.DeviceHistoryData;
 import com.jaagro.cbs.api.service.IotJoinService;
+import com.jaagro.cbs.biz.bo.FanLongIotDeviceBo;
 import com.jaagro.cbs.biz.config.RabbitMqConfig;
 import com.jaagro.cbs.biz.mapper.CoopDeviceMapperExt;
 import com.jaagro.cbs.biz.mapper.CoopMapperExt;
@@ -26,9 +28,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -64,14 +68,6 @@ public class IotJoinServiceImpl implements IotJoinService {
 
     private String deviceListStr = null;
 
-    /**
-     * 取【梵龙】环控设备的授权令牌
-     *
-     * @param loginName
-     * @param password
-     * @param loginType 登录类型：1-root账号登录 其他-普通账号登录
-     * @return
-     */
     @Override
     public String getTokenFromFanLong(String loginName, String password, Integer... loginType) {
 
@@ -88,12 +84,6 @@ public class IotJoinServiceImpl implements IotJoinService {
         return tokenMap.get("sessionId").toString();
     }
 
-    /**
-     * 获取【梵龙】账号下所有我司设备接口
-     *
-     * @param coopId
-     * @return 当前养殖场下所有的环控设备列表（将获取的json直接存入map）
-     */
     @Override
     public String getDeviceListFromFanLong(Integer coopId, Integer... loginType) {
 
@@ -137,49 +127,51 @@ public class IotJoinServiceImpl implements IotJoinService {
 
     @Override
     public void createDeviceCurrentDataFromFanLong() {
-        String deviceListStr = getDeviceListFromFanLong(1, 1);
-        System.out.println(deviceListStr);
-
-        
+        List<FanLongIotDeviceBo> deviceBoList = JSON.parseArray(getDeviceListFromFanLong(1, 1), FanLongIotDeviceBo.class);
+        if (CollectionUtils.isEmpty(deviceBoList)) {
+            throw new NullPointerException("deviceBoList must not be null");
+        }
         String sessionId = redisTemplate.opsForValue().get("fanLongSessionId");
-        String url = "http://www.ecventpro.uiot.top/APIAction!queryCurrentData.action?equipId=" + deviceCode;
-        Map<String, String> result = httpClientFactory(url, sessionId);
-        if (!"200".equals(result.get("statusCode"))) {
-            //通过deviceCode找到coopId
-            CoopDeviceExample coopDeviceExample = new CoopDeviceExample();
-            coopDeviceExample
-                    .createCriteria()
-                    .andDeviceCodeEqualTo(deviceCode);
-            List<CoopDevice> coopDevices = coopDeviceMapper.selectByExample(coopDeviceExample);
-            int coopId = 0;
-            if (null != coopDevices) {
-                coopId = coopDevices.get(0).getCoopId();
-            }
-            //通过coopId找到用户名和密码
-            Coop coop = coopMapper.selectByPrimaryKey(coopId);
-            String iotLoginName = coop.getIotUsername();
-            String iotPassword = coop.getIotPassword();
-            getTokenFromFanLong(iotLoginName, iotPassword);
-            retryCount += 1;
-            if (retryCount < 3) {
-                log.info("retryCount: " + retryCount);
-                createDeviceCurrentDataFromFanLong();
-            }
-        }
-        JSONObject jsonObject = JSON.parseObject(result.get("data"));
-        String dataStr = "";
-        if (null != jsonObject) {
-            Map resultMap = jsonObject.toJavaObject(Map.class);
-            dataStr = resultMap.get("list").toString();
-        }
-        Map<String, String> returnData = new LinkedHashMap<>();
-        returnData.put("deviceCode", deviceCode);
-        returnData.put("data", dataStr);
-        if (!StringUtils.isEmpty(returnData.get("data"))) {
-            amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "fanLong_iot.send", returnData);
-            log.debug("R createDeviceCurrentDataFromFanLong dataSet: " + returnData);
-        }
 
+        for (FanLongIotDeviceBo device : deviceBoList) {
+            String url = "http://www.ecventpro.uiot.top/APIAction!queryCurrentData.action?equipId=" + device.getId();
+            Map<String, String> result = httpClientFactory(url, sessionId);
+            if (!"200".equals(result.get("statusCode"))) {
+                //通过deviceCode找到coopId
+                CoopDeviceExample coopDeviceExample = new CoopDeviceExample();
+                coopDeviceExample
+                        .createCriteria()
+                        .andDeviceCodeEqualTo(device.getId().toString());
+                List<CoopDevice> coopDevices = coopDeviceMapper.selectByExample(coopDeviceExample);
+                int coopId = 0;
+                if (null != coopDevices) {
+                    coopId = coopDevices.get(0).getCoopId();
+                }
+                //通过coopId找到用户名和密码
+                Coop coop = coopMapper.selectByPrimaryKey(coopId);
+                String iotLoginName = coop.getIotUsername();
+                String iotPassword = coop.getIotPassword();
+                getTokenFromFanLong(iotLoginName, iotPassword);
+                retryCount += 1;
+                if (retryCount < 3) {
+                    log.info("retryCount: " + retryCount);
+                    createDeviceCurrentDataFromFanLong();
+                }
+            }
+            JSONObject jsonObject = JSON.parseObject(result.get("data"));
+            String dataStr = "";
+            if (null != jsonObject) {
+                Map resultMap = jsonObject.toJavaObject(Map.class);
+                dataStr = resultMap.get("list").toString();
+            }
+            Map<String, String> returnData = new LinkedHashMap<>();
+            returnData.put("deviceCode", device.getId().toString());
+            returnData.put("data", dataStr);
+            if (!StringUtils.isEmpty(returnData.get("data"))) {
+                amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "fanLong_iot.send", returnData);
+                log.debug("R createDeviceCurrentDataFromFanLong dataSet: " + returnData);
+            }
+        }
     }
 
     /**
@@ -220,9 +212,9 @@ public class IotJoinServiceImpl implements IotJoinService {
         try {
             deviceHistoryDataMapper.insertSelective(deviceHistoryData);
         } catch (Exception ex) {
-            log.error("R receiveMessageFromFanLong throw exception: " + ex);
+            log.error("R receiveMessageFromFanLong Mq consume failed, throw exception: " + ex);
             ex.printStackTrace();
         }
-        log.info("R receiveMessageFromFanLong success");
+        log.info("R receiveMessageFromFanLong Mq consume success");
     }
 }

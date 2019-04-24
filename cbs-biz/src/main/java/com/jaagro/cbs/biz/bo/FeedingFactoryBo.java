@@ -1,6 +1,5 @@
 package com.jaagro.cbs.biz.bo;
 
-import com.jaagro.cbs.api.dto.farmer.BreedingRecordDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
