@@ -171,7 +171,7 @@
         FROM breeding_plan
         WHERE technician_id = #{technicianId,jdbcType=INTEGER}
         and enable = 1
-        and plan_status in (3,4)
+        and plan_status in (2,3,4,5)
         order by plan_time desc
     </select>
     <select id="listBreedingPlanForTechnician" resultType="com.jaagro.cbs.api.dto.plan.ReturnBreedingPlanDto"
