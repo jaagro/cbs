@@ -1,6 +1,7 @@
 package com.jaagro.cbs.web.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.jaagro.cbs.api.dto.iot.DeviceIdDto;
 import com.jaagro.cbs.api.dto.plant.*;
 import com.jaagro.cbs.api.service.BreedingCoopDeviceService;
 import com.jaagro.cbs.api.service.BreedingPlantService;
@@ -255,7 +256,7 @@ public class BreedingPlantController {
     public BaseResponse listDeviceIdListBySessionId(@PathVariable Integer coopId) {
         String deviceListFromFanLong = iotJoinService.getDeviceListFromFanLong(coopId);
         if (!StringUtils.isEmpty(deviceListFromFanLong)) {
-            List<String> result = JSON.parseArray(deviceListFromFanLong, String.class);
+            List<DeviceIdDto> result = JSON.parseArray(deviceListFromFanLong, DeviceIdDto.class);
             return BaseResponse.successInstance(result);
         } else {
             return BaseResponse.queryDataEmpty();

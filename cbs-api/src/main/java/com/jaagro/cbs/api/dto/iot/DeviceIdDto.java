@@ -1,4 +1,4 @@
-package com.jaagro.cbs.api.dto.base;
+package com.jaagro.cbs.api.dto.iot;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
