@@ -1,10 +1,8 @@
 package com.jaagro.cbs.biz.service.impl;
 
-import cn.jpush.api.device.DeviceClient;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.annotations.VisibleForTesting;
-import com.jaagro.cbs.api.dto.base.ResultDeviceIdDto;
+import com.jaagro.cbs.api.dto.iot.FanLongDeviceDataDto;
 import com.jaagro.cbs.api.model.Coop;
 import com.jaagro.cbs.api.model.CoopDevice;
 import com.jaagro.cbs.api.model.CoopDeviceExample;
@@ -32,9 +30,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,6 +118,16 @@ public class IotJoinServiceImpl implements IotJoinService {
             deviceListStr = map.get("list").toString();
         }
         return deviceListStr;
+    }
+
+    @Override
+    public FanLongDeviceDataDto getCurrentDataByFanLongDeviceCode(String deviceCode) {
+        DeviceHistoryData deviceCurrentDataByDeviceCode = deviceHistoryDataMapper.getDeviceCurrentDataByDeviceCode(deviceCode);
+        if (null == deviceCurrentDataByDeviceCode) {
+            throw new NullPointerException("The query data is empty, deviceCode: " + deviceCode);
+        }
+        List<FanLongDeviceDataDto> deviceDataDtoList = JSON.parseArray(deviceCurrentDataByDeviceCode.getDataJson(), FanLongDeviceDataDto.class);
+        return null;
     }
 
     @Override

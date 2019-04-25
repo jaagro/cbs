@@ -3,7 +3,14 @@
 <mapper namespace="com.jaagro.cbs.biz.mapper.DeviceHistoryDataMapperExt">
 
     <!--          自动生成扩展XML author: generator on 2019/4/22                 -->
-
-
-
+    <select id="getDeviceCurrentDataByDeviceCode" resultType="com.jaagro.cbs.api.model.DeviceHistoryData">
+        select
+        <include refid="Base_Column_List" />
+        ,
+        <include refid="Blob_Column_List" />
+        from device_history_data
+        where device_code = #{deviceCode} and enable = 1
+        order by create_time desc
+        limit 1
+    </select>
 </mapper>

@@ -254,7 +254,7 @@ public class BreedingPlantController {
     public BaseResponse listDeviceIdListBySessionId(@PathVariable Integer coopId) {
         String deviceListFromFanLong = iotJoinService.getDeviceListFromFanLong(coopId);
         if (!StringUtils.isEmpty(deviceListFromFanLong)) {
-            return BaseResponse.successInstance(deviceListFromFanLong);
+            return BaseResponse.successInstance((Object) deviceListFromFanLong);
         } else {
             return BaseResponse.queryDataEmpty();
         }

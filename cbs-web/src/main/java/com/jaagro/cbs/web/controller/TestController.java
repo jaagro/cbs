@@ -1,6 +1,7 @@
 package com.jaagro.cbs.web.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.jaagro.cbs.api.dto.iot.FanLongDeviceDataDto;
 import com.jaagro.cbs.api.model.BatchPlantCoop;
 import com.jaagro.cbs.api.model.Product;
 import com.jaagro.cbs.api.model.ProductExample;
@@ -127,5 +128,10 @@ public class TestController {
         System.out.println(ss);
         List<FanLongIotDeviceBo> deviceBoList = JSON.parseArray(iotJoinService.getDeviceListFromFanLong(1, 1), FanLongIotDeviceBo.class);
         System.out.println(deviceBoList);
+    }
+
+    @GetMapping("/test6/{deviceCode}")
+    public void test6(@PathVariable("deviceCode") String deviceCode){
+        iotJoinService.getCurrentDataByFanLongDeviceCode(deviceCode);
     }
 }

@@ -23,17 +23,17 @@ public class RedisLock {
      * 加锁
      *
      * @param key
-     * @param value 当前时间 + 超时时间
-     * @param timeout 超时时间
+     * @param value    当前时间 + 超时时间
+     * @param timeout  超时时间
      * @param timeUnit 时间单位
      * @return
      */
     public boolean lock(String key, String value, Integer timeout, TimeUnit timeUnit) {
         if (redisTemplate.opsForValue().setIfAbsent(key, value)) {
-            if (timeout == null){
+            if (timeout == null) {
                 timeout = 10;
             }
-            if (timeUnit == null){
+            if (timeUnit == null) {
                 timeUnit = TimeUnit.MINUTES;
             }
             redisTemplate.expire(key, timeout, timeUnit);
